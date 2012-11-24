@@ -36,7 +36,7 @@ The client should currently treated as a proof of concept, but is stable enough 
 * Retriers;
 * Durable mailboxes;
 * Least-connection-error-based router / pool;
-* Fully iteratee-based reactive-mongo like goodness.
+* Full iteratee-based reactive-mongo like goodness.
 
 ## Architecture
 
