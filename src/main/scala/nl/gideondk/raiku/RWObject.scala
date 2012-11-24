@@ -68,20 +68,20 @@ trait RWRequests extends Request {
   }
 
   def store(rwObject: RaikuRWObject, w: Option[Int] = None, dw: Option[Int] = None, returnBody: Option[Boolean] = None,
-    pw: Option[Int] = None, ifNotModified: Option[Boolean] = None, ifNonMatched: Option[Boolean] = None, 
+    pw: Option[Int] = None, ifNotModified: Option[Boolean] = None, ifNonMatched: Option[Boolean] = None,
     returnHead: Option[Boolean] = None): ValidatedFutureIO[List[RaikuRWObject]] = {
-    val req = ?>(request(RiakMessageType.RpbPutReq, RpbPutReq(rwObject.bucket, stringToByteString(rwObject.key).some, 
+    val req = ?>(request(RiakMessageType.RpbPutReq, RpbPutReq(rwObject.bucket, stringToByteString(rwObject.key).some,
       rwObject.vClock.map(x => x.v), rwObjectToRpbContent(rwObject), w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead)))
     req.map(x => RpbPutResp().mergeFrom(x.message.toArray)).map(x => pbPutRespToRWObjects(rwObject.key, rwObject.bucket, x))
   }
 
-  def deleteByKey(bucket: String, key: String, rw: Option[Int] = None, vClock: Option[VClock] = None, r: Option[Int] = None, 
+  def deleteByKey(bucket: String, key: String, rw: Option[Int] = None, vClock: Option[VClock] = None, r: Option[Int] = None,
     w: Option[Int] = None, pr: Option[Int] = None, pw: Option[Int] = None, dw: Option[Int] = None): ValidatedFutureIO[Unit] = {
     val req = ?>(request(RiakMessageType.RpbDelReq, RpbDelReq(bucket, key, rw, vClock.map(x => x.v), r, w, pr, pw, dw)))
     req.map(x => ())
   }
 
-  def delete(rwObject: RaikuRWObject, rw: Option[Int] = None, r: Option[Int] = None, 
+  def delete(rwObject: RaikuRWObject, rw: Option[Int] = None, r: Option[Int] = None,
     w: Option[Int] = None, pr: Option[Int] = None, pw: Option[Int] = None, dw: Option[Int] = None): ValidatedFutureIO[Unit] = {
     deleteByKey(rwObject.bucket, rwObject.key, rw, rwObject.vClock, r, w, pr, pw, dw)
   }

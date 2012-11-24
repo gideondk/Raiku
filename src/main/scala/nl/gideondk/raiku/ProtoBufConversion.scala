@@ -52,8 +52,8 @@ trait ProtoBufConversion {
 
   def rwObjectToRpbContent(rw: RaikuRWObject) = { // TODO: implement links
     val indexes =
-      rw.binIndexes.map(tpl => tpl._2.map(x => RpbPair(stringToByteString(tpl._1 + "_bin"), stringToByteString(x).some))).flatten ++ 
-      rw.intIndexes.map(tpl => tpl._2.map(x => RpbPair(stringToByteString(tpl._1 + "_int"), stringToByteString(x.toString).some))).flatten
+      rw.binIndexes.map(tpl => tpl._2.map(x => RpbPair(stringToByteString(tpl._1 + "_bin"), stringToByteString(x).some))).flatten ++
+        rw.intIndexes.map(tpl => tpl._2.map(x => RpbPair(stringToByteString(tpl._1 + "_int"), stringToByteString(x.toString).some))).flatten
 
     RpbContent(rw.value, stringToByteString(rw.contentType).some, None, None, rw.vTag.map(x => byteArrayToByteString(x.v)), Vector[RpbLink](),
       rw.lastModified, rw.lastModifiedMicros, rw.userMeta.map(tpl => RpbPair(tpl._1, tpl._2.map(byteArrayToByteString(_)))).toVector, indexes.toVector, rw.deleted)
@@ -66,13 +66,13 @@ trait ProtoBufConversion {
 
     val userMeta: Map[String, Option[Array[Byte]]] = c.usermeta.map(p => p.key.toStringUtf8 -> p.value.map(_.toByteArray)).toMap
 
-    val indexes: Map[String, List[Option[com.google.protobuf.ByteString]]] = 
-      c.indexes.foldLeft(Map[String, List[Option[com.google.protobuf.ByteString]]]())((m,p) => m + (p.key.toStringUtf8 -> (~m.get(p.key.toStringUtf8) ++ List(p.value))))
+    val indexes: Map[String, List[Option[com.google.protobuf.ByteString]]] =
+      c.indexes.foldLeft(Map[String, List[Option[com.google.protobuf.ByteString]]]())((m, p) => m + (p.key.toStringUtf8 -> (~m.get(p.key.toStringUtf8) ++ List(p.value))))
 
     val (unDeSerIntIndexes, unDeSerBinIndexes) = indexes.partition(tpl => isIntIndex(tpl._1))
 
-    val intIndexes: Map[String, List[Int]] = unDeSerIntIndexes.map(tpl => indexName(tpl._1) -> tpl._2.filter(x => x.isDefined).map(_.get.toStringUtf8.toInt)) 
-    val binIndexes: Map[String, List[String]] = unDeSerBinIndexes.map(tpl => indexName(tpl._1) -> tpl._2.filter(x => x.isDefined).map(_.get.toStringUtf8)) 
+    val intIndexes: Map[String, List[Int]] = unDeSerIntIndexes.map(tpl => indexName(tpl._1) -> tpl._2.filter(x => x.isDefined).map(_.get.toStringUtf8.toInt))
+    val binIndexes: Map[String, List[String]] = unDeSerBinIndexes.map(tpl => indexName(tpl._1) -> tpl._2.filter(x => x.isDefined).map(_.get.toStringUtf8))
 
     RaikuRWObject(bucket, key, c.value.toByteArray, c.contentType.map(_.toStringUtf8).getOrElse("text/plain"), vClock,
       c.vtag.map(_.toByteArray).map(VTag(_)), c.lastMod, c.lastModUsecs, userMeta, intIndexes, binIndexes, c.deleted)
@@ -84,7 +84,7 @@ trait ProtoBufConversion {
       pbContentToRWObject(key, bucket, c, gr.vclock.map(_.toByteArray).map(VClock(_)))
     }.toList
   }
-  
+
   def pbGetRespToRWObjects(key: String, bucket: String, gr: com.basho.riak.protobuf.RpbGetResp): List[RaikuRWObject] = {
     val content: Vector[RpbContent] = gr.content
     content.map { c =>

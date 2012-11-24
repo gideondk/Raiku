@@ -5,1704 +5,1637 @@ package com.basho.riak.protobuf
 
 //import "riak.proto"
 
-final case class RpbGetClientIdResp (
-	`clientId`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbGetClientIdResp] {
+final case class RpbGetClientIdResp(
+  `clientId`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbGetClientIdResp] {
 
+  def clearClientId = copy(`clientId` = com.google.protobuf.ByteString.EMPTY)
 
-	def clearClientId = copy(`clientId` = com.google.protobuf.ByteString.EMPTY)
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    output.writeBytes(1, `clientId`)
+  }
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		output.writeBytes(1, `clientId`)
-	}
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    size += computeBytesSize(1, `clientId`)
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		size += computeBytesSize(1, `clientId`)
+    size
+  }
 
-		size
-	}
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbGetClientIdResp = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    var __clientId: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbGetClientIdResp = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		var __clientId: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
+    def __newMerged = RpbGetClientIdResp(
+      __clientId)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __clientId = in.readBytes()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-		def __newMerged = RpbGetClientIdResp(
-			__clientId
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __clientId = in.readBytes()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+  def mergeFrom(m: RpbGetClientIdResp) = {
+    RpbGetClientIdResp(
+      m.`clientId`)
+  }
 
-	def mergeFrom(m: RpbGetClientIdResp) = {
-		RpbGetClientIdResp(
-			m.`clientId`
-		)
-	}
-
-	def getDefaultInstanceForType = RpbGetClientIdResp.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbGetClientIdResp.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbGetClientIdResp {
-	@reflect.BeanProperty val defaultInstance = new RpbGetClientIdResp()
+  @reflect.BeanProperty val defaultInstance = new RpbGetClientIdResp()
 
-	val CLIENT_ID_FIELD_NUMBER = 1
+  val CLIENT_ID_FIELD_NUMBER = 1
 
 }
-final case class RpbSetClientIdReq (
-	`clientId`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbSetClientIdReq] {
+final case class RpbSetClientIdReq(
+  `clientId`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbSetClientIdReq] {
 
+  def clearClientId = copy(`clientId` = com.google.protobuf.ByteString.EMPTY)
 
-	def clearClientId = copy(`clientId` = com.google.protobuf.ByteString.EMPTY)
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    output.writeBytes(1, `clientId`)
+  }
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		output.writeBytes(1, `clientId`)
-	}
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    size += computeBytesSize(1, `clientId`)
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		size += computeBytesSize(1, `clientId`)
+    size
+  }
 
-		size
-	}
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbSetClientIdReq = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    var __clientId: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbSetClientIdReq = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		var __clientId: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
+    def __newMerged = RpbSetClientIdReq(
+      __clientId)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __clientId = in.readBytes()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-		def __newMerged = RpbSetClientIdReq(
-			__clientId
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __clientId = in.readBytes()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+  def mergeFrom(m: RpbSetClientIdReq) = {
+    RpbSetClientIdReq(
+      m.`clientId`)
+  }
 
-	def mergeFrom(m: RpbSetClientIdReq) = {
-		RpbSetClientIdReq(
-			m.`clientId`
-		)
-	}
-
-	def getDefaultInstanceForType = RpbSetClientIdReq.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbSetClientIdReq.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbSetClientIdReq {
-	@reflect.BeanProperty val defaultInstance = new RpbSetClientIdReq()
+  @reflect.BeanProperty val defaultInstance = new RpbSetClientIdReq()
 
-	val CLIENT_ID_FIELD_NUMBER = 1
+  val CLIENT_ID_FIELD_NUMBER = 1
 
 }
-final case class RpbGetReq (
-	`bucket`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
-	`key`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
-	`r`: Option[Int] = None,
-	`pr`: Option[Int] = None,
-	`basicQuorum`: Option[Boolean] = None,
-	`notfoundOk`: Option[Boolean] = None,
-	`ifModified`: Option[com.google.protobuf.ByteString] = None,
-	`head`: Option[Boolean] = None,
-	`deletedvclock`: Option[Boolean] = None
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbGetReq] {
+final case class RpbGetReq(
+  `bucket`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
+  `key`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
+  `r`: Option[Int] = None,
+  `pr`: Option[Int] = None,
+  `basicQuorum`: Option[Boolean] = None,
+  `notfoundOk`: Option[Boolean] = None,
+  `ifModified`: Option[com.google.protobuf.ByteString] = None,
+  `head`: Option[Boolean] = None,
+  `deletedvclock`: Option[Boolean] = None) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbGetReq] {
 
-	def setR(_f: Int) = copy(`r` = _f)
-	def setPr(_f: Int) = copy(`pr` = _f)
-	def setBasicQuorum(_f: Boolean) = copy(`basicQuorum` = _f)
-	def setNotfoundOk(_f: Boolean) = copy(`notfoundOk` = _f)
-	def setIfModified(_f: com.google.protobuf.ByteString) = copy(`ifModified` = _f)
-	def setHead(_f: Boolean) = copy(`head` = _f)
-	def setDeletedvclock(_f: Boolean) = copy(`deletedvclock` = _f)
+  def setR(_f: Int) = copy(`r` = _f)
+  def setPr(_f: Int) = copy(`pr` = _f)
+  def setBasicQuorum(_f: Boolean) = copy(`basicQuorum` = _f)
+  def setNotfoundOk(_f: Boolean) = copy(`notfoundOk` = _f)
+  def setIfModified(_f: com.google.protobuf.ByteString) = copy(`ifModified` = _f)
+  def setHead(_f: Boolean) = copy(`head` = _f)
+  def setDeletedvclock(_f: Boolean) = copy(`deletedvclock` = _f)
 
-	def clearBucket = copy(`bucket` = com.google.protobuf.ByteString.EMPTY)
-	def clearKey = copy(`key` = com.google.protobuf.ByteString.EMPTY)
-	def clearR = copy(`r` = None)
-	def clearPr = copy(`pr` = None)
-	def clearBasicQuorum = copy(`basicQuorum` = None)
-	def clearNotfoundOk = copy(`notfoundOk` = None)
-	def clearIfModified = copy(`ifModified` = None)
-	def clearHead = copy(`head` = None)
-	def clearDeletedvclock = copy(`deletedvclock` = None)
+  def clearBucket = copy(`bucket` = com.google.protobuf.ByteString.EMPTY)
+  def clearKey = copy(`key` = com.google.protobuf.ByteString.EMPTY)
+  def clearR = copy(`r` = None)
+  def clearPr = copy(`pr` = None)
+  def clearBasicQuorum = copy(`basicQuorum` = None)
+  def clearNotfoundOk = copy(`notfoundOk` = None)
+  def clearIfModified = copy(`ifModified` = None)
+  def clearHead = copy(`head` = None)
+  def clearDeletedvclock = copy(`deletedvclock` = None)
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		output.writeBytes(1, `bucket`)
-		output.writeBytes(2, `key`)
-		if (`r`.isDefined) output.writeUInt32(3, `r`.get)
-		if (`pr`.isDefined) output.writeUInt32(4, `pr`.get)
-		if (`basicQuorum`.isDefined) output.writeBool(5, `basicQuorum`.get)
-		if (`notfoundOk`.isDefined) output.writeBool(6, `notfoundOk`.get)
-		if (`ifModified`.isDefined) output.writeBytes(7, `ifModified`.get)
-		if (`head`.isDefined) output.writeBool(8, `head`.get)
-		if (`deletedvclock`.isDefined) output.writeBool(9, `deletedvclock`.get)
-	}
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    output.writeBytes(1, `bucket`)
+    output.writeBytes(2, `key`)
+    if (`r`.isDefined) output.writeUInt32(3, `r`.get)
+    if (`pr`.isDefined) output.writeUInt32(4, `pr`.get)
+    if (`basicQuorum`.isDefined) output.writeBool(5, `basicQuorum`.get)
+    if (`notfoundOk`.isDefined) output.writeBool(6, `notfoundOk`.get)
+    if (`ifModified`.isDefined) output.writeBytes(7, `ifModified`.get)
+    if (`head`.isDefined) output.writeBool(8, `head`.get)
+    if (`deletedvclock`.isDefined) output.writeBool(9, `deletedvclock`.get)
+  }
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		size += computeBytesSize(1, `bucket`)
-		size += computeBytesSize(2, `key`)
-		if (`r`.isDefined) size += computeUInt32Size(3, `r`.get)
-		if (`pr`.isDefined) size += computeUInt32Size(4, `pr`.get)
-		if (`basicQuorum`.isDefined) size += computeBoolSize(5, `basicQuorum`.get)
-		if (`notfoundOk`.isDefined) size += computeBoolSize(6, `notfoundOk`.get)
-		if (`ifModified`.isDefined) size += computeBytesSize(7, `ifModified`.get)
-		if (`head`.isDefined) size += computeBoolSize(8, `head`.get)
-		if (`deletedvclock`.isDefined) size += computeBoolSize(9, `deletedvclock`.get)
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    size += computeBytesSize(1, `bucket`)
+    size += computeBytesSize(2, `key`)
+    if (`r`.isDefined) size += computeUInt32Size(3, `r`.get)
+    if (`pr`.isDefined) size += computeUInt32Size(4, `pr`.get)
+    if (`basicQuorum`.isDefined) size += computeBoolSize(5, `basicQuorum`.get)
+    if (`notfoundOk`.isDefined) size += computeBoolSize(6, `notfoundOk`.get)
+    if (`ifModified`.isDefined) size += computeBytesSize(7, `ifModified`.get)
+    if (`head`.isDefined) size += computeBoolSize(8, `head`.get)
+    if (`deletedvclock`.isDefined) size += computeBoolSize(9, `deletedvclock`.get)
 
-		size
-	}
+    size
+  }
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbGetReq = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
-		var __key: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
-		var __r: Option[Int] = `r`
-		var __pr: Option[Int] = `pr`
-		var __basicQuorum: Option[Boolean] = `basicQuorum`
-		var __notfoundOk: Option[Boolean] = `notfoundOk`
-		var __ifModified: Option[com.google.protobuf.ByteString] = `ifModified`
-		var __head: Option[Boolean] = `head`
-		var __deletedvclock: Option[Boolean] = `deletedvclock`
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbGetReq = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
+    var __key: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
+    var __r: Option[Int] = `r`
+    var __pr: Option[Int] = `pr`
+    var __basicQuorum: Option[Boolean] = `basicQuorum`
+    var __notfoundOk: Option[Boolean] = `notfoundOk`
+    var __ifModified: Option[com.google.protobuf.ByteString] = `ifModified`
+    var __head: Option[Boolean] = `head`
+    var __deletedvclock: Option[Boolean] = `deletedvclock`
 
-		def __newMerged = RpbGetReq(
-			__bucket,
-			__key,
-			__r,
-			__pr,
-			__basicQuorum,
-			__notfoundOk,
-			__ifModified,
-			__head,
-			__deletedvclock
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __bucket = in.readBytes()
-			case 18 => __key = in.readBytes()
-			case 24 => __r = in.readUInt32()
-			case 32 => __pr = in.readUInt32()
-			case 40 => __basicQuorum = in.readBool()
-			case 48 => __notfoundOk = in.readBool()
-			case 58 => __ifModified = in.readBytes()
-			case 64 => __head = in.readBool()
-			case 72 => __deletedvclock = in.readBool()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+    def __newMerged = RpbGetReq(
+      __bucket,
+      __key,
+      __r,
+      __pr,
+      __basicQuorum,
+      __notfoundOk,
+      __ifModified,
+      __head,
+      __deletedvclock)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __bucket = in.readBytes()
+      case 18 => __key = in.readBytes()
+      case 24 => __r = in.readUInt32()
+      case 32 => __pr = in.readUInt32()
+      case 40 => __basicQuorum = in.readBool()
+      case 48 => __notfoundOk = in.readBool()
+      case 58 => __ifModified = in.readBytes()
+      case 64 => __head = in.readBool()
+      case 72 => __deletedvclock = in.readBool()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-	def mergeFrom(m: RpbGetReq) = {
-		RpbGetReq(
-			m.`bucket`,
-			m.`key`,
-			m.`r`.orElse(`r`),
-			m.`pr`.orElse(`pr`),
-			m.`basicQuorum`.orElse(`basicQuorum`),
-			m.`notfoundOk`.orElse(`notfoundOk`),
-			m.`ifModified`.orElse(`ifModified`),
-			m.`head`.orElse(`head`),
-			m.`deletedvclock`.orElse(`deletedvclock`)
-		)
-	}
+  def mergeFrom(m: RpbGetReq) = {
+    RpbGetReq(
+      m.`bucket`,
+      m.`key`,
+      m.`r`.orElse(`r`),
+      m.`pr`.orElse(`pr`),
+      m.`basicQuorum`.orElse(`basicQuorum`),
+      m.`notfoundOk`.orElse(`notfoundOk`),
+      m.`ifModified`.orElse(`ifModified`),
+      m.`head`.orElse(`head`),
+      m.`deletedvclock`.orElse(`deletedvclock`))
+  }
 
-	def getDefaultInstanceForType = RpbGetReq.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbGetReq.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbGetReq {
-	@reflect.BeanProperty val defaultInstance = new RpbGetReq()
+  @reflect.BeanProperty val defaultInstance = new RpbGetReq()
 
-	val BUCKET_FIELD_NUMBER = 1
-	val KEY_FIELD_NUMBER = 2
-	val R_FIELD_NUMBER = 3
-	val PR_FIELD_NUMBER = 4
-	val BASIC_QUORUM_FIELD_NUMBER = 5
-	val NOTFOUND_OK_FIELD_NUMBER = 6
-	val IF_MODIFIED_FIELD_NUMBER = 7
-	val HEAD_FIELD_NUMBER = 8
-	val DELETEDVCLOCK_FIELD_NUMBER = 9
+  val BUCKET_FIELD_NUMBER = 1
+  val KEY_FIELD_NUMBER = 2
+  val R_FIELD_NUMBER = 3
+  val PR_FIELD_NUMBER = 4
+  val BASIC_QUORUM_FIELD_NUMBER = 5
+  val NOTFOUND_OK_FIELD_NUMBER = 6
+  val IF_MODIFIED_FIELD_NUMBER = 7
+  val HEAD_FIELD_NUMBER = 8
+  val DELETEDVCLOCK_FIELD_NUMBER = 9
 
 }
-final case class RpbGetResp (
-	`content`: Vector[RpbContent] = Vector.empty[RpbContent],
-	`vclock`: Option[com.google.protobuf.ByteString] = None,
-	`unchanged`: Option[Boolean] = None
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbGetResp] {
+final case class RpbGetResp(
+  `content`: Vector[RpbContent] = Vector.empty[RpbContent],
+  `vclock`: Option[com.google.protobuf.ByteString] = None,
+  `unchanged`: Option[Boolean] = None) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbGetResp] {
 
-	def setContent(_i: Int, _v: RpbContent) = copy(`content` = `content`.updated(_i, _v))
-	def addContent(_f: RpbContent) = copy(`content` = `content` :+ _f)
-	def addAllContent(_f: RpbContent*) = copy(`content` = `content` ++ _f)
-	def addAllContent(_f: TraversableOnce[RpbContent]) = copy(`content` = `content` ++ _f)
-	def setVclock(_f: com.google.protobuf.ByteString) = copy(`vclock` = _f)
-	def setUnchanged(_f: Boolean) = copy(`unchanged` = _f)
+  def setContent(_i: Int, _v: RpbContent) = copy(`content` = `content`.updated(_i, _v))
+  def addContent(_f: RpbContent) = copy(`content` = `content` :+ _f)
+  def addAllContent(_f: RpbContent*) = copy(`content` = `content` ++ _f)
+  def addAllContent(_f: TraversableOnce[RpbContent]) = copy(`content` = `content` ++ _f)
+  def setVclock(_f: com.google.protobuf.ByteString) = copy(`vclock` = _f)
+  def setUnchanged(_f: Boolean) = copy(`unchanged` = _f)
 
-	def clearContent = copy(`content` = Vector.empty[RpbContent])
-	def clearVclock = copy(`vclock` = None)
-	def clearUnchanged = copy(`unchanged` = None)
+  def clearContent = copy(`content` = Vector.empty[RpbContent])
+  def clearVclock = copy(`vclock` = None)
+  def clearUnchanged = copy(`unchanged` = None)
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		for (_v <- `content`) output.writeMessage(1, _v)
-		if (`vclock`.isDefined) output.writeBytes(2, `vclock`.get)
-		if (`unchanged`.isDefined) output.writeBool(3, `unchanged`.get)
-	}
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    for (_v <- `content`) output.writeMessage(1, _v)
+    if (`vclock`.isDefined) output.writeBytes(2, `vclock`.get)
+    if (`unchanged`.isDefined) output.writeBool(3, `unchanged`.get)
+  }
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		for (_v <- `content`) size += computeMessageSize(1, _v)
-		if (`vclock`.isDefined) size += computeBytesSize(2, `vclock`.get)
-		if (`unchanged`.isDefined) size += computeBoolSize(3, `unchanged`.get)
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    for (_v <- `content`) size += computeMessageSize(1, _v)
+    if (`vclock`.isDefined) size += computeBytesSize(2, `vclock`.get)
+    if (`unchanged`.isDefined) size += computeBoolSize(3, `unchanged`.get)
 
-		size
-	}
+    size
+  }
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbGetResp = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		val __content: collection.mutable.Buffer[RpbContent] = `content`.toBuffer
-		var __vclock: Option[com.google.protobuf.ByteString] = `vclock`
-		var __unchanged: Option[Boolean] = `unchanged`
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbGetResp = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    val __content: collection.mutable.Buffer[RpbContent] = `content`.toBuffer
+    var __vclock: Option[com.google.protobuf.ByteString] = `vclock`
+    var __unchanged: Option[Boolean] = `unchanged`
 
-		def __newMerged = RpbGetResp(
-			Vector(__content: _*),
-			__vclock,
-			__unchanged
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __content += readMessage[RpbContent](in, RpbContent.defaultInstance, _emptyRegistry)
-			case 18 => __vclock = in.readBytes()
-			case 24 => __unchanged = in.readBool()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+    def __newMerged = RpbGetResp(
+      Vector(__content: _*),
+      __vclock,
+      __unchanged)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __content += readMessage[RpbContent](in, RpbContent.defaultInstance, _emptyRegistry)
+      case 18 => __vclock = in.readBytes()
+      case 24 => __unchanged = in.readBool()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-	def mergeFrom(m: RpbGetResp) = {
-		RpbGetResp(
-			`content` ++ m.`content`,
-			m.`vclock`.orElse(`vclock`),
-			m.`unchanged`.orElse(`unchanged`)
-		)
-	}
+  def mergeFrom(m: RpbGetResp) = {
+    RpbGetResp(
+      `content` ++ m.`content`,
+      m.`vclock`.orElse(`vclock`),
+      m.`unchanged`.orElse(`unchanged`))
+  }
 
-	def getDefaultInstanceForType = RpbGetResp.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbGetResp.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbGetResp {
-	@reflect.BeanProperty val defaultInstance = new RpbGetResp()
+  @reflect.BeanProperty val defaultInstance = new RpbGetResp()
 
-	val CONTENT_FIELD_NUMBER = 1
-	val VCLOCK_FIELD_NUMBER = 2
-	val UNCHANGED_FIELD_NUMBER = 3
+  val CONTENT_FIELD_NUMBER = 1
+  val VCLOCK_FIELD_NUMBER = 2
+  val UNCHANGED_FIELD_NUMBER = 3
 
 }
-final case class RpbPutReq (
-	`bucket`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
-	`key`: Option[com.google.protobuf.ByteString] = None,
-	`vclock`: Option[com.google.protobuf.ByteString] = None,
-	`content`: RpbContent = RpbContent.defaultInstance,
-	`w`: Option[Int] = None,
-	`dw`: Option[Int] = None,
-	`returnBody`: Option[Boolean] = None,
-	`pw`: Option[Int] = None,
-	`ifNotModified`: Option[Boolean] = None,
-	`ifNoneMatch`: Option[Boolean] = None,
-	`returnHead`: Option[Boolean] = None
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbPutReq] {
+final case class RpbPutReq(
+  `bucket`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
+  `key`: Option[com.google.protobuf.ByteString] = None,
+  `vclock`: Option[com.google.protobuf.ByteString] = None,
+  `content`: RpbContent = RpbContent.defaultInstance,
+  `w`: Option[Int] = None,
+  `dw`: Option[Int] = None,
+  `returnBody`: Option[Boolean] = None,
+  `pw`: Option[Int] = None,
+  `ifNotModified`: Option[Boolean] = None,
+  `ifNoneMatch`: Option[Boolean] = None,
+  `returnHead`: Option[Boolean] = None) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbPutReq] {
 
-	def setKey(_f: com.google.protobuf.ByteString) = copy(`key` = _f)
-	def setVclock(_f: com.google.protobuf.ByteString) = copy(`vclock` = _f)
-	def setW(_f: Int) = copy(`w` = _f)
-	def setDw(_f: Int) = copy(`dw` = _f)
-	def setReturnBody(_f: Boolean) = copy(`returnBody` = _f)
-	def setPw(_f: Int) = copy(`pw` = _f)
-	def setIfNotModified(_f: Boolean) = copy(`ifNotModified` = _f)
-	def setIfNoneMatch(_f: Boolean) = copy(`ifNoneMatch` = _f)
-	def setReturnHead(_f: Boolean) = copy(`returnHead` = _f)
+  def setKey(_f: com.google.protobuf.ByteString) = copy(`key` = _f)
+  def setVclock(_f: com.google.protobuf.ByteString) = copy(`vclock` = _f)
+  def setW(_f: Int) = copy(`w` = _f)
+  def setDw(_f: Int) = copy(`dw` = _f)
+  def setReturnBody(_f: Boolean) = copy(`returnBody` = _f)
+  def setPw(_f: Int) = copy(`pw` = _f)
+  def setIfNotModified(_f: Boolean) = copy(`ifNotModified` = _f)
+  def setIfNoneMatch(_f: Boolean) = copy(`ifNoneMatch` = _f)
+  def setReturnHead(_f: Boolean) = copy(`returnHead` = _f)
 
-	def clearBucket = copy(`bucket` = com.google.protobuf.ByteString.EMPTY)
-	def clearKey = copy(`key` = None)
-	def clearVclock = copy(`vclock` = None)
-	def clearContent = copy(`content` = RpbContent.defaultInstance)
-	def clearW = copy(`w` = None)
-	def clearDw = copy(`dw` = None)
-	def clearReturnBody = copy(`returnBody` = None)
-	def clearPw = copy(`pw` = None)
-	def clearIfNotModified = copy(`ifNotModified` = None)
-	def clearIfNoneMatch = copy(`ifNoneMatch` = None)
-	def clearReturnHead = copy(`returnHead` = None)
+  def clearBucket = copy(`bucket` = com.google.protobuf.ByteString.EMPTY)
+  def clearKey = copy(`key` = None)
+  def clearVclock = copy(`vclock` = None)
+  def clearContent = copy(`content` = RpbContent.defaultInstance)
+  def clearW = copy(`w` = None)
+  def clearDw = copy(`dw` = None)
+  def clearReturnBody = copy(`returnBody` = None)
+  def clearPw = copy(`pw` = None)
+  def clearIfNotModified = copy(`ifNotModified` = None)
+  def clearIfNoneMatch = copy(`ifNoneMatch` = None)
+  def clearReturnHead = copy(`returnHead` = None)
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		output.writeBytes(1, `bucket`)
-		if (`key`.isDefined) output.writeBytes(2, `key`.get)
-		if (`vclock`.isDefined) output.writeBytes(3, `vclock`.get)
-		output.writeMessage(4, `content`)
-		if (`w`.isDefined) output.writeUInt32(5, `w`.get)
-		if (`dw`.isDefined) output.writeUInt32(6, `dw`.get)
-		if (`returnBody`.isDefined) output.writeBool(7, `returnBody`.get)
-		if (`pw`.isDefined) output.writeUInt32(8, `pw`.get)
-		if (`ifNotModified`.isDefined) output.writeBool(9, `ifNotModified`.get)
-		if (`ifNoneMatch`.isDefined) output.writeBool(10, `ifNoneMatch`.get)
-		if (`returnHead`.isDefined) output.writeBool(11, `returnHead`.get)
-	}
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    output.writeBytes(1, `bucket`)
+    if (`key`.isDefined) output.writeBytes(2, `key`.get)
+    if (`vclock`.isDefined) output.writeBytes(3, `vclock`.get)
+    output.writeMessage(4, `content`)
+    if (`w`.isDefined) output.writeUInt32(5, `w`.get)
+    if (`dw`.isDefined) output.writeUInt32(6, `dw`.get)
+    if (`returnBody`.isDefined) output.writeBool(7, `returnBody`.get)
+    if (`pw`.isDefined) output.writeUInt32(8, `pw`.get)
+    if (`ifNotModified`.isDefined) output.writeBool(9, `ifNotModified`.get)
+    if (`ifNoneMatch`.isDefined) output.writeBool(10, `ifNoneMatch`.get)
+    if (`returnHead`.isDefined) output.writeBool(11, `returnHead`.get)
+  }
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		size += computeBytesSize(1, `bucket`)
-		if (`key`.isDefined) size += computeBytesSize(2, `key`.get)
-		if (`vclock`.isDefined) size += computeBytesSize(3, `vclock`.get)
-		size += computeMessageSize(4, `content`)
-		if (`w`.isDefined) size += computeUInt32Size(5, `w`.get)
-		if (`dw`.isDefined) size += computeUInt32Size(6, `dw`.get)
-		if (`returnBody`.isDefined) size += computeBoolSize(7, `returnBody`.get)
-		if (`pw`.isDefined) size += computeUInt32Size(8, `pw`.get)
-		if (`ifNotModified`.isDefined) size += computeBoolSize(9, `ifNotModified`.get)
-		if (`ifNoneMatch`.isDefined) size += computeBoolSize(10, `ifNoneMatch`.get)
-		if (`returnHead`.isDefined) size += computeBoolSize(11, `returnHead`.get)
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    size += computeBytesSize(1, `bucket`)
+    if (`key`.isDefined) size += computeBytesSize(2, `key`.get)
+    if (`vclock`.isDefined) size += computeBytesSize(3, `vclock`.get)
+    size += computeMessageSize(4, `content`)
+    if (`w`.isDefined) size += computeUInt32Size(5, `w`.get)
+    if (`dw`.isDefined) size += computeUInt32Size(6, `dw`.get)
+    if (`returnBody`.isDefined) size += computeBoolSize(7, `returnBody`.get)
+    if (`pw`.isDefined) size += computeUInt32Size(8, `pw`.get)
+    if (`ifNotModified`.isDefined) size += computeBoolSize(9, `ifNotModified`.get)
+    if (`ifNoneMatch`.isDefined) size += computeBoolSize(10, `ifNoneMatch`.get)
+    if (`returnHead`.isDefined) size += computeBoolSize(11, `returnHead`.get)
 
-		size
-	}
+    size
+  }
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbPutReq = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
-		var __key: Option[com.google.protobuf.ByteString] = `key`
-		var __vclock: Option[com.google.protobuf.ByteString] = `vclock`
-		var __content: RpbContent = RpbContent.defaultInstance
-		var __w: Option[Int] = `w`
-		var __dw: Option[Int] = `dw`
-		var __returnBody: Option[Boolean] = `returnBody`
-		var __pw: Option[Int] = `pw`
-		var __ifNotModified: Option[Boolean] = `ifNotModified`
-		var __ifNoneMatch: Option[Boolean] = `ifNoneMatch`
-		var __returnHead: Option[Boolean] = `returnHead`
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbPutReq = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
+    var __key: Option[com.google.protobuf.ByteString] = `key`
+    var __vclock: Option[com.google.protobuf.ByteString] = `vclock`
+    var __content: RpbContent = RpbContent.defaultInstance
+    var __w: Option[Int] = `w`
+    var __dw: Option[Int] = `dw`
+    var __returnBody: Option[Boolean] = `returnBody`
+    var __pw: Option[Int] = `pw`
+    var __ifNotModified: Option[Boolean] = `ifNotModified`
+    var __ifNoneMatch: Option[Boolean] = `ifNoneMatch`
+    var __returnHead: Option[Boolean] = `returnHead`
 
-		def __newMerged = RpbPutReq(
-			__bucket,
-			__key,
-			__vclock,
-			__content,
-			__w,
-			__dw,
-			__returnBody,
-			__pw,
-			__ifNotModified,
-			__ifNoneMatch,
-			__returnHead
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __bucket = in.readBytes()
-			case 18 => __key = in.readBytes()
-			case 26 => __vclock = in.readBytes()
-			case 34 => __content = readMessage[RpbContent](in, __content, _emptyRegistry)
-			case 40 => __w = in.readUInt32()
-			case 48 => __dw = in.readUInt32()
-			case 56 => __returnBody = in.readBool()
-			case 64 => __pw = in.readUInt32()
-			case 72 => __ifNotModified = in.readBool()
-			case 80 => __ifNoneMatch = in.readBool()
-			case 88 => __returnHead = in.readBool()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+    def __newMerged = RpbPutReq(
+      __bucket,
+      __key,
+      __vclock,
+      __content,
+      __w,
+      __dw,
+      __returnBody,
+      __pw,
+      __ifNotModified,
+      __ifNoneMatch,
+      __returnHead)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __bucket = in.readBytes()
+      case 18 => __key = in.readBytes()
+      case 26 => __vclock = in.readBytes()
+      case 34 => __content = readMessage[RpbContent](in, __content, _emptyRegistry)
+      case 40 => __w = in.readUInt32()
+      case 48 => __dw = in.readUInt32()
+      case 56 => __returnBody = in.readBool()
+      case 64 => __pw = in.readUInt32()
+      case 72 => __ifNotModified = in.readBool()
+      case 80 => __ifNoneMatch = in.readBool()
+      case 88 => __returnHead = in.readBool()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-	def mergeFrom(m: RpbPutReq) = {
-		RpbPutReq(
-			m.`bucket`,
-			m.`key`.orElse(`key`),
-			m.`vclock`.orElse(`vclock`),
-			m.`content`,
-			m.`w`.orElse(`w`),
-			m.`dw`.orElse(`dw`),
-			m.`returnBody`.orElse(`returnBody`),
-			m.`pw`.orElse(`pw`),
-			m.`ifNotModified`.orElse(`ifNotModified`),
-			m.`ifNoneMatch`.orElse(`ifNoneMatch`),
-			m.`returnHead`.orElse(`returnHead`)
-		)
-	}
+  def mergeFrom(m: RpbPutReq) = {
+    RpbPutReq(
+      m.`bucket`,
+      m.`key`.orElse(`key`),
+      m.`vclock`.orElse(`vclock`),
+      m.`content`,
+      m.`w`.orElse(`w`),
+      m.`dw`.orElse(`dw`),
+      m.`returnBody`.orElse(`returnBody`),
+      m.`pw`.orElse(`pw`),
+      m.`ifNotModified`.orElse(`ifNotModified`),
+      m.`ifNoneMatch`.orElse(`ifNoneMatch`),
+      m.`returnHead`.orElse(`returnHead`))
+  }
 
-	def getDefaultInstanceForType = RpbPutReq.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbPutReq.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbPutReq {
-	@reflect.BeanProperty val defaultInstance = new RpbPutReq()
+  @reflect.BeanProperty val defaultInstance = new RpbPutReq()
 
-	val BUCKET_FIELD_NUMBER = 1
-	val KEY_FIELD_NUMBER = 2
-	val VCLOCK_FIELD_NUMBER = 3
-	val CONTENT_FIELD_NUMBER = 4
-	val W_FIELD_NUMBER = 5
-	val DW_FIELD_NUMBER = 6
-	val RETURN_BODY_FIELD_NUMBER = 7
-	val PW_FIELD_NUMBER = 8
-	val IF_NOT_MODIFIED_FIELD_NUMBER = 9
-	val IF_NONE_MATCH_FIELD_NUMBER = 10
-	val RETURN_HEAD_FIELD_NUMBER = 11
+  val BUCKET_FIELD_NUMBER = 1
+  val KEY_FIELD_NUMBER = 2
+  val VCLOCK_FIELD_NUMBER = 3
+  val CONTENT_FIELD_NUMBER = 4
+  val W_FIELD_NUMBER = 5
+  val DW_FIELD_NUMBER = 6
+  val RETURN_BODY_FIELD_NUMBER = 7
+  val PW_FIELD_NUMBER = 8
+  val IF_NOT_MODIFIED_FIELD_NUMBER = 9
+  val IF_NONE_MATCH_FIELD_NUMBER = 10
+  val RETURN_HEAD_FIELD_NUMBER = 11
 
 }
-final case class RpbPutResp (
-	`content`: Vector[RpbContent] = Vector.empty[RpbContent],
-	`vclock`: Option[com.google.protobuf.ByteString] = None,
-	`key`: Option[com.google.protobuf.ByteString] = None
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbPutResp] {
+final case class RpbPutResp(
+  `content`: Vector[RpbContent] = Vector.empty[RpbContent],
+  `vclock`: Option[com.google.protobuf.ByteString] = None,
+  `key`: Option[com.google.protobuf.ByteString] = None) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbPutResp] {
 
-	def setContent(_i: Int, _v: RpbContent) = copy(`content` = `content`.updated(_i, _v))
-	def addContent(_f: RpbContent) = copy(`content` = `content` :+ _f)
-	def addAllContent(_f: RpbContent*) = copy(`content` = `content` ++ _f)
-	def addAllContent(_f: TraversableOnce[RpbContent]) = copy(`content` = `content` ++ _f)
-	def setVclock(_f: com.google.protobuf.ByteString) = copy(`vclock` = _f)
-	def setKey(_f: com.google.protobuf.ByteString) = copy(`key` = _f)
+  def setContent(_i: Int, _v: RpbContent) = copy(`content` = `content`.updated(_i, _v))
+  def addContent(_f: RpbContent) = copy(`content` = `content` :+ _f)
+  def addAllContent(_f: RpbContent*) = copy(`content` = `content` ++ _f)
+  def addAllContent(_f: TraversableOnce[RpbContent]) = copy(`content` = `content` ++ _f)
+  def setVclock(_f: com.google.protobuf.ByteString) = copy(`vclock` = _f)
+  def setKey(_f: com.google.protobuf.ByteString) = copy(`key` = _f)
 
-	def clearContent = copy(`content` = Vector.empty[RpbContent])
-	def clearVclock = copy(`vclock` = None)
-	def clearKey = copy(`key` = None)
+  def clearContent = copy(`content` = Vector.empty[RpbContent])
+  def clearVclock = copy(`vclock` = None)
+  def clearKey = copy(`key` = None)
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		for (_v <- `content`) output.writeMessage(1, _v)
-		if (`vclock`.isDefined) output.writeBytes(2, `vclock`.get)
-		if (`key`.isDefined) output.writeBytes(3, `key`.get)
-	}
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    for (_v <- `content`) output.writeMessage(1, _v)
+    if (`vclock`.isDefined) output.writeBytes(2, `vclock`.get)
+    if (`key`.isDefined) output.writeBytes(3, `key`.get)
+  }
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		for (_v <- `content`) size += computeMessageSize(1, _v)
-		if (`vclock`.isDefined) size += computeBytesSize(2, `vclock`.get)
-		if (`key`.isDefined) size += computeBytesSize(3, `key`.get)
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    for (_v <- `content`) size += computeMessageSize(1, _v)
+    if (`vclock`.isDefined) size += computeBytesSize(2, `vclock`.get)
+    if (`key`.isDefined) size += computeBytesSize(3, `key`.get)
 
-		size
-	}
+    size
+  }
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbPutResp = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		val __content: collection.mutable.Buffer[RpbContent] = `content`.toBuffer
-		var __vclock: Option[com.google.protobuf.ByteString] = `vclock`
-		var __key: Option[com.google.protobuf.ByteString] = `key`
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbPutResp = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    val __content: collection.mutable.Buffer[RpbContent] = `content`.toBuffer
+    var __vclock: Option[com.google.protobuf.ByteString] = `vclock`
+    var __key: Option[com.google.protobuf.ByteString] = `key`
 
-		def __newMerged = RpbPutResp(
-			Vector(__content: _*),
-			__vclock,
-			__key
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __content += readMessage[RpbContent](in, RpbContent.defaultInstance, _emptyRegistry)
-			case 18 => __vclock = in.readBytes()
-			case 26 => __key = in.readBytes()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+    def __newMerged = RpbPutResp(
+      Vector(__content: _*),
+      __vclock,
+      __key)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __content += readMessage[RpbContent](in, RpbContent.defaultInstance, _emptyRegistry)
+      case 18 => __vclock = in.readBytes()
+      case 26 => __key = in.readBytes()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-	def mergeFrom(m: RpbPutResp) = {
-		RpbPutResp(
-			`content` ++ m.`content`,
-			m.`vclock`.orElse(`vclock`),
-			m.`key`.orElse(`key`)
-		)
-	}
+  def mergeFrom(m: RpbPutResp) = {
+    RpbPutResp(
+      `content` ++ m.`content`,
+      m.`vclock`.orElse(`vclock`),
+      m.`key`.orElse(`key`))
+  }
 
-	def getDefaultInstanceForType = RpbPutResp.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbPutResp.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbPutResp {
-	@reflect.BeanProperty val defaultInstance = new RpbPutResp()
+  @reflect.BeanProperty val defaultInstance = new RpbPutResp()
 
-	val CONTENT_FIELD_NUMBER = 1
-	val VCLOCK_FIELD_NUMBER = 2
-	val KEY_FIELD_NUMBER = 3
+  val CONTENT_FIELD_NUMBER = 1
+  val VCLOCK_FIELD_NUMBER = 2
+  val KEY_FIELD_NUMBER = 3
 
 }
-final case class RpbDelReq (
-	`bucket`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
-	`key`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
-	`rw`: Option[Int] = None,
-	`vclock`: Option[com.google.protobuf.ByteString] = None,
-	`r`: Option[Int] = None,
-	`w`: Option[Int] = None,
-	`pr`: Option[Int] = None,
-	`pw`: Option[Int] = None,
-	`dw`: Option[Int] = None
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbDelReq] {
+final case class RpbDelReq(
+  `bucket`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
+  `key`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
+  `rw`: Option[Int] = None,
+  `vclock`: Option[com.google.protobuf.ByteString] = None,
+  `r`: Option[Int] = None,
+  `w`: Option[Int] = None,
+  `pr`: Option[Int] = None,
+  `pw`: Option[Int] = None,
+  `dw`: Option[Int] = None) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbDelReq] {
 
-	def setRw(_f: Int) = copy(`rw` = _f)
-	def setVclock(_f: com.google.protobuf.ByteString) = copy(`vclock` = _f)
-	def setR(_f: Int) = copy(`r` = _f)
-	def setW(_f: Int) = copy(`w` = _f)
-	def setPr(_f: Int) = copy(`pr` = _f)
-	def setPw(_f: Int) = copy(`pw` = _f)
-	def setDw(_f: Int) = copy(`dw` = _f)
+  def setRw(_f: Int) = copy(`rw` = _f)
+  def setVclock(_f: com.google.protobuf.ByteString) = copy(`vclock` = _f)
+  def setR(_f: Int) = copy(`r` = _f)
+  def setW(_f: Int) = copy(`w` = _f)
+  def setPr(_f: Int) = copy(`pr` = _f)
+  def setPw(_f: Int) = copy(`pw` = _f)
+  def setDw(_f: Int) = copy(`dw` = _f)
 
-	def clearBucket = copy(`bucket` = com.google.protobuf.ByteString.EMPTY)
-	def clearKey = copy(`key` = com.google.protobuf.ByteString.EMPTY)
-	def clearRw = copy(`rw` = None)
-	def clearVclock = copy(`vclock` = None)
-	def clearR = copy(`r` = None)
-	def clearW = copy(`w` = None)
-	def clearPr = copy(`pr` = None)
-	def clearPw = copy(`pw` = None)
-	def clearDw = copy(`dw` = None)
+  def clearBucket = copy(`bucket` = com.google.protobuf.ByteString.EMPTY)
+  def clearKey = copy(`key` = com.google.protobuf.ByteString.EMPTY)
+  def clearRw = copy(`rw` = None)
+  def clearVclock = copy(`vclock` = None)
+  def clearR = copy(`r` = None)
+  def clearW = copy(`w` = None)
+  def clearPr = copy(`pr` = None)
+  def clearPw = copy(`pw` = None)
+  def clearDw = copy(`dw` = None)
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		output.writeBytes(1, `bucket`)
-		output.writeBytes(2, `key`)
-		if (`rw`.isDefined) output.writeUInt32(3, `rw`.get)
-		if (`vclock`.isDefined) output.writeBytes(4, `vclock`.get)
-		if (`r`.isDefined) output.writeUInt32(5, `r`.get)
-		if (`w`.isDefined) output.writeUInt32(6, `w`.get)
-		if (`pr`.isDefined) output.writeUInt32(7, `pr`.get)
-		if (`pw`.isDefined) output.writeUInt32(8, `pw`.get)
-		if (`dw`.isDefined) output.writeUInt32(9, `dw`.get)
-	}
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    output.writeBytes(1, `bucket`)
+    output.writeBytes(2, `key`)
+    if (`rw`.isDefined) output.writeUInt32(3, `rw`.get)
+    if (`vclock`.isDefined) output.writeBytes(4, `vclock`.get)
+    if (`r`.isDefined) output.writeUInt32(5, `r`.get)
+    if (`w`.isDefined) output.writeUInt32(6, `w`.get)
+    if (`pr`.isDefined) output.writeUInt32(7, `pr`.get)
+    if (`pw`.isDefined) output.writeUInt32(8, `pw`.get)
+    if (`dw`.isDefined) output.writeUInt32(9, `dw`.get)
+  }
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		size += computeBytesSize(1, `bucket`)
-		size += computeBytesSize(2, `key`)
-		if (`rw`.isDefined) size += computeUInt32Size(3, `rw`.get)
-		if (`vclock`.isDefined) size += computeBytesSize(4, `vclock`.get)
-		if (`r`.isDefined) size += computeUInt32Size(5, `r`.get)
-		if (`w`.isDefined) size += computeUInt32Size(6, `w`.get)
-		if (`pr`.isDefined) size += computeUInt32Size(7, `pr`.get)
-		if (`pw`.isDefined) size += computeUInt32Size(8, `pw`.get)
-		if (`dw`.isDefined) size += computeUInt32Size(9, `dw`.get)
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    size += computeBytesSize(1, `bucket`)
+    size += computeBytesSize(2, `key`)
+    if (`rw`.isDefined) size += computeUInt32Size(3, `rw`.get)
+    if (`vclock`.isDefined) size += computeBytesSize(4, `vclock`.get)
+    if (`r`.isDefined) size += computeUInt32Size(5, `r`.get)
+    if (`w`.isDefined) size += computeUInt32Size(6, `w`.get)
+    if (`pr`.isDefined) size += computeUInt32Size(7, `pr`.get)
+    if (`pw`.isDefined) size += computeUInt32Size(8, `pw`.get)
+    if (`dw`.isDefined) size += computeUInt32Size(9, `dw`.get)
 
-		size
-	}
+    size
+  }
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbDelReq = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
-		var __key: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
-		var __rw: Option[Int] = `rw`
-		var __vclock: Option[com.google.protobuf.ByteString] = `vclock`
-		var __r: Option[Int] = `r`
-		var __w: Option[Int] = `w`
-		var __pr: Option[Int] = `pr`
-		var __pw: Option[Int] = `pw`
-		var __dw: Option[Int] = `dw`
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbDelReq = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
+    var __key: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
+    var __rw: Option[Int] = `rw`
+    var __vclock: Option[com.google.protobuf.ByteString] = `vclock`
+    var __r: Option[Int] = `r`
+    var __w: Option[Int] = `w`
+    var __pr: Option[Int] = `pr`
+    var __pw: Option[Int] = `pw`
+    var __dw: Option[Int] = `dw`
 
-		def __newMerged = RpbDelReq(
-			__bucket,
-			__key,
-			__rw,
-			__vclock,
-			__r,
-			__w,
-			__pr,
-			__pw,
-			__dw
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __bucket = in.readBytes()
-			case 18 => __key = in.readBytes()
-			case 24 => __rw = in.readUInt32()
-			case 34 => __vclock = in.readBytes()
-			case 40 => __r = in.readUInt32()
-			case 48 => __w = in.readUInt32()
-			case 56 => __pr = in.readUInt32()
-			case 64 => __pw = in.readUInt32()
-			case 72 => __dw = in.readUInt32()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+    def __newMerged = RpbDelReq(
+      __bucket,
+      __key,
+      __rw,
+      __vclock,
+      __r,
+      __w,
+      __pr,
+      __pw,
+      __dw)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __bucket = in.readBytes()
+      case 18 => __key = in.readBytes()
+      case 24 => __rw = in.readUInt32()
+      case 34 => __vclock = in.readBytes()
+      case 40 => __r = in.readUInt32()
+      case 48 => __w = in.readUInt32()
+      case 56 => __pr = in.readUInt32()
+      case 64 => __pw = in.readUInt32()
+      case 72 => __dw = in.readUInt32()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-	def mergeFrom(m: RpbDelReq) = {
-		RpbDelReq(
-			m.`bucket`,
-			m.`key`,
-			m.`rw`.orElse(`rw`),
-			m.`vclock`.orElse(`vclock`),
-			m.`r`.orElse(`r`),
-			m.`w`.orElse(`w`),
-			m.`pr`.orElse(`pr`),
-			m.`pw`.orElse(`pw`),
-			m.`dw`.orElse(`dw`)
-		)
-	}
+  def mergeFrom(m: RpbDelReq) = {
+    RpbDelReq(
+      m.`bucket`,
+      m.`key`,
+      m.`rw`.orElse(`rw`),
+      m.`vclock`.orElse(`vclock`),
+      m.`r`.orElse(`r`),
+      m.`w`.orElse(`w`),
+      m.`pr`.orElse(`pr`),
+      m.`pw`.orElse(`pw`),
+      m.`dw`.orElse(`dw`))
+  }
 
-	def getDefaultInstanceForType = RpbDelReq.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbDelReq.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbDelReq {
-	@reflect.BeanProperty val defaultInstance = new RpbDelReq()
+  @reflect.BeanProperty val defaultInstance = new RpbDelReq()
 
-	val BUCKET_FIELD_NUMBER = 1
-	val KEY_FIELD_NUMBER = 2
-	val RW_FIELD_NUMBER = 3
-	val VCLOCK_FIELD_NUMBER = 4
-	val R_FIELD_NUMBER = 5
-	val W_FIELD_NUMBER = 6
-	val PR_FIELD_NUMBER = 7
-	val PW_FIELD_NUMBER = 8
-	val DW_FIELD_NUMBER = 9
+  val BUCKET_FIELD_NUMBER = 1
+  val KEY_FIELD_NUMBER = 2
+  val RW_FIELD_NUMBER = 3
+  val VCLOCK_FIELD_NUMBER = 4
+  val R_FIELD_NUMBER = 5
+  val W_FIELD_NUMBER = 6
+  val PR_FIELD_NUMBER = 7
+  val PW_FIELD_NUMBER = 8
+  val DW_FIELD_NUMBER = 9
 
 }
-final case class RpbListBucketsResp (
-	`buckets`: Vector[com.google.protobuf.ByteString] = Vector.empty[com.google.protobuf.ByteString]
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbListBucketsResp] {
+final case class RpbListBucketsResp(
+  `buckets`: Vector[com.google.protobuf.ByteString] = Vector.empty[com.google.protobuf.ByteString]) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbListBucketsResp] {
 
-	def setBuckets(_i: Int, _v: com.google.protobuf.ByteString) = copy(`buckets` = `buckets`.updated(_i, _v))
-	def addBuckets(_f: com.google.protobuf.ByteString) = copy(`buckets` = `buckets` :+ _f)
-	def addAllBuckets(_f: com.google.protobuf.ByteString*) = copy(`buckets` = `buckets` ++ _f)
-	def addAllBuckets(_f: TraversableOnce[com.google.protobuf.ByteString]) = copy(`buckets` = `buckets` ++ _f)
+  def setBuckets(_i: Int, _v: com.google.protobuf.ByteString) = copy(`buckets` = `buckets`.updated(_i, _v))
+  def addBuckets(_f: com.google.protobuf.ByteString) = copy(`buckets` = `buckets` :+ _f)
+  def addAllBuckets(_f: com.google.protobuf.ByteString*) = copy(`buckets` = `buckets` ++ _f)
+  def addAllBuckets(_f: TraversableOnce[com.google.protobuf.ByteString]) = copy(`buckets` = `buckets` ++ _f)
 
-	def clearBuckets = copy(`buckets` = Vector.empty[com.google.protobuf.ByteString])
+  def clearBuckets = copy(`buckets` = Vector.empty[com.google.protobuf.ByteString])
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		for (_v <- `buckets`) output.writeBytes(1, _v)
-	}
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    for (_v <- `buckets`) output.writeBytes(1, _v)
+  }
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		for (_v <- `buckets`) size += computeBytesSize(1, _v)
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    for (_v <- `buckets`) size += computeBytesSize(1, _v)
 
-		size
-	}
+    size
+  }
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbListBucketsResp = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		val __buckets: collection.mutable.Buffer[com.google.protobuf.ByteString] = `buckets`.toBuffer
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbListBucketsResp = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    val __buckets: collection.mutable.Buffer[com.google.protobuf.ByteString] = `buckets`.toBuffer
 
-		def __newMerged = RpbListBucketsResp(
-			Vector(__buckets: _*)
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __buckets += in.readBytes()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+    def __newMerged = RpbListBucketsResp(
+      Vector(__buckets: _*))
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __buckets += in.readBytes()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-	def mergeFrom(m: RpbListBucketsResp) = {
-		RpbListBucketsResp(
-			`buckets` ++ m.`buckets`
-		)
-	}
+  def mergeFrom(m: RpbListBucketsResp) = {
+    RpbListBucketsResp(
+      `buckets` ++ m.`buckets`)
+  }
 
-	def getDefaultInstanceForType = RpbListBucketsResp.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbListBucketsResp.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbListBucketsResp {
-	@reflect.BeanProperty val defaultInstance = new RpbListBucketsResp()
+  @reflect.BeanProperty val defaultInstance = new RpbListBucketsResp()
 
-	val BUCKETS_FIELD_NUMBER = 1
+  val BUCKETS_FIELD_NUMBER = 1
 
 }
-final case class RpbListKeysReq (
-	`bucket`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbListKeysReq] {
+final case class RpbListKeysReq(
+  `bucket`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbListKeysReq] {
 
+  def clearBucket = copy(`bucket` = com.google.protobuf.ByteString.EMPTY)
 
-	def clearBucket = copy(`bucket` = com.google.protobuf.ByteString.EMPTY)
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    output.writeBytes(1, `bucket`)
+  }
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		output.writeBytes(1, `bucket`)
-	}
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    size += computeBytesSize(1, `bucket`)
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		size += computeBytesSize(1, `bucket`)
+    size
+  }
 
-		size
-	}
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbListKeysReq = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbListKeysReq = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
+    def __newMerged = RpbListKeysReq(
+      __bucket)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __bucket = in.readBytes()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-		def __newMerged = RpbListKeysReq(
-			__bucket
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __bucket = in.readBytes()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+  def mergeFrom(m: RpbListKeysReq) = {
+    RpbListKeysReq(
+      m.`bucket`)
+  }
 
-	def mergeFrom(m: RpbListKeysReq) = {
-		RpbListKeysReq(
-			m.`bucket`
-		)
-	}
-
-	def getDefaultInstanceForType = RpbListKeysReq.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbListKeysReq.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbListKeysReq {
-	@reflect.BeanProperty val defaultInstance = new RpbListKeysReq()
+  @reflect.BeanProperty val defaultInstance = new RpbListKeysReq()
 
-	val BUCKET_FIELD_NUMBER = 1
+  val BUCKET_FIELD_NUMBER = 1
 
 }
-final case class RpbListKeysResp (
-	`keys`: Vector[com.google.protobuf.ByteString] = Vector.empty[com.google.protobuf.ByteString],
-	`done`: Option[Boolean] = None
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbListKeysResp] {
+final case class RpbListKeysResp(
+  `keys`: Vector[com.google.protobuf.ByteString] = Vector.empty[com.google.protobuf.ByteString],
+  `done`: Option[Boolean] = None) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbListKeysResp] {
 
-	def setKeys(_i: Int, _v: com.google.protobuf.ByteString) = copy(`keys` = `keys`.updated(_i, _v))
-	def addKeys(_f: com.google.protobuf.ByteString) = copy(`keys` = `keys` :+ _f)
-	def addAllKeys(_f: com.google.protobuf.ByteString*) = copy(`keys` = `keys` ++ _f)
-	def addAllKeys(_f: TraversableOnce[com.google.protobuf.ByteString]) = copy(`keys` = `keys` ++ _f)
-	def setDone(_f: Boolean) = copy(`done` = _f)
+  def setKeys(_i: Int, _v: com.google.protobuf.ByteString) = copy(`keys` = `keys`.updated(_i, _v))
+  def addKeys(_f: com.google.protobuf.ByteString) = copy(`keys` = `keys` :+ _f)
+  def addAllKeys(_f: com.google.protobuf.ByteString*) = copy(`keys` = `keys` ++ _f)
+  def addAllKeys(_f: TraversableOnce[com.google.protobuf.ByteString]) = copy(`keys` = `keys` ++ _f)
+  def setDone(_f: Boolean) = copy(`done` = _f)
 
-	def clearKeys = copy(`keys` = Vector.empty[com.google.protobuf.ByteString])
-	def clearDone = copy(`done` = None)
+  def clearKeys = copy(`keys` = Vector.empty[com.google.protobuf.ByteString])
+  def clearDone = copy(`done` = None)
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		for (_v <- `keys`) output.writeBytes(1, _v)
-		if (`done`.isDefined) output.writeBool(2, `done`.get)
-	}
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    for (_v <- `keys`) output.writeBytes(1, _v)
+    if (`done`.isDefined) output.writeBool(2, `done`.get)
+  }
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		for (_v <- `keys`) size += computeBytesSize(1, _v)
-		if (`done`.isDefined) size += computeBoolSize(2, `done`.get)
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    for (_v <- `keys`) size += computeBytesSize(1, _v)
+    if (`done`.isDefined) size += computeBoolSize(2, `done`.get)
 
-		size
-	}
+    size
+  }
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbListKeysResp = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		val __keys: collection.mutable.Buffer[com.google.protobuf.ByteString] = `keys`.toBuffer
-		var __done: Option[Boolean] = `done`
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbListKeysResp = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    val __keys: collection.mutable.Buffer[com.google.protobuf.ByteString] = `keys`.toBuffer
+    var __done: Option[Boolean] = `done`
 
-		def __newMerged = RpbListKeysResp(
-			Vector(__keys: _*),
-			__done
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __keys += in.readBytes()
-			case 16 => __done = in.readBool()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+    def __newMerged = RpbListKeysResp(
+      Vector(__keys: _*),
+      __done)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __keys += in.readBytes()
+      case 16 => __done = in.readBool()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-	def mergeFrom(m: RpbListKeysResp) = {
-		RpbListKeysResp(
-			`keys` ++ m.`keys`,
-			m.`done`.orElse(`done`)
-		)
-	}
+  def mergeFrom(m: RpbListKeysResp) = {
+    RpbListKeysResp(
+      `keys` ++ m.`keys`,
+      m.`done`.orElse(`done`))
+  }
 
-	def getDefaultInstanceForType = RpbListKeysResp.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbListKeysResp.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbListKeysResp {
-	@reflect.BeanProperty val defaultInstance = new RpbListKeysResp()
+  @reflect.BeanProperty val defaultInstance = new RpbListKeysResp()
 
-	val KEYS_FIELD_NUMBER = 1
-	val DONE_FIELD_NUMBER = 2
+  val KEYS_FIELD_NUMBER = 1
+  val DONE_FIELD_NUMBER = 2
 
 }
-final case class RpbGetBucketReq (
-	`bucket`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbGetBucketReq] {
+final case class RpbGetBucketReq(
+  `bucket`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbGetBucketReq] {
 
+  def clearBucket = copy(`bucket` = com.google.protobuf.ByteString.EMPTY)
 
-	def clearBucket = copy(`bucket` = com.google.protobuf.ByteString.EMPTY)
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    output.writeBytes(1, `bucket`)
+  }
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		output.writeBytes(1, `bucket`)
-	}
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    size += computeBytesSize(1, `bucket`)
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		size += computeBytesSize(1, `bucket`)
+    size
+  }
 
-		size
-	}
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbGetBucketReq = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbGetBucketReq = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
+    def __newMerged = RpbGetBucketReq(
+      __bucket)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __bucket = in.readBytes()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-		def __newMerged = RpbGetBucketReq(
-			__bucket
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __bucket = in.readBytes()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+  def mergeFrom(m: RpbGetBucketReq) = {
+    RpbGetBucketReq(
+      m.`bucket`)
+  }
 
-	def mergeFrom(m: RpbGetBucketReq) = {
-		RpbGetBucketReq(
-			m.`bucket`
-		)
-	}
-
-	def getDefaultInstanceForType = RpbGetBucketReq.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbGetBucketReq.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbGetBucketReq {
-	@reflect.BeanProperty val defaultInstance = new RpbGetBucketReq()
+  @reflect.BeanProperty val defaultInstance = new RpbGetBucketReq()
 
-	val BUCKET_FIELD_NUMBER = 1
+  val BUCKET_FIELD_NUMBER = 1
 
 }
-final case class RpbGetBucketResp (
-	`props`: RpbBucketProps = RpbBucketProps.defaultInstance
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbGetBucketResp] {
+final case class RpbGetBucketResp(
+  `props`: RpbBucketProps = RpbBucketProps.defaultInstance) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbGetBucketResp] {
 
+  def clearProps = copy(`props` = RpbBucketProps.defaultInstance)
 
-	def clearProps = copy(`props` = RpbBucketProps.defaultInstance)
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    output.writeMessage(1, `props`)
+  }
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		output.writeMessage(1, `props`)
-	}
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    size += computeMessageSize(1, `props`)
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		size += computeMessageSize(1, `props`)
+    size
+  }
 
-		size
-	}
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbGetBucketResp = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    var __props: RpbBucketProps = RpbBucketProps.defaultInstance
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbGetBucketResp = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		var __props: RpbBucketProps = RpbBucketProps.defaultInstance
+    def __newMerged = RpbGetBucketResp(
+      __props)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __props = readMessage[RpbBucketProps](in, __props, _emptyRegistry)
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-		def __newMerged = RpbGetBucketResp(
-			__props
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __props = readMessage[RpbBucketProps](in, __props, _emptyRegistry)
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+  def mergeFrom(m: RpbGetBucketResp) = {
+    RpbGetBucketResp(
+      m.`props`)
+  }
 
-	def mergeFrom(m: RpbGetBucketResp) = {
-		RpbGetBucketResp(
-			m.`props`
-		)
-	}
-
-	def getDefaultInstanceForType = RpbGetBucketResp.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbGetBucketResp.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbGetBucketResp {
-	@reflect.BeanProperty val defaultInstance = new RpbGetBucketResp()
+  @reflect.BeanProperty val defaultInstance = new RpbGetBucketResp()
 
-	val PROPS_FIELD_NUMBER = 1
+  val PROPS_FIELD_NUMBER = 1
 
 }
-final case class RpbSetBucketReq (
-	`bucket`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
-	`props`: RpbBucketProps = RpbBucketProps.defaultInstance
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbSetBucketReq] {
+final case class RpbSetBucketReq(
+  `bucket`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
+  `props`: RpbBucketProps = RpbBucketProps.defaultInstance) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbSetBucketReq] {
 
+  def clearBucket = copy(`bucket` = com.google.protobuf.ByteString.EMPTY)
+  def clearProps = copy(`props` = RpbBucketProps.defaultInstance)
 
-	def clearBucket = copy(`bucket` = com.google.protobuf.ByteString.EMPTY)
-	def clearProps = copy(`props` = RpbBucketProps.defaultInstance)
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    output.writeBytes(1, `bucket`)
+    output.writeMessage(2, `props`)
+  }
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		output.writeBytes(1, `bucket`)
-		output.writeMessage(2, `props`)
-	}
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    size += computeBytesSize(1, `bucket`)
+    size += computeMessageSize(2, `props`)
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		size += computeBytesSize(1, `bucket`)
-		size += computeMessageSize(2, `props`)
+    size
+  }
 
-		size
-	}
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbSetBucketReq = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
+    var __props: RpbBucketProps = RpbBucketProps.defaultInstance
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbSetBucketReq = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
-		var __props: RpbBucketProps = RpbBucketProps.defaultInstance
+    def __newMerged = RpbSetBucketReq(
+      __bucket,
+      __props)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __bucket = in.readBytes()
+      case 18 => __props = readMessage[RpbBucketProps](in, __props, _emptyRegistry)
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-		def __newMerged = RpbSetBucketReq(
-			__bucket,
-			__props
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __bucket = in.readBytes()
-			case 18 => __props = readMessage[RpbBucketProps](in, __props, _emptyRegistry)
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+  def mergeFrom(m: RpbSetBucketReq) = {
+    RpbSetBucketReq(
+      m.`bucket`,
+      m.`props`)
+  }
 
-	def mergeFrom(m: RpbSetBucketReq) = {
-		RpbSetBucketReq(
-			m.`bucket`,
-			m.`props`
-		)
-	}
-
-	def getDefaultInstanceForType = RpbSetBucketReq.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbSetBucketReq.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbSetBucketReq {
-	@reflect.BeanProperty val defaultInstance = new RpbSetBucketReq()
+  @reflect.BeanProperty val defaultInstance = new RpbSetBucketReq()
 
-	val BUCKET_FIELD_NUMBER = 1
-	val PROPS_FIELD_NUMBER = 2
+  val BUCKET_FIELD_NUMBER = 1
+  val PROPS_FIELD_NUMBER = 2
 
 }
-final case class RpbMapRedReq (
-	`request`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
-	`contentType`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbMapRedReq] {
+final case class RpbMapRedReq(
+  `request`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
+  `contentType`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbMapRedReq] {
 
+  def clearRequest = copy(`request` = com.google.protobuf.ByteString.EMPTY)
+  def clearContentType = copy(`contentType` = com.google.protobuf.ByteString.EMPTY)
 
-	def clearRequest = copy(`request` = com.google.protobuf.ByteString.EMPTY)
-	def clearContentType = copy(`contentType` = com.google.protobuf.ByteString.EMPTY)
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    output.writeBytes(1, `request`)
+    output.writeBytes(2, `contentType`)
+  }
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		output.writeBytes(1, `request`)
-		output.writeBytes(2, `contentType`)
-	}
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    size += computeBytesSize(1, `request`)
+    size += computeBytesSize(2, `contentType`)
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		size += computeBytesSize(1, `request`)
-		size += computeBytesSize(2, `contentType`)
+    size
+  }
 
-		size
-	}
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbMapRedReq = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    var __request: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
+    var __contentType: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbMapRedReq = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		var __request: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
-		var __contentType: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
+    def __newMerged = RpbMapRedReq(
+      __request,
+      __contentType)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __request = in.readBytes()
+      case 18 => __contentType = in.readBytes()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-		def __newMerged = RpbMapRedReq(
-			__request,
-			__contentType
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __request = in.readBytes()
-			case 18 => __contentType = in.readBytes()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+  def mergeFrom(m: RpbMapRedReq) = {
+    RpbMapRedReq(
+      m.`request`,
+      m.`contentType`)
+  }
 
-	def mergeFrom(m: RpbMapRedReq) = {
-		RpbMapRedReq(
-			m.`request`,
-			m.`contentType`
-		)
-	}
-
-	def getDefaultInstanceForType = RpbMapRedReq.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbMapRedReq.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbMapRedReq {
-	@reflect.BeanProperty val defaultInstance = new RpbMapRedReq()
+  @reflect.BeanProperty val defaultInstance = new RpbMapRedReq()
 
-	val REQUEST_FIELD_NUMBER = 1
-	val CONTENT_TYPE_FIELD_NUMBER = 2
+  val REQUEST_FIELD_NUMBER = 1
+  val CONTENT_TYPE_FIELD_NUMBER = 2
 
 }
-final case class RpbMapRedResp (
-	`phase`: Option[Int] = None,
-	`response`: Option[com.google.protobuf.ByteString] = None,
-	`done`: Option[Boolean] = None
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbMapRedResp] {
+final case class RpbMapRedResp(
+  `phase`: Option[Int] = None,
+  `response`: Option[com.google.protobuf.ByteString] = None,
+  `done`: Option[Boolean] = None) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbMapRedResp] {
 
-	def setPhase(_f: Int) = copy(`phase` = _f)
-	def setResponse(_f: com.google.protobuf.ByteString) = copy(`response` = _f)
-	def setDone(_f: Boolean) = copy(`done` = _f)
+  def setPhase(_f: Int) = copy(`phase` = _f)
+  def setResponse(_f: com.google.protobuf.ByteString) = copy(`response` = _f)
+  def setDone(_f: Boolean) = copy(`done` = _f)
 
-	def clearPhase = copy(`phase` = None)
-	def clearResponse = copy(`response` = None)
-	def clearDone = copy(`done` = None)
+  def clearPhase = copy(`phase` = None)
+  def clearResponse = copy(`response` = None)
+  def clearDone = copy(`done` = None)
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		if (`phase`.isDefined) output.writeUInt32(1, `phase`.get)
-		if (`response`.isDefined) output.writeBytes(2, `response`.get)
-		if (`done`.isDefined) output.writeBool(3, `done`.get)
-	}
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    if (`phase`.isDefined) output.writeUInt32(1, `phase`.get)
+    if (`response`.isDefined) output.writeBytes(2, `response`.get)
+    if (`done`.isDefined) output.writeBool(3, `done`.get)
+  }
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		if (`phase`.isDefined) size += computeUInt32Size(1, `phase`.get)
-		if (`response`.isDefined) size += computeBytesSize(2, `response`.get)
-		if (`done`.isDefined) size += computeBoolSize(3, `done`.get)
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    if (`phase`.isDefined) size += computeUInt32Size(1, `phase`.get)
+    if (`response`.isDefined) size += computeBytesSize(2, `response`.get)
+    if (`done`.isDefined) size += computeBoolSize(3, `done`.get)
 
-		size
-	}
+    size
+  }
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbMapRedResp = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		var __phase: Option[Int] = `phase`
-		var __response: Option[com.google.protobuf.ByteString] = `response`
-		var __done: Option[Boolean] = `done`
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbMapRedResp = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    var __phase: Option[Int] = `phase`
+    var __response: Option[com.google.protobuf.ByteString] = `response`
+    var __done: Option[Boolean] = `done`
 
-		def __newMerged = RpbMapRedResp(
-			__phase,
-			__response,
-			__done
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 8 => __phase = in.readUInt32()
-			case 18 => __response = in.readBytes()
-			case 24 => __done = in.readBool()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+    def __newMerged = RpbMapRedResp(
+      __phase,
+      __response,
+      __done)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 8 => __phase = in.readUInt32()
+      case 18 => __response = in.readBytes()
+      case 24 => __done = in.readBool()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-	def mergeFrom(m: RpbMapRedResp) = {
-		RpbMapRedResp(
-			m.`phase`.orElse(`phase`),
-			m.`response`.orElse(`response`),
-			m.`done`.orElse(`done`)
-		)
-	}
+  def mergeFrom(m: RpbMapRedResp) = {
+    RpbMapRedResp(
+      m.`phase`.orElse(`phase`),
+      m.`response`.orElse(`response`),
+      m.`done`.orElse(`done`))
+  }
 
-	def getDefaultInstanceForType = RpbMapRedResp.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbMapRedResp.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbMapRedResp {
-	@reflect.BeanProperty val defaultInstance = new RpbMapRedResp()
+  @reflect.BeanProperty val defaultInstance = new RpbMapRedResp()
 
-	val PHASE_FIELD_NUMBER = 1
-	val RESPONSE_FIELD_NUMBER = 2
-	val DONE_FIELD_NUMBER = 3
+  val PHASE_FIELD_NUMBER = 1
+  val RESPONSE_FIELD_NUMBER = 2
+  val DONE_FIELD_NUMBER = 3
 
 }
-final case class RpbIndexReq (
-	`bucket`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
-	`index`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
-	`qtype`: RpbIndexReq.IndexQueryType.EnumVal = RpbIndexReq.IndexQueryType._UNINITIALIZED,
-	`key`: Option[com.google.protobuf.ByteString] = None,
-	`rangeMin`: Option[com.google.protobuf.ByteString] = None,
-	`rangeMax`: Option[com.google.protobuf.ByteString] = None
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbIndexReq] {
+final case class RpbIndexReq(
+  `bucket`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
+  `index`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
+  `qtype`: RpbIndexReq.IndexQueryType.EnumVal = RpbIndexReq.IndexQueryType._UNINITIALIZED,
+  `key`: Option[com.google.protobuf.ByteString] = None,
+  `rangeMin`: Option[com.google.protobuf.ByteString] = None,
+  `rangeMax`: Option[com.google.protobuf.ByteString] = None) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbIndexReq] {
 
-	def setKey(_f: com.google.protobuf.ByteString) = copy(`key` = _f)
-	def setRangeMin(_f: com.google.protobuf.ByteString) = copy(`rangeMin` = _f)
-	def setRangeMax(_f: com.google.protobuf.ByteString) = copy(`rangeMax` = _f)
+  def setKey(_f: com.google.protobuf.ByteString) = copy(`key` = _f)
+  def setRangeMin(_f: com.google.protobuf.ByteString) = copy(`rangeMin` = _f)
+  def setRangeMax(_f: com.google.protobuf.ByteString) = copy(`rangeMax` = _f)
 
-	def clearBucket = copy(`bucket` = com.google.protobuf.ByteString.EMPTY)
-	def clearIndex = copy(`index` = com.google.protobuf.ByteString.EMPTY)
-	def clearQtype = copy(`qtype` = RpbIndexReq.IndexQueryType._UNINITIALIZED)
-	def clearKey = copy(`key` = None)
-	def clearRangeMin = copy(`rangeMin` = None)
-	def clearRangeMax = copy(`rangeMax` = None)
+  def clearBucket = copy(`bucket` = com.google.protobuf.ByteString.EMPTY)
+  def clearIndex = copy(`index` = com.google.protobuf.ByteString.EMPTY)
+  def clearQtype = copy(`qtype` = RpbIndexReq.IndexQueryType._UNINITIALIZED)
+  def clearKey = copy(`key` = None)
+  def clearRangeMin = copy(`rangeMin` = None)
+  def clearRangeMax = copy(`rangeMax` = None)
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		output.writeBytes(1, `bucket`)
-		output.writeBytes(2, `index`)
-		output.writeEnum(3, `qtype`)
-		if (`key`.isDefined) output.writeBytes(4, `key`.get)
-		if (`rangeMin`.isDefined) output.writeBytes(5, `rangeMin`.get)
-		if (`rangeMax`.isDefined) output.writeBytes(6, `rangeMax`.get)
-	}
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    output.writeBytes(1, `bucket`)
+    output.writeBytes(2, `index`)
+    output.writeEnum(3, `qtype`)
+    if (`key`.isDefined) output.writeBytes(4, `key`.get)
+    if (`rangeMin`.isDefined) output.writeBytes(5, `rangeMin`.get)
+    if (`rangeMax`.isDefined) output.writeBytes(6, `rangeMax`.get)
+  }
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		size += computeBytesSize(1, `bucket`)
-		size += computeBytesSize(2, `index`)
-		size += computeEnumSize(3, `qtype`)
-		if (`key`.isDefined) size += computeBytesSize(4, `key`.get)
-		if (`rangeMin`.isDefined) size += computeBytesSize(5, `rangeMin`.get)
-		if (`rangeMax`.isDefined) size += computeBytesSize(6, `rangeMax`.get)
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    size += computeBytesSize(1, `bucket`)
+    size += computeBytesSize(2, `index`)
+    size += computeEnumSize(3, `qtype`)
+    if (`key`.isDefined) size += computeBytesSize(4, `key`.get)
+    if (`rangeMin`.isDefined) size += computeBytesSize(5, `rangeMin`.get)
+    if (`rangeMax`.isDefined) size += computeBytesSize(6, `rangeMax`.get)
 
-		size
-	}
+    size
+  }
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbIndexReq = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
-		var __index: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
-		var __qtype: RpbIndexReq.IndexQueryType.EnumVal = RpbIndexReq.IndexQueryType._UNINITIALIZED
-		var __key: Option[com.google.protobuf.ByteString] = `key`
-		var __rangeMin: Option[com.google.protobuf.ByteString] = `rangeMin`
-		var __rangeMax: Option[com.google.protobuf.ByteString] = `rangeMax`
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbIndexReq = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
+    var __index: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
+    var __qtype: RpbIndexReq.IndexQueryType.EnumVal = RpbIndexReq.IndexQueryType._UNINITIALIZED
+    var __key: Option[com.google.protobuf.ByteString] = `key`
+    var __rangeMin: Option[com.google.protobuf.ByteString] = `rangeMin`
+    var __rangeMax: Option[com.google.protobuf.ByteString] = `rangeMax`
 
-		def __newMerged = RpbIndexReq(
-			__bucket,
-			__index,
-			__qtype,
-			__key,
-			__rangeMin,
-			__rangeMax
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __bucket = in.readBytes()
-			case 18 => __index = in.readBytes()
-			case 24 => __qtype = RpbIndexReq.IndexQueryType.valueOf(in.readEnum())
-			case 34 => __key = in.readBytes()
-			case 42 => __rangeMin = in.readBytes()
-			case 50 => __rangeMax = in.readBytes()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+    def __newMerged = RpbIndexReq(
+      __bucket,
+      __index,
+      __qtype,
+      __key,
+      __rangeMin,
+      __rangeMax)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __bucket = in.readBytes()
+      case 18 => __index = in.readBytes()
+      case 24 => __qtype = RpbIndexReq.IndexQueryType.valueOf(in.readEnum())
+      case 34 => __key = in.readBytes()
+      case 42 => __rangeMin = in.readBytes()
+      case 50 => __rangeMax = in.readBytes()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-	def mergeFrom(m: RpbIndexReq) = {
-		RpbIndexReq(
-			m.`bucket`,
-			m.`index`,
-			m.`qtype`,
-			m.`key`.orElse(`key`),
-			m.`rangeMin`.orElse(`rangeMin`),
-			m.`rangeMax`.orElse(`rangeMax`)
-		)
-	}
+  def mergeFrom(m: RpbIndexReq) = {
+    RpbIndexReq(
+      m.`bucket`,
+      m.`index`,
+      m.`qtype`,
+      m.`key`.orElse(`key`),
+      m.`rangeMin`.orElse(`rangeMin`),
+      m.`rangeMax`.orElse(`rangeMax`))
+  }
 
-	def getDefaultInstanceForType = RpbIndexReq.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbIndexReq.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbIndexReq {
-	@reflect.BeanProperty val defaultInstance = new RpbIndexReq()
+  @reflect.BeanProperty val defaultInstance = new RpbIndexReq()
 
-	val BUCKET_FIELD_NUMBER = 1
-	val INDEX_FIELD_NUMBER = 2
-	val QTYPE_FIELD_NUMBER = 3
-	val KEY_FIELD_NUMBER = 4
-	val RANGE_MIN_FIELD_NUMBER = 5
-	val RANGE_MAX_FIELD_NUMBER = 6
+  val BUCKET_FIELD_NUMBER = 1
+  val INDEX_FIELD_NUMBER = 2
+  val QTYPE_FIELD_NUMBER = 3
+  val KEY_FIELD_NUMBER = 4
+  val RANGE_MIN_FIELD_NUMBER = 5
+  val RANGE_MAX_FIELD_NUMBER = 6
 
-	object IndexQueryType extends Enum {
-		sealed trait EnumVal extends Value
-		val _UNINITIALIZED = new EnumVal { val name = "UNINITIALIZED ENUM VALUE"; val id = -1 }
+  object IndexQueryType extends Enum {
+    sealed trait EnumVal extends Value
+    val _UNINITIALIZED = new EnumVal { val name = "UNINITIALIZED ENUM VALUE"; val id = -1 }
 
-		val eq = new EnumVal { val name = "eq"; val id = 0 }
-		val range = new EnumVal { val name = "range"; val id = 1 }
+    val eq = new EnumVal { val name = "eq"; val id = 0 }
+    val range = new EnumVal { val name = "range"; val id = 1 }
 
-		val eq_VALUE = 0
-		val range_VALUE = 1
+    val eq_VALUE = 0
+    val range_VALUE = 1
 
-		def valueOf(id: Int) = id match {
-			case 0 => eq
-			case 1 => range
-			case _default => throw new UnknownEnumException(_default)
-		}
-		val internalGetValueMap = new com.google.protobuf.Internal.EnumLiteMap[EnumVal] {
-			def findValueByNumber(id: Int): EnumVal = valueOf(id)
-		}
-	}
+    def valueOf(id: Int) = id match {
+      case 0 => eq
+      case 1 => range
+      case _default => throw new UnknownEnumException(_default)
+    }
+    val internalGetValueMap = new com.google.protobuf.Internal.EnumLiteMap[EnumVal] {
+      def findValueByNumber(id: Int): EnumVal = valueOf(id)
+    }
+  }
 
 }
-final case class RpbIndexResp (
-	`keys`: Vector[com.google.protobuf.ByteString] = Vector.empty[com.google.protobuf.ByteString]
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbIndexResp] {
+final case class RpbIndexResp(
+  `keys`: Vector[com.google.protobuf.ByteString] = Vector.empty[com.google.protobuf.ByteString]) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbIndexResp] {
 
-	def setKeys(_i: Int, _v: com.google.protobuf.ByteString) = copy(`keys` = `keys`.updated(_i, _v))
-	def addKeys(_f: com.google.protobuf.ByteString) = copy(`keys` = `keys` :+ _f)
-	def addAllKeys(_f: com.google.protobuf.ByteString*) = copy(`keys` = `keys` ++ _f)
-	def addAllKeys(_f: TraversableOnce[com.google.protobuf.ByteString]) = copy(`keys` = `keys` ++ _f)
+  def setKeys(_i: Int, _v: com.google.protobuf.ByteString) = copy(`keys` = `keys`.updated(_i, _v))
+  def addKeys(_f: com.google.protobuf.ByteString) = copy(`keys` = `keys` :+ _f)
+  def addAllKeys(_f: com.google.protobuf.ByteString*) = copy(`keys` = `keys` ++ _f)
+  def addAllKeys(_f: TraversableOnce[com.google.protobuf.ByteString]) = copy(`keys` = `keys` ++ _f)
 
-	def clearKeys = copy(`keys` = Vector.empty[com.google.protobuf.ByteString])
+  def clearKeys = copy(`keys` = Vector.empty[com.google.protobuf.ByteString])
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		for (_v <- `keys`) output.writeBytes(1, _v)
-	}
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    for (_v <- `keys`) output.writeBytes(1, _v)
+  }
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		for (_v <- `keys`) size += computeBytesSize(1, _v)
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    for (_v <- `keys`) size += computeBytesSize(1, _v)
 
-		size
-	}
+    size
+  }
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbIndexResp = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		val __keys: collection.mutable.Buffer[com.google.protobuf.ByteString] = `keys`.toBuffer
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbIndexResp = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    val __keys: collection.mutable.Buffer[com.google.protobuf.ByteString] = `keys`.toBuffer
 
-		def __newMerged = RpbIndexResp(
-			Vector(__keys: _*)
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __keys += in.readBytes()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+    def __newMerged = RpbIndexResp(
+      Vector(__keys: _*))
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __keys += in.readBytes()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-	def mergeFrom(m: RpbIndexResp) = {
-		RpbIndexResp(
-			`keys` ++ m.`keys`
-		)
-	}
+  def mergeFrom(m: RpbIndexResp) = {
+    RpbIndexResp(
+      `keys` ++ m.`keys`)
+  }
 
-	def getDefaultInstanceForType = RpbIndexResp.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbIndexResp.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbIndexResp {
-	@reflect.BeanProperty val defaultInstance = new RpbIndexResp()
+  @reflect.BeanProperty val defaultInstance = new RpbIndexResp()
 
-	val KEYS_FIELD_NUMBER = 1
+  val KEYS_FIELD_NUMBER = 1
 
 }
-final case class RpbContent (
-	`value`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
-	`contentType`: Option[com.google.protobuf.ByteString] = None,
-	`charset`: Option[com.google.protobuf.ByteString] = None,
-	`contentEncoding`: Option[com.google.protobuf.ByteString] = None,
-	`vtag`: Option[com.google.protobuf.ByteString] = None,
-	`links`: Vector[RpbLink] = Vector.empty[RpbLink],
-	`lastMod`: Option[Int] = None,
-	`lastModUsecs`: Option[Int] = None,
-	`usermeta`: Vector[RpbPair] = Vector.empty[RpbPair],
-	`indexes`: Vector[RpbPair] = Vector.empty[RpbPair],
-	`deleted`: Option[Boolean] = None
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbContent] {
+final case class RpbContent(
+  `value`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
+  `contentType`: Option[com.google.protobuf.ByteString] = None,
+  `charset`: Option[com.google.protobuf.ByteString] = None,
+  `contentEncoding`: Option[com.google.protobuf.ByteString] = None,
+  `vtag`: Option[com.google.protobuf.ByteString] = None,
+  `links`: Vector[RpbLink] = Vector.empty[RpbLink],
+  `lastMod`: Option[Int] = None,
+  `lastModUsecs`: Option[Int] = None,
+  `usermeta`: Vector[RpbPair] = Vector.empty[RpbPair],
+  `indexes`: Vector[RpbPair] = Vector.empty[RpbPair],
+  `deleted`: Option[Boolean] = None) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbContent] {
 
-	def setContentType(_f: com.google.protobuf.ByteString) = copy(`contentType` = _f)
-	def setCharset(_f: com.google.protobuf.ByteString) = copy(`charset` = _f)
-	def setContentEncoding(_f: com.google.protobuf.ByteString) = copy(`contentEncoding` = _f)
-	def setVtag(_f: com.google.protobuf.ByteString) = copy(`vtag` = _f)
-	def setLinks(_i: Int, _v: RpbLink) = copy(`links` = `links`.updated(_i, _v))
-	def addLinks(_f: RpbLink) = copy(`links` = `links` :+ _f)
-	def addAllLinks(_f: RpbLink*) = copy(`links` = `links` ++ _f)
-	def addAllLinks(_f: TraversableOnce[RpbLink]) = copy(`links` = `links` ++ _f)
-	def setLastMod(_f: Int) = copy(`lastMod` = _f)
-	def setLastModUsecs(_f: Int) = copy(`lastModUsecs` = _f)
-	def setUsermeta(_i: Int, _v: RpbPair) = copy(`usermeta` = `usermeta`.updated(_i, _v))
-	def addUsermeta(_f: RpbPair) = copy(`usermeta` = `usermeta` :+ _f)
-	def addAllUsermeta(_f: RpbPair*) = copy(`usermeta` = `usermeta` ++ _f)
-	def addAllUsermeta(_f: TraversableOnce[RpbPair]) = copy(`usermeta` = `usermeta` ++ _f)
-	def setIndexes(_i: Int, _v: RpbPair) = copy(`indexes` = `indexes`.updated(_i, _v))
-	def addIndexes(_f: RpbPair) = copy(`indexes` = `indexes` :+ _f)
-	def addAllIndexes(_f: RpbPair*) = copy(`indexes` = `indexes` ++ _f)
-	def addAllIndexes(_f: TraversableOnce[RpbPair]) = copy(`indexes` = `indexes` ++ _f)
-	def setDeleted(_f: Boolean) = copy(`deleted` = _f)
+  def setContentType(_f: com.google.protobuf.ByteString) = copy(`contentType` = _f)
+  def setCharset(_f: com.google.protobuf.ByteString) = copy(`charset` = _f)
+  def setContentEncoding(_f: com.google.protobuf.ByteString) = copy(`contentEncoding` = _f)
+  def setVtag(_f: com.google.protobuf.ByteString) = copy(`vtag` = _f)
+  def setLinks(_i: Int, _v: RpbLink) = copy(`links` = `links`.updated(_i, _v))
+  def addLinks(_f: RpbLink) = copy(`links` = `links` :+ _f)
+  def addAllLinks(_f: RpbLink*) = copy(`links` = `links` ++ _f)
+  def addAllLinks(_f: TraversableOnce[RpbLink]) = copy(`links` = `links` ++ _f)
+  def setLastMod(_f: Int) = copy(`lastMod` = _f)
+  def setLastModUsecs(_f: Int) = copy(`lastModUsecs` = _f)
+  def setUsermeta(_i: Int, _v: RpbPair) = copy(`usermeta` = `usermeta`.updated(_i, _v))
+  def addUsermeta(_f: RpbPair) = copy(`usermeta` = `usermeta` :+ _f)
+  def addAllUsermeta(_f: RpbPair*) = copy(`usermeta` = `usermeta` ++ _f)
+  def addAllUsermeta(_f: TraversableOnce[RpbPair]) = copy(`usermeta` = `usermeta` ++ _f)
+  def setIndexes(_i: Int, _v: RpbPair) = copy(`indexes` = `indexes`.updated(_i, _v))
+  def addIndexes(_f: RpbPair) = copy(`indexes` = `indexes` :+ _f)
+  def addAllIndexes(_f: RpbPair*) = copy(`indexes` = `indexes` ++ _f)
+  def addAllIndexes(_f: TraversableOnce[RpbPair]) = copy(`indexes` = `indexes` ++ _f)
+  def setDeleted(_f: Boolean) = copy(`deleted` = _f)
 
-	def clearValue = copy(`value` = com.google.protobuf.ByteString.EMPTY)
-	def clearContentType = copy(`contentType` = None)
-	def clearCharset = copy(`charset` = None)
-	def clearContentEncoding = copy(`contentEncoding` = None)
-	def clearVtag = copy(`vtag` = None)
-	def clearLinks = copy(`links` = Vector.empty[RpbLink])
-	def clearLastMod = copy(`lastMod` = None)
-	def clearLastModUsecs = copy(`lastModUsecs` = None)
-	def clearUsermeta = copy(`usermeta` = Vector.empty[RpbPair])
-	def clearIndexes = copy(`indexes` = Vector.empty[RpbPair])
-	def clearDeleted = copy(`deleted` = None)
+  def clearValue = copy(`value` = com.google.protobuf.ByteString.EMPTY)
+  def clearContentType = copy(`contentType` = None)
+  def clearCharset = copy(`charset` = None)
+  def clearContentEncoding = copy(`contentEncoding` = None)
+  def clearVtag = copy(`vtag` = None)
+  def clearLinks = copy(`links` = Vector.empty[RpbLink])
+  def clearLastMod = copy(`lastMod` = None)
+  def clearLastModUsecs = copy(`lastModUsecs` = None)
+  def clearUsermeta = copy(`usermeta` = Vector.empty[RpbPair])
+  def clearIndexes = copy(`indexes` = Vector.empty[RpbPair])
+  def clearDeleted = copy(`deleted` = None)
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		output.writeBytes(1, `value`)
-		if (`contentType`.isDefined) output.writeBytes(2, `contentType`.get)
-		if (`charset`.isDefined) output.writeBytes(3, `charset`.get)
-		if (`contentEncoding`.isDefined) output.writeBytes(4, `contentEncoding`.get)
-		if (`vtag`.isDefined) output.writeBytes(5, `vtag`.get)
-		for (_v <- `links`) output.writeMessage(6, _v)
-		if (`lastMod`.isDefined) output.writeUInt32(7, `lastMod`.get)
-		if (`lastModUsecs`.isDefined) output.writeUInt32(8, `lastModUsecs`.get)
-		for (_v <- `usermeta`) output.writeMessage(9, _v)
-		for (_v <- `indexes`) output.writeMessage(10, _v)
-		if (`deleted`.isDefined) output.writeBool(11, `deleted`.get)
-	}
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    output.writeBytes(1, `value`)
+    if (`contentType`.isDefined) output.writeBytes(2, `contentType`.get)
+    if (`charset`.isDefined) output.writeBytes(3, `charset`.get)
+    if (`contentEncoding`.isDefined) output.writeBytes(4, `contentEncoding`.get)
+    if (`vtag`.isDefined) output.writeBytes(5, `vtag`.get)
+    for (_v <- `links`) output.writeMessage(6, _v)
+    if (`lastMod`.isDefined) output.writeUInt32(7, `lastMod`.get)
+    if (`lastModUsecs`.isDefined) output.writeUInt32(8, `lastModUsecs`.get)
+    for (_v <- `usermeta`) output.writeMessage(9, _v)
+    for (_v <- `indexes`) output.writeMessage(10, _v)
+    if (`deleted`.isDefined) output.writeBool(11, `deleted`.get)
+  }
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		size += computeBytesSize(1, `value`)
-		if (`contentType`.isDefined) size += computeBytesSize(2, `contentType`.get)
-		if (`charset`.isDefined) size += computeBytesSize(3, `charset`.get)
-		if (`contentEncoding`.isDefined) size += computeBytesSize(4, `contentEncoding`.get)
-		if (`vtag`.isDefined) size += computeBytesSize(5, `vtag`.get)
-		for (_v <- `links`) size += computeMessageSize(6, _v)
-		if (`lastMod`.isDefined) size += computeUInt32Size(7, `lastMod`.get)
-		if (`lastModUsecs`.isDefined) size += computeUInt32Size(8, `lastModUsecs`.get)
-		for (_v <- `usermeta`) size += computeMessageSize(9, _v)
-		for (_v <- `indexes`) size += computeMessageSize(10, _v)
-		if (`deleted`.isDefined) size += computeBoolSize(11, `deleted`.get)
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    size += computeBytesSize(1, `value`)
+    if (`contentType`.isDefined) size += computeBytesSize(2, `contentType`.get)
+    if (`charset`.isDefined) size += computeBytesSize(3, `charset`.get)
+    if (`contentEncoding`.isDefined) size += computeBytesSize(4, `contentEncoding`.get)
+    if (`vtag`.isDefined) size += computeBytesSize(5, `vtag`.get)
+    for (_v <- `links`) size += computeMessageSize(6, _v)
+    if (`lastMod`.isDefined) size += computeUInt32Size(7, `lastMod`.get)
+    if (`lastModUsecs`.isDefined) size += computeUInt32Size(8, `lastModUsecs`.get)
+    for (_v <- `usermeta`) size += computeMessageSize(9, _v)
+    for (_v <- `indexes`) size += computeMessageSize(10, _v)
+    if (`deleted`.isDefined) size += computeBoolSize(11, `deleted`.get)
 
-		size
-	}
+    size
+  }
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbContent = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		var __value: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
-		var __contentType: Option[com.google.protobuf.ByteString] = `contentType`
-		var __charset: Option[com.google.protobuf.ByteString] = `charset`
-		var __contentEncoding: Option[com.google.protobuf.ByteString] = `contentEncoding`
-		var __vtag: Option[com.google.protobuf.ByteString] = `vtag`
-		val __links: collection.mutable.Buffer[RpbLink] = `links`.toBuffer
-		var __lastMod: Option[Int] = `lastMod`
-		var __lastModUsecs: Option[Int] = `lastModUsecs`
-		val __usermeta: collection.mutable.Buffer[RpbPair] = `usermeta`.toBuffer
-		val __indexes: collection.mutable.Buffer[RpbPair] = `indexes`.toBuffer
-		var __deleted: Option[Boolean] = `deleted`
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbContent = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    var __value: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
+    var __contentType: Option[com.google.protobuf.ByteString] = `contentType`
+    var __charset: Option[com.google.protobuf.ByteString] = `charset`
+    var __contentEncoding: Option[com.google.protobuf.ByteString] = `contentEncoding`
+    var __vtag: Option[com.google.protobuf.ByteString] = `vtag`
+    val __links: collection.mutable.Buffer[RpbLink] = `links`.toBuffer
+    var __lastMod: Option[Int] = `lastMod`
+    var __lastModUsecs: Option[Int] = `lastModUsecs`
+    val __usermeta: collection.mutable.Buffer[RpbPair] = `usermeta`.toBuffer
+    val __indexes: collection.mutable.Buffer[RpbPair] = `indexes`.toBuffer
+    var __deleted: Option[Boolean] = `deleted`
 
-		def __newMerged = RpbContent(
-			__value,
-			__contentType,
-			__charset,
-			__contentEncoding,
-			__vtag,
-			Vector(__links: _*),
-			__lastMod,
-			__lastModUsecs,
-			Vector(__usermeta: _*),
-			Vector(__indexes: _*),
-			__deleted
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __value = in.readBytes()
-			case 18 => __contentType = in.readBytes()
-			case 26 => __charset = in.readBytes()
-			case 34 => __contentEncoding = in.readBytes()
-			case 42 => __vtag = in.readBytes()
-			case 50 => __links += readMessage[RpbLink](in, RpbLink.defaultInstance, _emptyRegistry)
-			case 56 => __lastMod = in.readUInt32()
-			case 64 => __lastModUsecs = in.readUInt32()
-			case 74 => __usermeta += readMessage[RpbPair](in, RpbPair.defaultInstance, _emptyRegistry)
-			case 82 => __indexes += readMessage[RpbPair](in, RpbPair.defaultInstance, _emptyRegistry)
-			case 88 => __deleted = in.readBool()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+    def __newMerged = RpbContent(
+      __value,
+      __contentType,
+      __charset,
+      __contentEncoding,
+      __vtag,
+      Vector(__links: _*),
+      __lastMod,
+      __lastModUsecs,
+      Vector(__usermeta: _*),
+      Vector(__indexes: _*),
+      __deleted)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __value = in.readBytes()
+      case 18 => __contentType = in.readBytes()
+      case 26 => __charset = in.readBytes()
+      case 34 => __contentEncoding = in.readBytes()
+      case 42 => __vtag = in.readBytes()
+      case 50 => __links += readMessage[RpbLink](in, RpbLink.defaultInstance, _emptyRegistry)
+      case 56 => __lastMod = in.readUInt32()
+      case 64 => __lastModUsecs = in.readUInt32()
+      case 74 => __usermeta += readMessage[RpbPair](in, RpbPair.defaultInstance, _emptyRegistry)
+      case 82 => __indexes += readMessage[RpbPair](in, RpbPair.defaultInstance, _emptyRegistry)
+      case 88 => __deleted = in.readBool()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-	def mergeFrom(m: RpbContent) = {
-		RpbContent(
-			m.`value`,
-			m.`contentType`.orElse(`contentType`),
-			m.`charset`.orElse(`charset`),
-			m.`contentEncoding`.orElse(`contentEncoding`),
-			m.`vtag`.orElse(`vtag`),
-			`links` ++ m.`links`,
-			m.`lastMod`.orElse(`lastMod`),
-			m.`lastModUsecs`.orElse(`lastModUsecs`),
-			`usermeta` ++ m.`usermeta`,
-			`indexes` ++ m.`indexes`,
-			m.`deleted`.orElse(`deleted`)
-		)
-	}
+  def mergeFrom(m: RpbContent) = {
+    RpbContent(
+      m.`value`,
+      m.`contentType`.orElse(`contentType`),
+      m.`charset`.orElse(`charset`),
+      m.`contentEncoding`.orElse(`contentEncoding`),
+      m.`vtag`.orElse(`vtag`),
+      `links` ++ m.`links`,
+      m.`lastMod`.orElse(`lastMod`),
+      m.`lastModUsecs`.orElse(`lastModUsecs`),
+      `usermeta` ++ m.`usermeta`,
+      `indexes` ++ m.`indexes`,
+      m.`deleted`.orElse(`deleted`))
+  }
 
-	def getDefaultInstanceForType = RpbContent.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbContent.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbContent {
-	@reflect.BeanProperty val defaultInstance = new RpbContent()
+  @reflect.BeanProperty val defaultInstance = new RpbContent()
 
-	val VALUE_FIELD_NUMBER = 1
-	val CONTENT_TYPE_FIELD_NUMBER = 2
-	val CHARSET_FIELD_NUMBER = 3
-	val CONTENT_ENCODING_FIELD_NUMBER = 4
-	val VTAG_FIELD_NUMBER = 5
-	val LINKS_FIELD_NUMBER = 6
-	val LAST_MOD_FIELD_NUMBER = 7
-	val LAST_MOD_USECS_FIELD_NUMBER = 8
-	val USERMETA_FIELD_NUMBER = 9
-	val INDEXES_FIELD_NUMBER = 10
-	val DELETED_FIELD_NUMBER = 11
+  val VALUE_FIELD_NUMBER = 1
+  val CONTENT_TYPE_FIELD_NUMBER = 2
+  val CHARSET_FIELD_NUMBER = 3
+  val CONTENT_ENCODING_FIELD_NUMBER = 4
+  val VTAG_FIELD_NUMBER = 5
+  val LINKS_FIELD_NUMBER = 6
+  val LAST_MOD_FIELD_NUMBER = 7
+  val LAST_MOD_USECS_FIELD_NUMBER = 8
+  val USERMETA_FIELD_NUMBER = 9
+  val INDEXES_FIELD_NUMBER = 10
+  val DELETED_FIELD_NUMBER = 11
 
 }
-final case class RpbLink (
-	`bucket`: Option[com.google.protobuf.ByteString] = None,
-	`key`: Option[com.google.protobuf.ByteString] = None,
-	`tag`: Option[com.google.protobuf.ByteString] = None
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbLink] {
+final case class RpbLink(
+  `bucket`: Option[com.google.protobuf.ByteString] = None,
+  `key`: Option[com.google.protobuf.ByteString] = None,
+  `tag`: Option[com.google.protobuf.ByteString] = None) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbLink] {
 
-	def setBucket(_f: com.google.protobuf.ByteString) = copy(`bucket` = _f)
-	def setKey(_f: com.google.protobuf.ByteString) = copy(`key` = _f)
-	def setTag(_f: com.google.protobuf.ByteString) = copy(`tag` = _f)
+  def setBucket(_f: com.google.protobuf.ByteString) = copy(`bucket` = _f)
+  def setKey(_f: com.google.protobuf.ByteString) = copy(`key` = _f)
+  def setTag(_f: com.google.protobuf.ByteString) = copy(`tag` = _f)
 
-	def clearBucket = copy(`bucket` = None)
-	def clearKey = copy(`key` = None)
-	def clearTag = copy(`tag` = None)
+  def clearBucket = copy(`bucket` = None)
+  def clearKey = copy(`key` = None)
+  def clearTag = copy(`tag` = None)
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		if (`bucket`.isDefined) output.writeBytes(1, `bucket`.get)
-		if (`key`.isDefined) output.writeBytes(2, `key`.get)
-		if (`tag`.isDefined) output.writeBytes(3, `tag`.get)
-	}
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    if (`bucket`.isDefined) output.writeBytes(1, `bucket`.get)
+    if (`key`.isDefined) output.writeBytes(2, `key`.get)
+    if (`tag`.isDefined) output.writeBytes(3, `tag`.get)
+  }
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		if (`bucket`.isDefined) size += computeBytesSize(1, `bucket`.get)
-		if (`key`.isDefined) size += computeBytesSize(2, `key`.get)
-		if (`tag`.isDefined) size += computeBytesSize(3, `tag`.get)
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    if (`bucket`.isDefined) size += computeBytesSize(1, `bucket`.get)
+    if (`key`.isDefined) size += computeBytesSize(2, `key`.get)
+    if (`tag`.isDefined) size += computeBytesSize(3, `tag`.get)
 
-		size
-	}
+    size
+  }
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbLink = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		var __bucket: Option[com.google.protobuf.ByteString] = `bucket`
-		var __key: Option[com.google.protobuf.ByteString] = `key`
-		var __tag: Option[com.google.protobuf.ByteString] = `tag`
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbLink = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    var __bucket: Option[com.google.protobuf.ByteString] = `bucket`
+    var __key: Option[com.google.protobuf.ByteString] = `key`
+    var __tag: Option[com.google.protobuf.ByteString] = `tag`
 
-		def __newMerged = RpbLink(
-			__bucket,
-			__key,
-			__tag
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 10 => __bucket = in.readBytes()
-			case 18 => __key = in.readBytes()
-			case 26 => __tag = in.readBytes()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+    def __newMerged = RpbLink(
+      __bucket,
+      __key,
+      __tag)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 10 => __bucket = in.readBytes()
+      case 18 => __key = in.readBytes()
+      case 26 => __tag = in.readBytes()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-	def mergeFrom(m: RpbLink) = {
-		RpbLink(
-			m.`bucket`.orElse(`bucket`),
-			m.`key`.orElse(`key`),
-			m.`tag`.orElse(`tag`)
-		)
-	}
+  def mergeFrom(m: RpbLink) = {
+    RpbLink(
+      m.`bucket`.orElse(`bucket`),
+      m.`key`.orElse(`key`),
+      m.`tag`.orElse(`tag`))
+  }
 
-	def getDefaultInstanceForType = RpbLink.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbLink.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbLink {
-	@reflect.BeanProperty val defaultInstance = new RpbLink()
+  @reflect.BeanProperty val defaultInstance = new RpbLink()
 
-	val BUCKET_FIELD_NUMBER = 1
-	val KEY_FIELD_NUMBER = 2
-	val TAG_FIELD_NUMBER = 3
+  val BUCKET_FIELD_NUMBER = 1
+  val KEY_FIELD_NUMBER = 2
+  val TAG_FIELD_NUMBER = 3
 
 }
-final case class RpbBucketProps (
-	`nVal`: Option[Int] = None,
-	`allowMult`: Option[Boolean] = None
-) extends com.google.protobuf.GeneratedMessageLite
-	with Message[RpbBucketProps] {
+final case class RpbBucketProps(
+  `nVal`: Option[Int] = None,
+  `allowMult`: Option[Boolean] = None) extends com.google.protobuf.GeneratedMessageLite
+  with Message[RpbBucketProps] {
 
-	def setNVal(_f: Int) = copy(`nVal` = _f)
-	def setAllowMult(_f: Boolean) = copy(`allowMult` = _f)
+  def setNVal(_f: Int) = copy(`nVal` = _f)
+  def setAllowMult(_f: Boolean) = copy(`allowMult` = _f)
 
-	def clearNVal = copy(`nVal` = None)
-	def clearAllowMult = copy(`allowMult` = None)
+  def clearNVal = copy(`nVal` = None)
+  def clearAllowMult = copy(`allowMult` = None)
 
-	def writeTo(output: com.google.protobuf.CodedOutputStream) {
-		if (`nVal`.isDefined) output.writeUInt32(1, `nVal`.get)
-		if (`allowMult`.isDefined) output.writeBool(2, `allowMult`.get)
-	}
+  def writeTo(output: com.google.protobuf.CodedOutputStream) {
+    if (`nVal`.isDefined) output.writeUInt32(1, `nVal`.get)
+    if (`allowMult`.isDefined) output.writeBool(2, `allowMult`.get)
+  }
 
-	lazy val getSerializedSize = {
-		import com.google.protobuf.CodedOutputStream._
-		var size = 0
-		if (`nVal`.isDefined) size += computeUInt32Size(1, `nVal`.get)
-		if (`allowMult`.isDefined) size += computeBoolSize(2, `allowMult`.get)
+  lazy val getSerializedSize = {
+    import com.google.protobuf.CodedOutputStream._
+    var size = 0
+    if (`nVal`.isDefined) size += computeUInt32Size(1, `nVal`.get)
+    if (`allowMult`.isDefined) size += computeBoolSize(2, `allowMult`.get)
 
-		size
-	}
+    size
+  }
 
-	def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbBucketProps = {
-		import com.google.protobuf.ExtensionRegistryLite.{getEmptyRegistry => _emptyRegistry}
-		var __nVal: Option[Int] = `nVal`
-		var __allowMult: Option[Boolean] = `allowMult`
+  def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbBucketProps = {
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    var __nVal: Option[Int] = `nVal`
+    var __allowMult: Option[Boolean] = `allowMult`
 
-		def __newMerged = RpbBucketProps(
-			__nVal,
-			__allowMult
-		)
-		while (true) in.readTag match {
-			case 0 => return __newMerged
-			case 8 => __nVal = in.readUInt32()
-			case 16 => __allowMult = in.readBool()
-			case default => if (!in.skipField(default)) return __newMerged
-		}
-		null
-	}
+    def __newMerged = RpbBucketProps(
+      __nVal,
+      __allowMult)
+    while (true) in.readTag match {
+      case 0 => return __newMerged
+      case 8 => __nVal = in.readUInt32()
+      case 16 => __allowMult = in.readBool()
+      case default => if (!in.skipField(default)) return __newMerged
+    }
+    null
+  }
 
-	def mergeFrom(m: RpbBucketProps) = {
-		RpbBucketProps(
-			m.`nVal`.orElse(`nVal`),
-			m.`allowMult`.orElse(`allowMult`)
-		)
-	}
+  def mergeFrom(m: RpbBucketProps) = {
+    RpbBucketProps(
+      m.`nVal`.orElse(`nVal`),
+      m.`allowMult`.orElse(`allowMult`))
+  }
 
-	def getDefaultInstanceForType = RpbBucketProps.defaultInstance
-	def clear = getDefaultInstanceForType
-	def isInitialized = true
-	def build = this
-	def buildPartial = this
-	def newBuilderForType = this
-	def toBuilder = this
+  def getDefaultInstanceForType = RpbBucketProps.defaultInstance
+  def clear = getDefaultInstanceForType
+  def isInitialized = true
+  def build = this
+  def buildPartial = this
+  def newBuilderForType = this
+  def toBuilder = this
 }
 
 object RpbBucketProps {
-	@reflect.BeanProperty val defaultInstance = new RpbBucketProps()
+  @reflect.BeanProperty val defaultInstance = new RpbBucketProps()
 
-	val N_VAL_FIELD_NUMBER = 1
-	val ALLOW_MULT_FIELD_NUMBER = 2
+  val N_VAL_FIELD_NUMBER = 1
+  val ALLOW_MULT_FIELD_NUMBER = 2
 
 }
 
 object RiakKvPB {
-	def registerAllExtensions(registry: com.google.protobuf.ExtensionRegistryLite) {
-	}
+  def registerAllExtensions(registry: com.google.protobuf.ExtensionRegistryLite) {
+  }
 
 }

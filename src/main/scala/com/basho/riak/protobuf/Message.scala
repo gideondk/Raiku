@@ -23,7 +23,7 @@ trait Message[MessageType <: MessageLite with MessageLite.Builder] extends Messa
   def isInitialized: Boolean
 
   def writeTo(output: com.google.protobuf.CodedOutputStream)
-  
+
   def mergeFrom(input: CodedInputStream, extensionRegistry: ExtensionRegistryLite): MessageType
 
   def mergeFrom(input: CodedInputStream): MessageType = mergeFrom(input, ExtensionRegistryLite.getEmptyRegistry)

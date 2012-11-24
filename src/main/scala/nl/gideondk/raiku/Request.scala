@@ -29,15 +29,15 @@ trait Request extends Connection with ProtoBufConversion {
   def ?>(op: ByteString): ValidatedFutureIO[RiakResponse] = {
     val ioAction = {
       val promise = Promise[RiakResponse]()
-      actor ! RiakOperation(promise, op)  
+      actor ! RiakOperation(promise, op)
       promise
     }.point[IO]
-    
+
     errorCheckedValidatedFutureIORiakResponse(ValidatedFutureIO(ioAction.map(x => ValidatedFuture(x.future))))
   }
 
   def errorCheckedValidatedFutureIORiakResponse(vr: ValidatedFutureIO[RiakResponse]) = {
-    ValidatedFutureIO(vr.io.map(z => ValidatedFuture(z.future.map (x => x.flatMap(riakResponseToValidation)))))
+    ValidatedFutureIO(vr.io.map(z => ValidatedFuture(z.future.map(x => x.flatMap(riakResponseToValidation)))))
   }
 
   def riakResponseToValidation(resp: RiakResponse): Validation[Throwable, RiakResponse] = {

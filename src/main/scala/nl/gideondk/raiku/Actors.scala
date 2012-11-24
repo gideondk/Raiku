@@ -35,7 +35,7 @@ private[raiku] class RaikuActor(config: RaikuConfig) extends Actor {
 
   override def preStart = {
     log info ("Connecting")
-    sockets = Vector.fill(connections){ 
+    sockets = Vector.fill(connections) {
       val host = nextHost
       IOManager(context.system).connect(host.host, host.port)
     }
@@ -61,7 +61,7 @@ private[raiku] class RaikuActor(config: RaikuConfig) extends Actor {
 
   def checkAndReinitSockets = if (sockets.length < math.ceil(config.connections / 2)) {
     val nrDiff = config.connections - sockets.length
-    sockets = sockets ++ Vector.fill(nrDiff) { 
+    sockets = sockets ++ Vector.fill(nrDiff) {
       val host = nextHost
       IOManager(context.system).connect(host.host, host.port)
     }
@@ -71,7 +71,7 @@ private[raiku] class RaikuActor(config: RaikuConfig) extends Actor {
     case IO.Connected(socket, address) ⇒
       log.info("Successfully connected to " + address)
 
-    case IO.Read(socket, bytes) ⇒ 
+    case IO.Read(socket, bytes) ⇒
       state(socket)(IO Chunk bytes)
 
     case IO.Closed(socket: IO.SocketHandle, cause) ⇒ {
@@ -109,7 +109,6 @@ object Iteratees {
     RiakResponse(frameLen + 1, messageType.head.toInt, frame)
   }
 }
-
 
 private[raiku] case class RiakResponse(length: Int, messageType: Int, message: ByteString)
 private[raiku] case class RiakOperation(promise: Promise[RiakResponse], bytes: ByteString)
