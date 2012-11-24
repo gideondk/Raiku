@@ -27,7 +27,7 @@ The client should currently treated as a proof of concept, but is stable enough 
 * Querying items on 2i, based on binary or integral indexes (ranges also supported);
 * Sequencing and continuing multiple operations using monad transformers (ValidatedFuture, ValidatedFutureIO).
 
-**The following is currently missing in the client, and will be added soon: **
+**The following is currently missing in the client, and will be added soon:**
 
 * Map/Reduce functionality;
 * Link walking;
@@ -61,9 +61,9 @@ persons ?* 	List(personIdA, personIdB)
 </code></pre>
 
 **Storing objects**
-<pre><code>persons <<	Person("Basho", 42, "Japan")
+<notextile><pre><code>persons <<	Person("Basho", 42, "Japan")
 persons <<*  List(Person("Basho", 42, "Japan"), Person("Shiki", 52, "Japan"))
-</code></pre>
+</code></pre></notextile>
 
 **Deleting objects**
 <pre><code>persons - 	Person("Basho", 42, "Japan")
@@ -79,10 +79,13 @@ persons idx	 ("age", 39 to 50)
 ## Usage
 Using the client / bucket is quite simple, check the code of the tests to see all functionality. But it basically comes down to this:
 
-<pre><code>implicit val system = ActorSystem("system")
+**Create a client:**
+<notextile><pre><code>implicit val system = ActorSystem("system")
 val client = RaikuClient("localhost", 8087, 4)
+</code></pre></notextile>
 
-implicit val yFormat = jsonFormat4(Y)
+**Create a converter:**
+<pre><code>implicit val yFormat = jsonFormat4(Y)
 
 implicit val yConverter = new RaikuConverter[Y] {
 	def read(o: RaikuRWObject): ReadResult[Y] = try {
@@ -92,10 +95,8 @@ implicit val yConverter = new RaikuConverter[Y] {
 	}
 	def write(bucket: String, o: Y): RaikuRWObject = RaikuRWObject(bucket, o.id, o.toJson.toString.getBytes, binIndexes = Map("group_id" -> List(o.groupId)), intIndexes = Map("age" -> List(o.age)))
 }
+</code></pre>
 
-val bucket = RaikuBucket[Y]("raiku_test_y_bucket", client)
-
-val obj = Y(newId, "Matsuo Bashō", 41, groupId)
-(bucket << obj).unsafeFulFill
-
+**Finally, create the bucket:**
+<pre><code>val bucket = RaikuBucket[Y]("raiku_test_y_bucket", client)
 </code></pre>
