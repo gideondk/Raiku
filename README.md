@@ -19,7 +19,7 @@ Based on Akka IO, it uses the iteratee pattern and actors to create the best thr
 
 The client should currently treated as a proof of concept, but is stable enough to try out in hobby-projects.
 
-**You can use the following in the client:**
+**Currently available in the client:**
 
 *  Writing low-level protobuf style read-write objects through a RaikuClient;
 * Doing this non-blocking through multiple sockets, handled by a single actor;
@@ -27,7 +27,7 @@ The client should currently treated as a proof of concept, but is stable enough 
 * Querying items on 2i, based on binary or integral indexes (ranges also supported);
 * Sequencing and continuing multiple operations using monad transformers (ValidatedFuture, ValidatedFutureIO).
 
-**The following is currently missing in the client, and will be added soon:**
+**The following is currently missing in the client, but will be added soon:**
 
 * Map/Reduce functionality;
 * Link walking;
@@ -40,9 +40,9 @@ The client should currently treated as a proof of concept, but is stable enough 
 
 ## Architecture
 
-The client is uses Akka IO and iteratees to send and receive protocol buffer encoded data streams over "normal" TCP sockets.
+The client is uses Akka IO and iteratees to send and receive protocol buffer encoded data streams over TCP sockets.
 
-Protocol Buffer messages are transformed into easier to use requests and back, Riak PBC Content objects are serialised into *RWObjects*, which are easy to use case classes, containing all information needed to successfully write objects back into Riak.
+Protocol Buffer messages are transformed into case classes using ScalaBuff, Riak PBC Content objects are serialized into *RWObjects*, which are easy to use case classes, containing all information needed to successfully write objects back into Riak.
 
 You can use the client functionality to fetch, store and delete these "low level" objects, but it's wiser to use the RaikuBucket to store objects converted using a RaikuConverter implementation. 
 
