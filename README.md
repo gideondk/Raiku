@@ -106,7 +106,7 @@ implicit val yConverter = new RaikuConverter[Y] {
 ## Credits
 
 Lots of credits go to [Jordan West](https://github.com/jrwest) for the structure of his Scaliak driver,
-and to [Sandro Gržičić](https://github.com/SandroGrzicic) for his ScalaBuff implementation.
+and to [Sandro Gržičić](https://github.com/SandroGrzicic) for the ScalaBuff implementation.
 
 ## License
 Copyright © 2012 Gideon de Kok
