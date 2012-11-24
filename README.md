@@ -19,7 +19,7 @@ Based on Akka IO, it uses the iteratee pattern and actors to create the best thr
 
 The client should currently treated as a proof of concept, but is stable enough to try out in hobby-projects.
 
-**You can use the following in the client:**
+**Currently available in the client:**
 
 *  Writing low-level protobuf style read-write objects through a RaikuClient;
 * Doing this non-blocking through multiple sockets, handled by a single actor;
@@ -27,7 +27,7 @@ The client should currently treated as a proof of concept, but is stable enough 
 * Querying items on 2i, based on binary or integral indexes (ranges also supported);
 * Sequencing and continuing multiple operations using monad transformers (ValidatedFuture, ValidatedFutureIO).
 
-**The following is currently missing in the client, and will be added soon: **
+**The following is currently missing in the client, but will be added soon:**
 
 * Map/Reduce functionality;
 * Link walking;
@@ -40,15 +40,17 @@ The client should currently treated as a proof of concept, but is stable enough 
 
 ## Architecture
 
-The client is uses Akka IO and iteratees to send and receive protocol buffer encoded data streams over "normal" TCP sockets.
+The client is uses Akka IO and iteratees to send and receive protocol buffer encoded data streams over TCP sockets.
 
-Protocol Buffer messages are transformed into easier to use requests and back, Riak PBC Content objects are serialised into *RWObjects*, which are easy to use case classes, containing all information needed to successfully write objects back into Riak.
+Protocol Buffer messages are transformed into case classes using ScalaBuff, Riak PBC Content objects are serialized into *RWObjects*, which are easy to use case classes, containing all information needed to successfully write objects back into Riak.
 
 You can use the client functionality to fetch, store and delete these "low level" objects, but it's wiser to use the RaikuBucket to store objects converted using a RaikuConverter implementation. 
 
 You are free to use any value serialisation method available, but I recommended to use the Spray JSON package (behaves very good in multi-threaded environments).
 
 All operations return a value in a monad transformer (ValidatedFutureIO) which combines a validation, future and IO monad into one type: most (if not all) exceptions will be caught in the validation monad, all async actions are abstracted into a future monad and all IO actions are as pure as possible by using the Scalaz IO monad.
+
+Use <code>unsafePerformIO</code> to expose the Future, or use <code>unsafeFulFill(d: Duration)</code> to perform IO and wait (blocking) on the future.
 
 ## DSL
 You can use the *normal* functions to store, fetch or delete objects. 
@@ -61,9 +63,9 @@ persons ?* 	List(personIdA, personIdB)
 </code></pre>
 
 **Storing objects**
-<pre><code>persons <<	Person("Basho", 42, "Japan")
+<notextile><pre><code>persons <<	Person("Basho", 42, "Japan")
 persons <<*  List(Person("Basho", 42, "Japan"), Person("Shiki", 52, "Japan"))
-</code></pre>
+</code></pre></notextile>
 
 **Deleting objects**
 <pre><code>persons - 	Person("Basho", 42, "Japan")
@@ -79,10 +81,13 @@ persons idx	 ("age", 39 to 50)
 ## Usage
 Using the client / bucket is quite simple, check the code of the tests to see all functionality. But it basically comes down to this:
 
-<pre><code>implicit val system = ActorSystem("system")
+**Create a client:**
+<notextile><pre><code>implicit val system = ActorSystem("system")
 val client = RaikuClient("localhost", 8087, 4)
+</code></pre></notextile>
 
-implicit val yFormat = jsonFormat4(Y)
+**Create a converter:**
+<pre><code>implicit val yFormat = jsonFormat4(Y)
 
 implicit val yConverter = new RaikuConverter[Y] {
 	def read(o: RaikuRWObject): ReadResult[Y] = try {
@@ -92,10 +97,8 @@ implicit val yConverter = new RaikuConverter[Y] {
 	}
 	def write(bucket: String, o: Y): RaikuRWObject = RaikuRWObject(bucket, o.id, o.toJson.toString.getBytes, binIndexes = Map("group_id" -> List(o.groupId)), intIndexes = Map("age" -> List(o.age)))
 }
+</code></pre>
 
-val bucket = RaikuBucket[Y]("raiku_test_y_bucket", client)
-
-val obj = Y(newId, "Matsuo Bashō", 41, groupId)
-(bucket << obj).unsafeFulFill
-
+**Finally, create the bucket:**
+<pre><code>val bucket = RaikuBucket[Y]("raiku_test_y_bucket", client)
 </code></pre>
