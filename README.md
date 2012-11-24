@@ -50,7 +50,7 @@ You are free to use any value serialisation method available, but I recommended 
 
 All operations return a value in a monad transformer (ValidatedFutureIO) which combines a validation, future and IO monad into one type: most (if not all) exceptions will be caught in the validation monad, all async actions are abstracted into a future monad and all IO actions are as pure as possible by using the Scalaz IO monad.
 
-Use unsafePerformIO to expose the Future, or use unsafeFulFill(d: Duration) to perform IO and wait (blocking) on the future.
+Use <code>unsafePerformIO</code> to expose the Future, or use <code>unsafeFulFill(d: Duration)</code> to perform IO and wait (blocking) on the future.
 
 ## DSL
 You can use the *normal* functions to store, fetch or delete objects. 
