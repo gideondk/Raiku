@@ -135,7 +135,6 @@ Or if you want to run queries in parrallel:
 
 <notextile><pre><code>val storePersons = persons <<* perObjs
 val storeCountries = countries <<* countryObjs
-
 ValidatedFutureIO.sequence(List(storePersons, storeCountries))</code></pre></notextile>
 
 
