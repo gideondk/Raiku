@@ -121,12 +121,11 @@ implicit val yConverter = new RaikuConverter[Y] {
 ## Monadic behavior
 You can use the monadic behavior of <code>ValidatedFutureIO[T]</code> to combine multiple requests:
 
-<pre><code>val objs: ValidatedFutureIO[List[Person]] = for {
+<notextile><pre><code>val objs: ValidatedFutureIO[List[Person]] = for {
 	keys <- persons idx ("age", 39 to 50)
 	objs <- persons ?* keys
 } yield objs
-
-</code></pre>
+</code></pre></notextile>
 
 Or better, using Scalaz:
 
@@ -134,10 +133,10 @@ Or better, using Scalaz:
 
 Or if you want to run queries in parrallel:
 
-<pre><code>val storePersons = persons <<* perObjs
+<notextile><pre><code>val storePersons = persons <<* perObjs
 val storeCountries = countries <<* countryObjs
 
-ValidatedFutureIO.sequence(List(storePersons, storeCountries))</code></pre>
+ValidatedFutureIO.sequence(List(storePersons, storeCountries))</code></pre></notextile>
 
 
 ## Credits
