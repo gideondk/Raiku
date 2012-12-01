@@ -72,18 +72,16 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
   }
 
   /* 
-     * Faster then the "normal" store, because object won't be fetched first to determine the vclock.
+     * *Should* be faster then the "normal" store, because object won't be fetched first to determine the vclock.
      * Only to be used when you are *absolutely* sure this object doesn't already exists.
      *
      * Some parameters (like ifNonModified, ifNonMatched) won't make sense for this purpose, 
      * leaving them here if you wan't to misuse this function for other purposes.
      *
-     * Not integrated in DSL, unsafe should read unsafe ;-)
+     * Not integrated in DSL, unsafe should stay unsafe ;-)
     */
 
   def unsafeStoreNew(obj: T, 
-                      r: RArgument = RArgument(), 
-                      pr: PRArgument = PRArgument(),
                       basicQuorum: BasicQuorumArgument = BasicQuorumArgument(), 
                       notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
                       deletedVClock: DeletedVClockArgument = DeletedVClockArgument(), 
@@ -115,8 +113,6 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
   }
 
   def unsafeStoreManyNew(objs: List[T], 
-                          r: RArgument = RArgument(), 
-                          pr: PRArgument = PRArgument(),
                           basicQuorum: BasicQuorumArgument = BasicQuorumArgument(), 
                           notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
                           deletedVClock: DeletedVClockArgument = DeletedVClockArgument(), 
@@ -127,7 +123,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
                           ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(), 
                           ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
                           returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[List[T]] = {
-    ValidatedFutureIO.sequence(objs.map(unsafeStoreNew(_, r, pr, basicQuorum, notFoundOk, deletedVClock, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead))).map(_.flatten)
+    ValidatedFutureIO.sequence(objs.map(unsafeStoreNew(_, basicQuorum, notFoundOk, deletedVClock, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead))).map(_.flatten)
   }
 
   def delete(obj: T, 

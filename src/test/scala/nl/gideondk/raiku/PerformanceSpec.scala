@@ -1,7 +1,5 @@
 package nl.gideondk.raiku
 
-// import org.scalatest.FunSuite
-// import org.scalatest.BeforeAndAfter
 import akka.actor._
 import scala.concurrent._
 import scala.concurrent.duration._
@@ -17,7 +15,7 @@ import org.specs2.matcher.Matcher
 import scala.concurrent.duration._
 import scala.concurrent._
 
-class PerformanceSpec extends Specification with DefaultJsonProtocol {
+class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
 	sequential 
 
 	implicit val system = ActorSystem("perf-bucket-system")
@@ -35,7 +33,7 @@ class PerformanceSpec extends Specification with DefaultJsonProtocol {
   			binIndexes = Map("group_id" -> List(o.groupId)), intIndexes = Map("age" -> List(o.age)))
   	}
 
-  	val nrOfItems = 2000
+  	val nrOfItems = 1000
   	
   	val randomObjects = List.fill(nrOfItems)(Y(java.util.UUID.randomUUID.toString, "Test Name", 25, "A")).toList
 	val ids = randomObjects.map(_.id)
@@ -45,28 +43,42 @@ class PerformanceSpec extends Specification with DefaultJsonProtocol {
 
 	"A bucket" should {
 		"be able to store objects in timely fashion" in {
-			val futs = bucket <<* (randomObjects, w = 1)
-	      	val t1 = System.currentTimeMillis
-	      	val status = futs.unsafeFulFill
-	      	val t2 = System.currentTimeMillis
-	     
-	   	  	val diff = t2 - t1
-	   	  	val nrOfOps = nrOfItems / (diff / 1000.0)
-	   	  	
-	   	  	println("Storing ops: " + nrOfOps)
-	   	  	nrOfOps > 200
-		}
-		"be able to fetch objects in timely fashion" in {
-	   	  val futs = bucket ?* (ids, r = 1)
-	      val t1 = System.currentTimeMillis
-	      val status = futs.unsafeFulFill.toOption.get
-	      val t2 = System.currentTimeMillis
+			val acts = randomObjects.map(x => bucket << (x, w = 1))
+	    	
+	    	timed("Storing " + nrOfItems + " items sequentially (bad)", nrOfItems) {
+	    		acts.foreach { x =>
+	    			x.unsafeFulFill
+	    		}
+	    	}
 
-	   	  val diff = t2 - t1
-	   	  val nrOfOps = nrOfItems / (diff / 1000.0)
-	   	  
-	   	  println("Fetching ops: " + nrOfOps)
-	   	  nrOfOps > 500
+	    	val futs = bucket <<* (randomObjects, w = 1)
+	    	timed("Storing " + nrOfItems + " items in parallel (good)", nrOfItems) {
+	    		val status = futs.unsafeFulFill	
+	    	}
+		}
+
+		"be able to fetch objects in timely fashion" in {
+			val acts = ids.map(x => bucket ? (x, r = 1))
+
+	    	timed("Fetching " + nrOfItems + " items sequentially (bad)", nrOfItems) {
+	    		acts.foreach { x =>
+	    			x.unsafeFulFill
+	    		}
+	    	}
+
+	    	val futs = bucket ?* (ids, r = 1)
+
+	    	timed("Fetching " + nrOfItems + " items in parallel (good)",nrOfItems) {
+	    		val status = futs.unsafeFulFill	
+	    	}
+		}
+		"be able to delete objects in timely fashion" in {
+
+	   	  	val futs = bucket -* (randomObjects, r = 1, w = 1)
+
+	    	timed("Deleting " + nrOfItems + " items in parallel", nrOfItems) {
+	    		val status = futs.unsafeFulFill	
+	    	}
 		}
 	}
 
