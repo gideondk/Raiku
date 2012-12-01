@@ -45,9 +45,9 @@ trait RWRequests extends Request {
 
   def fetch(bucket: String, key: String, r: Option[Int] = None, pr: Option[Int] = None,
     basicQuorum: Option[Boolean] = None, notFoundOk: Option[Boolean] = None,
-    ifModified: Option[String] = None, head: Option[Boolean] = None,
+    ifModified: Option[VClock] = None, head: Option[Boolean] = None,
     deletedvclock: Option[Boolean] = None): ValidatedFutureIO[List[RaikuRWObject]] = {
-    val req = ?>(request(RiakMessageType.RpbGetReq, RpbGetReq(bucket, key, r, pr, basicQuorum, notFoundOk, ifModified.map(stringToByteString(_)), head, deletedvclock)))
+    val req = ?>(request(RiakMessageType.RpbGetReq, RpbGetReq(bucket, key, r, pr, basicQuorum, notFoundOk, ifModified.map(x => x.v), head, deletedvclock)))
     req.map(x => RpbGetResp().mergeFrom(x.message.toArray)).map(x => pbGetRespToRWObjects(key, bucket, x))
   }
 
