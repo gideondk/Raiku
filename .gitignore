@@ -1,5 +1,8 @@
 .idea
 .idea_modules
+.classpath
+.cache
+.project
 *.iml
 target
 .DS_Store
