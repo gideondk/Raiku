@@ -29,9 +29,9 @@ package object raiku {
   implicit def booleanToDeletedVClockArgument(b: Boolean): DeletedVClockArgument = DeletedVClockArgument(Option(b))
 
   implicit def ValidatedFutureIORWListToValidatedFutureIOOptT[T](v: ValidatedFutureIO[List[RaikuRWObject]])(implicit converter: RaikuConverter[T]): ValidatedFutureIO[Option[T]] = {
-    ValidatedFutureIO(v.io.map {
+    ValidatedFutureIO(v.run.map {
       x =>
-        ValidatedFuture(x.future.map { v =>
+        ValidatedFuture(x.run.map { v =>
           v match {
             case Success(List(obj)) => converter.read(obj).map(_.some)
             case Success(List()) => none.success[Throwable]
@@ -43,9 +43,9 @@ package object raiku {
   }
 
   implicit def ValidatedFutureIORWListToValidatedFutureIOOptRW(v: ValidatedFutureIO[List[RaikuRWObject]]): ValidatedFutureIO[Option[RaikuRWObject]] = {
-    ValidatedFutureIO(v.io.map {
+    ValidatedFutureIO(v.run.map {
       x =>
-        ValidatedFuture(x.future.map { v =>
+        ValidatedFuture(x.run.map { v =>
           v match {
             case Success(List(obj)) => Some(obj).success
             case Success(List()) => none.success[Throwable]

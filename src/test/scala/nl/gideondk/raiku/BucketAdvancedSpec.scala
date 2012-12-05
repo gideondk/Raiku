@@ -86,6 +86,24 @@ class BucketAdvancedSpec extends Specification with DefaultJsonProtocol {
 			val res = keys.unsafeFulFill.toOption.get
 			res._1.contains(newId) && res._1.contains(secId) && res._2.contains(newId) && !res._2.contains(secId) && !res._3.contains(newId) && res._3.contains(secId)
 		}
+
+		"be able to use Scalaz functionality on ValidatedIOFutures" in {
+			val newId = java.util.UUID.randomUUID.toString
+			val secId = java.util.UUID.randomUUID.toString
+			val groupId = java.util.UUID.randomUUID.toString
+			
+			val basho = Y(newId, "Matsuo Bashō", 41, groupId)
+			val shiki = Y(secId, "Masaoka Shiki", 52, groupId)
+
+			val all = for {
+				_ 		<- bucket << basho
+				_ 		<- bucket << shiki
+				all 	<- bucket idx ("age", 40 to 60) >>= ((x: List[String]) => bucket ?* x)
+			} yield (all)
+
+			val res = all.unsafeFulFill
+			res.isSuccess
+		}
 	}
 
 	step { 

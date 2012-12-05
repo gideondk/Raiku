@@ -3,62 +3,62 @@ package nl.gideondk.raiku
 import scalaz._
 import Scalaz._
 import scalaz.effect._
-import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
+import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-final case class ValidatedFuture[A](future: Future[Validation[Throwable, A]]) {
-  self =>
-
-  def map[B](f: A => B): ValidatedFuture[B] = ValidatedFuture {
-    future map {
-      x =>
-        x match {
-          case Failure(fail) => fail.failure
-          case Success(succ) => f(succ).success
-        }
-    }
-  }
-
-  def flatMap[B](f: A => ValidatedFuture[B]): ValidatedFuture[B] = ValidatedFuture {
-    future flatMap {
-      _ match {
-        case Failure(fail) => Future(fail.failure)
-        case Success(succ) => f(succ).future
-      }
-    }
-  }
-}
+final case class ValidatedFuture[A](run: Future[Validation[Throwable, A]])
 
 object ValidatedFuture {
-  def apply[T](a: => Future[T]): ValidatedFuture[T] = ValidatedFuture((a.map(_.success) recover { case t => t.failure }))
+  implicit val validatedFuture = new Monad[ValidatedFuture] {
+    def point[A](a: => A): ValidatedFuture[A] = ValidatedFuture(Future(a.success))
+
+    override def map[A, B](fa: ValidatedFuture[A])(f: A => B): ValidatedFuture[B] =
+      ValidatedFuture(fa.run.map(validation => validation map f))
+
+    def bind[A, B](fa: ValidatedFuture[A])(f: A => ValidatedFuture[B]) =
+      ValidatedFuture(fa.run.flatMap(validation => validation match {
+        case Success(succ) => f(succ).run
+        case Failure(fail) => Future(fail.failure)
+
+      }))
+  }
+
+  def apply[T](a: => Future[T]): ValidatedFuture[T] = ValidatedFuture((a.map(_.success) recover {
+    case t => t.failure
+  }))
 }
 
-final case class ValidatedFutureIO[A](io: IO[ValidatedFuture[A]]) {
-  self =>
+case class ValidatedFutureIO[A](run: IO[ValidatedFuture[A]]) { self =>
+  def fulFill(duration: Duration = 5 seconds): IO[Validation[Throwable, A]] = run.map(x => Await.result(x.run, duration))
 
-  def map[B](f: A => B): ValidatedFutureIO[B] =
-    ValidatedFutureIO(io.map { _ map { f(_) } })
-
-  def flatMap[B](f: A => ValidatedFutureIO[B]): ValidatedFutureIO[B] =
-    ValidatedFutureIO { io.flatMap { _.flatMap { f(_).unsafePerformIO }.point[IO] } }
-
-  def fulFill(duration: Duration = 5 seconds): IO[Validation[Throwable, A]] = io.map(x => Await.result(x.future, duration))
-
-  def unsafePerformIO: ValidatedFuture[A] = io.unsafePerformIO
+  def unsafePerformIO: ValidatedFuture[A] = run.unsafePerformIO
 
   def unsafeFulFill: Validation[Throwable, A] = unsafeFulFill()
 
   def unsafeFulFill(duration: Duration = 5 seconds): Validation[Throwable, A] = fulFill(duration).unsafePerformIO
-
-  def !!(duration: Duration = 5 seconds): Validation[Throwable, A] = unsafeFulFill(duration)
 }
 
-object ValidatedFutureIO {
+trait ValidatedFutureIOInstances {
+  implicit val validatedFutureIO = new Monad[ValidatedFutureIO] {
+    def point[A](a: => A): ValidatedFutureIO[A] = ValidatedFutureIO(a.point[ValidatedFuture].point[IO])
+
+    override def map[A, B](fa: ValidatedFutureIO[A])(f: A => B): ValidatedFutureIO[B] =
+      ValidatedFutureIO(fa.run.map(valFut => valFut map f))
+
+    def bind[A, B](fa: ValidatedFutureIO[A])(f: A => ValidatedFutureIO[B]): ValidatedFutureIO[B] =
+      ValidatedFutureIO(fa.run.flatMap(valFut => valFut.flatMap(f(_).run.unsafePerformIO).point[IO]))
+
+    def unsafePerformIO[A](fa: ValidatedFutureIO[A]): ValidatedFuture[A] = fa.run.unsafePerformIO()
+  }
+}
+
+trait ValidatedFutureIOFunctions {
   def apply[T](a: => Future[T]): ValidatedFutureIO[T] = ValidatedFutureIO(ValidatedFuture(a).point[IO])
 
   def sequence[T](z: List[ValidatedFutureIO[T]]): ValidatedFutureIO[List[T]] =
-    ValidatedFutureIO(z.map(_.io).sequence.map(l => Future.sequence(l.map(_.future.map(_.toValidationNEL)))
-      .map(_.toList.sequence[({ type l[a] = ValidationNEL[Throwable, a] })#l, T])).map(z => ValidatedFuture(z.map(y => (y.bimap(x => x.head, x => x))))))
-
+      ValidatedFutureIO(z.map(_.run).sequence.map(l => Future.sequence(l.map(_.run.map(_.toValidationNEL)))
+        .map(_.toList.sequence[({ type l[a] = ValidationNEL[Throwable, a] })#l, T])).map(z => ValidatedFuture(z.map(y => (y.bimap(x => x.head, x => x))))))
 }
+
+object ValidatedFutureIO extends ValidatedFutureIOInstances with ValidatedFutureIOFunctions
