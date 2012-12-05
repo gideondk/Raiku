@@ -109,7 +109,7 @@ trait Message[MessageType <: MessageLite with MessageLite.Builder] extends Messa
    * See {@link com.google.protobuf.AbstractMessageLite.Builder#LimitedInputStream}.
    */
   private final class LimitedInputStream(
-    val inputStream: InputStream, private var limit: Int) extends FilterInputStream(inputStream) {
+      val inputStream: InputStream, private var limit: Int) extends FilterInputStream(inputStream) {
 
     override def available = scala.math.min(super.available, limit)
 

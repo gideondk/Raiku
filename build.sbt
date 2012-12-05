@@ -27,3 +27,15 @@ libraryDependencies ++= Seq(
 )
 
 logBuffered := false
+
+scalariformSettings
+
+ScalariformKeys.preferences :=
+  (FormattingPreferences()
+        setPreference(IndentSpaces, 2)
+        setPreference(AlignParameters, false)
+        setPreference(AlignSingleLineCaseStatements, true)
+        setPreference(DoubleIndentClassDeclaration, true)
+        setPreference(RewriteArrowSymbols, true)
+        setPreference(PreserveSpaceBeforeArguments, true)
+        setPreference(IndentWithTabs, false))

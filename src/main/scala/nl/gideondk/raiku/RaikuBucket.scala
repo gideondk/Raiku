@@ -24,42 +24,42 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
   def setBucketProperties(pr: RaikuBucketProperties) =
     client.setBucketProperties(bucketName, RpbBucketProps(pr.nVal, pr.allowMulti))
 
-  def fetch(key: String, 
-            r: RArgument = RArgument(), 
-            pr: PRArgument = PRArgument(),
-            basicQuorum: BasicQuorumArgument = BasicQuorumArgument(), 
-            notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-            ifModified: IfModifiedArgument = IfModifiedArgument(), 
-            onlyHead: OnlyHeadArgument = OnlyHeadArgument(),
-            deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): ValidatedFutureIO[Option[T]] = {
+  def fetch(key: String,
+    r: RArgument = RArgument(),
+    pr: PRArgument = PRArgument(),
+    basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+    notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
+    ifModified: IfModifiedArgument = IfModifiedArgument(),
+    onlyHead: OnlyHeadArgument = OnlyHeadArgument(),
+    deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): ValidatedFutureIO[Option[T]] = {
     val (nR, pR) = (List(r.v, config.r.v).flatten headOption, List(pr.v, config.pr.v).flatten headOption)
     client.fetch(bucketName, key, nR, pR, basicQuorum.v, notFoundOk.v, ifModified.v, onlyHead.v, deletedVClock.v)
   }
 
-  def fetchMany(keys: List[String], 
-                r: RArgument = RArgument(), 
-                pr: PRArgument = PRArgument(),
-                basicQuorum: BasicQuorumArgument = BasicQuorumArgument(), 
-                notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-                ifModified: IfModifiedArgument = IfModifiedArgument(), 
-                onlyHead: OnlyHeadArgument = OnlyHeadArgument(),
-                deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): ValidatedFutureIO[List[T]] = {
+  def fetchMany(keys: List[String],
+    r: RArgument = RArgument(),
+    pr: PRArgument = PRArgument(),
+    basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+    notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
+    ifModified: IfModifiedArgument = IfModifiedArgument(),
+    onlyHead: OnlyHeadArgument = OnlyHeadArgument(),
+    deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): ValidatedFutureIO[List[T]] = {
     ValidatedFutureIO.sequence(keys.map(fetch(_, r, pr, basicQuorum, notFoundOk, ifModified, onlyHead, deletedVClock))).map(_.flatten)
   }
 
-  def store(obj: T, 
-            r: RArgument = RArgument(), 
-            pr: PRArgument = PRArgument(),
-            basicQuorum: BasicQuorumArgument = BasicQuorumArgument(), 
-            notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-            deletedVClock: DeletedVClockArgument = DeletedVClockArgument(), 
-            w: WArgument = WArgument(), 
-            dw: DWArgument = DWArgument(), 
-            returnBody: ReturnBodyArgument = ReturnBodyArgument(),
-            pw: PWArgument = PWArgument(), 
-            ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(), 
-            ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
-            returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[Option[T]] = {
+  def store(obj: T,
+    r: RArgument = RArgument(),
+    pr: PRArgument = PRArgument(),
+    basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+    notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
+    deletedVClock: DeletedVClockArgument = DeletedVClockArgument(),
+    w: WArgument = WArgument(),
+    dw: DWArgument = DWArgument(),
+    returnBody: ReturnBodyArgument = ReturnBodyArgument(),
+    pw: PWArgument = PWArgument(),
+    ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
+    ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
+    returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[Option[T]] = {
     val converted = converter.write(bucketName, obj)
     val (nR, pR) = (List(r.v, config.r.v).flatten headOption, List(pr.v, config.pr.v).flatten headOption)
     ValidatedFutureIORWListToValidatedFutureIOOptRW(client.fetch(bucketName, converted.key, nR, pR, basicQuorum.v, notFoundOk.v, deletedvclock = deletedVClock.v))
@@ -81,70 +81,70 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
      * Not integrated in DSL, unsafe should stay unsafe ;-)
     */
 
-  def unsafeStoreNew(obj: T, 
-                      basicQuorum: BasicQuorumArgument = BasicQuorumArgument(), 
-                      notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-                      deletedVClock: DeletedVClockArgument = DeletedVClockArgument(), 
-                      w: WArgument = WArgument(), 
-                      dw: DWArgument = DWArgument(), 
-                      returnBody: ReturnBodyArgument = ReturnBodyArgument(),
-                      pw: PWArgument = PWArgument(), 
-                      ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(), 
-                      ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
-                      returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[Option[T]] = {
+  def unsafeStoreNew(obj: T,
+    basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+    notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
+    deletedVClock: DeletedVClockArgument = DeletedVClockArgument(),
+    w: WArgument = WArgument(),
+    dw: DWArgument = DWArgument(),
+    returnBody: ReturnBodyArgument = ReturnBodyArgument(),
+    pw: PWArgument = PWArgument(),
+    ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
+    ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
+    returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[Option[T]] = {
     val (nW, nDw, nPw) = (List(w.v, config.w.v).flatten headOption, List(dw.v, config.dw.v).flatten headOption, List(pw.v, config.pw.v).flatten headOption)
     client.store(converter.write(bucketName, obj), nW, nDw, returnBody.v, nPw, ifNotModified.v, ifNonMatched.v, returnHead.v)
   }
 
-  def storeMany(objs: List[T], 
-                r: RArgument = RArgument(), 
-                pr: PRArgument = PRArgument(),
-                basicQuorum: BasicQuorumArgument = BasicQuorumArgument(), 
-                notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-                deletedVClock: DeletedVClockArgument = DeletedVClockArgument(), 
-                w: WArgument = WArgument(), 
-                dw: DWArgument = DWArgument(), 
-                returnBody: ReturnBodyArgument = ReturnBodyArgument(),
-                pw: PWArgument = PWArgument(), 
-                ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(), 
-                ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
-                returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[List[T]] = {
+  def storeMany(objs: List[T],
+    r: RArgument = RArgument(),
+    pr: PRArgument = PRArgument(),
+    basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+    notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
+    deletedVClock: DeletedVClockArgument = DeletedVClockArgument(),
+    w: WArgument = WArgument(),
+    dw: DWArgument = DWArgument(),
+    returnBody: ReturnBodyArgument = ReturnBodyArgument(),
+    pw: PWArgument = PWArgument(),
+    ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
+    ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
+    returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[List[T]] = {
     ValidatedFutureIO.sequence(objs.map(store(_, r, pr, basicQuorum, notFoundOk, deletedVClock, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead))).map(_.flatten)
   }
 
-  def unsafeStoreManyNew(objs: List[T], 
-                          basicQuorum: BasicQuorumArgument = BasicQuorumArgument(), 
-                          notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-                          deletedVClock: DeletedVClockArgument = DeletedVClockArgument(), 
-                          w: WArgument = WArgument(), 
-                          dw: DWArgument = DWArgument(), 
-                          returnBody: ReturnBodyArgument = ReturnBodyArgument(),
-                          pw: PWArgument = PWArgument(), 
-                          ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(), 
-                          ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
-                          returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[List[T]] = {
+  def unsafeStoreManyNew(objs: List[T],
+    basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+    notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
+    deletedVClock: DeletedVClockArgument = DeletedVClockArgument(),
+    w: WArgument = WArgument(),
+    dw: DWArgument = DWArgument(),
+    returnBody: ReturnBodyArgument = ReturnBodyArgument(),
+    pw: PWArgument = PWArgument(),
+    ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
+    ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
+    returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[List[T]] = {
     ValidatedFutureIO.sequence(objs.map(unsafeStoreNew(_, basicQuorum, notFoundOk, deletedVClock, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead))).map(_.flatten)
   }
 
-  def delete(obj: T, 
-              rw: RWArgument = RWArgument(), 
-              r: RArgument = RArgument(), 
-              w: WArgument = WArgument(), 
-              pr: PRArgument = PRArgument(),
-              pw: PWArgument = PWArgument(), 
-              dw: DWArgument = DWArgument()): ValidatedFutureIO[Unit] = {
+  def delete(obj: T,
+    rw: RWArgument = RWArgument(),
+    r: RArgument = RArgument(),
+    w: WArgument = WArgument(),
+    pr: PRArgument = PRArgument(),
+    pw: PWArgument = PWArgument(),
+    dw: DWArgument = DWArgument()): ValidatedFutureIO[Unit] = {
     val (nRw, nR, nW, nPr, nPw, nDw) = (List(rw.v, config.rw.v).flatten headOption, List(r.v, config.r.v).flatten headOption, List(w.v, config.w.v).flatten headOption,
       List(pr.v, config.pr.v).flatten headOption, List(pw.v, config.pw.v).flatten headOption, List(dw.v, config.dw.v).flatten headOption)
     client.delete(converter.write(bucketName, obj), nRw, nR, nW, nPr, nPw, nDw)
   }
 
-  def deleteMany(objs: List[T], 
-                  rw: RWArgument = RWArgument(), 
-                  r: RArgument = RArgument(), 
-                  w: WArgument = WArgument(), 
-                  pr: PRArgument = PRArgument(),
-                  pw: PWArgument = PWArgument(), 
-                  dw: DWArgument = DWArgument()): ValidatedFutureIO[List[Unit]] = {
+  def deleteMany(objs: List[T],
+    rw: RWArgument = RWArgument(),
+    r: RArgument = RArgument(),
+    w: WArgument = WArgument(),
+    pr: PRArgument = PRArgument(),
+    pw: PWArgument = PWArgument(),
+    dw: DWArgument = DWArgument()): ValidatedFutureIO[List[Unit]] = {
     ValidatedFutureIO.sequence(objs.map(delete(_, rw, r, w, pr, pw, dw)))
   }
 
@@ -163,72 +163,72 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
      *
      */
 
-  def ?(key: String, 
-        r: RArgument = RArgument(), 
-        pr: PRArgument = PRArgument(),
-        basicQuorum: BasicQuorumArgument = BasicQuorumArgument(), 
-        notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-        ifModified: IfModifiedArgument = IfModifiedArgument(), 
-        onlyHead: OnlyHeadArgument = OnlyHeadArgument(),
-        deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): ValidatedFutureIO[Option[T]] =
+  def ?(key: String,
+    r: RArgument = RArgument(),
+    pr: PRArgument = PRArgument(),
+    basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+    notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
+    ifModified: IfModifiedArgument = IfModifiedArgument(),
+    onlyHead: OnlyHeadArgument = OnlyHeadArgument(),
+    deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): ValidatedFutureIO[Option[T]] =
     fetch(key, r, pr, basicQuorum, notFoundOk, ifModified, onlyHead, deletedVClock)
 
-  def ?*(keys: List[String], 
-          r: RArgument = RArgument(), 
-          pr: PRArgument = PRArgument(),
-          basicQuorum: BasicQuorumArgument = BasicQuorumArgument(), 
-          notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-          ifModified: IfModifiedArgument = IfModifiedArgument(), 
-          onlyHead: OnlyHeadArgument = OnlyHeadArgument(),
-          deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): ValidatedFutureIO[List[T]] =
+  def ?*(keys: List[String],
+    r: RArgument = RArgument(),
+    pr: PRArgument = PRArgument(),
+    basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+    notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
+    ifModified: IfModifiedArgument = IfModifiedArgument(),
+    onlyHead: OnlyHeadArgument = OnlyHeadArgument(),
+    deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): ValidatedFutureIO[List[T]] =
     fetchMany(keys, r, pr, basicQuorum, notFoundOk, ifModified, onlyHead, deletedVClock)
 
-  def <<(obj: T, 
-          r: RArgument = RArgument(), 
-          pr: PRArgument = PRArgument(),
-          basicQuorum: BasicQuorumArgument = BasicQuorumArgument(), 
-          notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-          deletedVClock: DeletedVClockArgument = DeletedVClockArgument(), 
-          w: WArgument = WArgument(), 
-          dw: DWArgument = DWArgument(), 
-          returnBody: ReturnBodyArgument = ReturnBodyArgument(),
-          pw: PWArgument = PWArgument(), 
-          ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(), 
-          ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
-          returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[Option[T]] =
+  def <<(obj: T,
+    r: RArgument = RArgument(),
+    pr: PRArgument = PRArgument(),
+    basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+    notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
+    deletedVClock: DeletedVClockArgument = DeletedVClockArgument(),
+    w: WArgument = WArgument(),
+    dw: DWArgument = DWArgument(),
+    returnBody: ReturnBodyArgument = ReturnBodyArgument(),
+    pw: PWArgument = PWArgument(),
+    ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
+    ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
+    returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[Option[T]] =
     store(obj, r, pr, basicQuorum, notFoundOk, deletedVClock, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead)
 
-  def <<*(objs: List[T], 
-          r: RArgument = RArgument(), 
-          pr: PRArgument = PRArgument(),
-          basicQuorum: BasicQuorumArgument = BasicQuorumArgument(), 
-          notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-          deletedVClock: DeletedVClockArgument = DeletedVClockArgument(), 
-          w: WArgument = WArgument(), 
-          dw: DWArgument = DWArgument(), 
-          returnBody: ReturnBodyArgument = ReturnBodyArgument(),
-          pw: PWArgument = PWArgument(), 
-          ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(), 
-          ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
-          returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[List[T]] =
-  storeMany(objs, r, pr, basicQuorum, notFoundOk, deletedVClock, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead)
+  def <<*(objs: List[T],
+    r: RArgument = RArgument(),
+    pr: PRArgument = PRArgument(),
+    basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+    notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
+    deletedVClock: DeletedVClockArgument = DeletedVClockArgument(),
+    w: WArgument = WArgument(),
+    dw: DWArgument = DWArgument(),
+    returnBody: ReturnBodyArgument = ReturnBodyArgument(),
+    pw: PWArgument = PWArgument(),
+    ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
+    ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
+    returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[List[T]] =
+    storeMany(objs, r, pr, basicQuorum, notFoundOk, deletedVClock, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead)
 
-  def -(obj: T, 
-          rw: RWArgument = RWArgument(), 
-          r: RArgument = RArgument(), 
-          w: WArgument = WArgument(), 
-          pr: PRArgument = PRArgument(),
-          pw: PWArgument = PWArgument(), 
-          dw: DWArgument = DWArgument()): ValidatedFutureIO[Unit] =
+  def -(obj: T,
+    rw: RWArgument = RWArgument(),
+    r: RArgument = RArgument(),
+    w: WArgument = WArgument(),
+    pr: PRArgument = PRArgument(),
+    pw: PWArgument = PWArgument(),
+    dw: DWArgument = DWArgument()): ValidatedFutureIO[Unit] =
     delete(obj, rw, r, w, pr, pw, dw)
 
-  def -*(objs: List[T], 
-          rw: RWArgument = RWArgument(), 
-          r: RArgument = RArgument(), 
-          w: WArgument = WArgument(), 
-          pr: PRArgument = PRArgument(),
-          pw: PWArgument = PWArgument(), 
-          dw: DWArgument = DWArgument()): ValidatedFutureIO[List[Unit]] =
+  def -*(objs: List[T],
+    rw: RWArgument = RWArgument(),
+    r: RArgument = RArgument(),
+    w: WArgument = WArgument(),
+    pr: PRArgument = PRArgument(),
+    pw: PWArgument = PWArgument(),
+    dw: DWArgument = DWArgument()): ValidatedFutureIO[List[Unit]] =
     deleteMany(objs, rw, r, w, pr, pw, dw)
 
   def idx(idxk: String, idxv: String): ValidatedFutureIO[List[String]] =

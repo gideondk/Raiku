@@ -6,7 +6,7 @@ package com.basho.riak.protobuf
 final case class RpbErrorResp(
   `errmsg`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
   `errcode`: Int = 0) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbErrorResp] {
+    with Message[RpbErrorResp] {
 
   def clearErrmsg = copy(`errmsg` = com.google.protobuf.ByteString.EMPTY)
   def clearErrcode = copy(`errcode` = 0)
@@ -67,7 +67,7 @@ object RpbErrorResp {
 final case class RpbGetServerInfoResp(
   `node`: Option[com.google.protobuf.ByteString] = None,
   `serverVersion`: Option[com.google.protobuf.ByteString] = None) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbGetServerInfoResp] {
+    with Message[RpbGetServerInfoResp] {
 
   def setNode(_f: com.google.protobuf.ByteString) = copy(`node` = _f)
   def setServerVersion(_f: com.google.protobuf.ByteString) = copy(`serverVersion` = _f)
@@ -131,7 +131,7 @@ object RpbGetServerInfoResp {
 final case class RpbPair(
   `key`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
   `value`: Option[com.google.protobuf.ByteString] = None) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbPair] {
+    with Message[RpbPair] {
 
   def setValue(_f: com.google.protobuf.ByteString) = copy(`value` = _f)
 

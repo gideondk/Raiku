@@ -7,7 +7,7 @@ package com.basho.riak.protobuf
 
 final case class RpbGetClientIdResp(
   `clientId`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbGetClientIdResp] {
+    with Message[RpbGetClientIdResp] {
 
   def clearClientId = copy(`clientId` = com.google.protobuf.ByteString.EMPTY)
 
@@ -59,7 +59,7 @@ object RpbGetClientIdResp {
 }
 final case class RpbSetClientIdReq(
   `clientId`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbSetClientIdReq] {
+    with Message[RpbSetClientIdReq] {
 
   def clearClientId = copy(`clientId` = com.google.protobuf.ByteString.EMPTY)
 
@@ -119,7 +119,7 @@ final case class RpbGetReq(
   `ifModified`: Option[com.google.protobuf.ByteString] = None,
   `head`: Option[Boolean] = None,
   `deletedvclock`: Option[Boolean] = None) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbGetReq] {
+    with Message[RpbGetReq] {
 
   def setR(_f: Int) = copy(`r` = _f)
   def setPr(_f: Int) = copy(`pr` = _f)
@@ -245,7 +245,7 @@ final case class RpbGetResp(
   `content`: Vector[RpbContent] = Vector.empty[RpbContent],
   `vclock`: Option[com.google.protobuf.ByteString] = None,
   `unchanged`: Option[Boolean] = None) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbGetResp] {
+    with Message[RpbGetResp] {
 
   def setContent(_i: Int, _v: RpbContent) = copy(`content` = `content`.updated(_i, _v))
   def addContent(_f: RpbContent) = copy(`content` = `content` :+ _f)
@@ -330,7 +330,7 @@ final case class RpbPutReq(
   `ifNotModified`: Option[Boolean] = None,
   `ifNoneMatch`: Option[Boolean] = None,
   `returnHead`: Option[Boolean] = None) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbPutReq] {
+    with Message[RpbPutReq] {
 
   def setKey(_f: com.google.protobuf.ByteString) = copy(`key` = _f)
   def setVclock(_f: com.google.protobuf.ByteString) = copy(`vclock` = _f)
@@ -474,7 +474,7 @@ final case class RpbPutResp(
   `content`: Vector[RpbContent] = Vector.empty[RpbContent],
   `vclock`: Option[com.google.protobuf.ByteString] = None,
   `key`: Option[com.google.protobuf.ByteString] = None) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbPutResp] {
+    with Message[RpbPutResp] {
 
   def setContent(_i: Int, _v: RpbContent) = copy(`content` = `content`.updated(_i, _v))
   def addContent(_f: RpbContent) = copy(`content` = `content` :+ _f)
@@ -557,7 +557,7 @@ final case class RpbDelReq(
   `pr`: Option[Int] = None,
   `pw`: Option[Int] = None,
   `dw`: Option[Int] = None) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbDelReq] {
+    with Message[RpbDelReq] {
 
   def setRw(_f: Int) = copy(`rw` = _f)
   def setVclock(_f: com.google.protobuf.ByteString) = copy(`vclock` = _f)
@@ -681,7 +681,7 @@ object RpbDelReq {
 }
 final case class RpbListBucketsResp(
   `buckets`: Vector[com.google.protobuf.ByteString] = Vector.empty[com.google.protobuf.ByteString]) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbListBucketsResp] {
+    with Message[RpbListBucketsResp] {
 
   def setBuckets(_i: Int, _v: com.google.protobuf.ByteString) = copy(`buckets` = `buckets`.updated(_i, _v))
   def addBuckets(_f: com.google.protobuf.ByteString) = copy(`buckets` = `buckets` :+ _f)
@@ -738,7 +738,7 @@ object RpbListBucketsResp {
 }
 final case class RpbListKeysReq(
   `bucket`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbListKeysReq] {
+    with Message[RpbListKeysReq] {
 
   def clearBucket = copy(`bucket` = com.google.protobuf.ByteString.EMPTY)
 
@@ -791,7 +791,7 @@ object RpbListKeysReq {
 final case class RpbListKeysResp(
   `keys`: Vector[com.google.protobuf.ByteString] = Vector.empty[com.google.protobuf.ByteString],
   `done`: Option[Boolean] = None) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbListKeysResp] {
+    with Message[RpbListKeysResp] {
 
   def setKeys(_i: Int, _v: com.google.protobuf.ByteString) = copy(`keys` = `keys`.updated(_i, _v))
   def addKeys(_f: com.google.protobuf.ByteString) = copy(`keys` = `keys` :+ _f)
@@ -857,7 +857,7 @@ object RpbListKeysResp {
 }
 final case class RpbGetBucketReq(
   `bucket`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbGetBucketReq] {
+    with Message[RpbGetBucketReq] {
 
   def clearBucket = copy(`bucket` = com.google.protobuf.ByteString.EMPTY)
 
@@ -909,7 +909,7 @@ object RpbGetBucketReq {
 }
 final case class RpbGetBucketResp(
   `props`: RpbBucketProps = RpbBucketProps.defaultInstance) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbGetBucketResp] {
+    with Message[RpbGetBucketResp] {
 
   def clearProps = copy(`props` = RpbBucketProps.defaultInstance)
 
@@ -962,7 +962,7 @@ object RpbGetBucketResp {
 final case class RpbSetBucketReq(
   `bucket`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
   `props`: RpbBucketProps = RpbBucketProps.defaultInstance) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbSetBucketReq] {
+    with Message[RpbSetBucketReq] {
 
   def clearBucket = copy(`bucket` = com.google.protobuf.ByteString.EMPTY)
   def clearProps = copy(`props` = RpbBucketProps.defaultInstance)
@@ -1023,7 +1023,7 @@ object RpbSetBucketReq {
 final case class RpbMapRedReq(
   `request`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY,
   `contentType`: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbMapRedReq] {
+    with Message[RpbMapRedReq] {
 
   def clearRequest = copy(`request` = com.google.protobuf.ByteString.EMPTY)
   def clearContentType = copy(`contentType` = com.google.protobuf.ByteString.EMPTY)
@@ -1085,7 +1085,7 @@ final case class RpbMapRedResp(
   `phase`: Option[Int] = None,
   `response`: Option[com.google.protobuf.ByteString] = None,
   `done`: Option[Boolean] = None) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbMapRedResp] {
+    with Message[RpbMapRedResp] {
 
   def setPhase(_f: Int) = copy(`phase` = _f)
   def setResponse(_f: com.google.protobuf.ByteString) = copy(`response` = _f)
@@ -1162,7 +1162,7 @@ final case class RpbIndexReq(
   `key`: Option[com.google.protobuf.ByteString] = None,
   `rangeMin`: Option[com.google.protobuf.ByteString] = None,
   `rangeMax`: Option[com.google.protobuf.ByteString] = None) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbIndexReq] {
+    with Message[RpbIndexReq] {
 
   def setKey(_f: com.google.protobuf.ByteString) = copy(`key` = _f)
   def setRangeMin(_f: com.google.protobuf.ByteString) = copy(`rangeMin` = _f)
@@ -1278,7 +1278,7 @@ object RpbIndexReq {
 }
 final case class RpbIndexResp(
   `keys`: Vector[com.google.protobuf.ByteString] = Vector.empty[com.google.protobuf.ByteString]) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbIndexResp] {
+    with Message[RpbIndexResp] {
 
   def setKeys(_i: Int, _v: com.google.protobuf.ByteString) = copy(`keys` = `keys`.updated(_i, _v))
   def addKeys(_f: com.google.protobuf.ByteString) = copy(`keys` = `keys` :+ _f)
@@ -1345,7 +1345,7 @@ final case class RpbContent(
   `usermeta`: Vector[RpbPair] = Vector.empty[RpbPair],
   `indexes`: Vector[RpbPair] = Vector.empty[RpbPair],
   `deleted`: Option[Boolean] = None) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbContent] {
+    with Message[RpbContent] {
 
   def setContentType(_f: com.google.protobuf.ByteString) = copy(`contentType` = _f)
   def setCharset(_f: com.google.protobuf.ByteString) = copy(`charset` = _f)
@@ -1499,7 +1499,7 @@ final case class RpbLink(
   `bucket`: Option[com.google.protobuf.ByteString] = None,
   `key`: Option[com.google.protobuf.ByteString] = None,
   `tag`: Option[com.google.protobuf.ByteString] = None) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbLink] {
+    with Message[RpbLink] {
 
   def setBucket(_f: com.google.protobuf.ByteString) = copy(`bucket` = _f)
   def setKey(_f: com.google.protobuf.ByteString) = copy(`key` = _f)
@@ -1572,7 +1572,7 @@ object RpbLink {
 final case class RpbBucketProps(
   `nVal`: Option[Int] = None,
   `allowMult`: Option[Boolean] = None) extends com.google.protobuf.GeneratedMessageLite
-  with Message[RpbBucketProps] {
+    with Message[RpbBucketProps] {
 
   def setNVal(_f: Int) = copy(`nVal` = _f)
   def setAllowMult(_f: Boolean) = copy(`allowMult` = _f)
