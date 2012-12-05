@@ -8,6 +8,8 @@ scalaVersion := "2.10.0-RC2"
 
 crossScalaVersions := Seq("2.10.0-RC2")
 
+parallelExecution in Test := false
+
 resolvers ++= Seq("Typesafe Repository (releases)" at "http://repo.typesafe.com/typesafe/releases/",
                   "gideondk-repo" at "https://raw.github.com/gideondk/gideondk-mvn-repo/master",
                   "Scala Tools Repository (snapshots)" at "http://scala-tools.org/repo-snapshots",
