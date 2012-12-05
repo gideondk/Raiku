@@ -9,12 +9,12 @@ abstract class BenchmarkSpec extends Specification {
   sequential
   xonly
 
-  def timed(desc: String, n: Int)(benchmark: => Unit): Result = {
+  def timed(desc: String, n: Int)(benchmark: ⇒ Unit): Result = {
     val t = System.currentTimeMillis
     benchmark
     val d = System.currentTimeMillis - t
 
-    println(desc + ":\n*** number of ops/s: " + n / (d / 1000.0) + "\n")
+    println(desc+":\n*** number of ops/s: "+n / (d / 1000.0)+"\n")
     Success()
   }
 

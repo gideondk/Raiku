@@ -1,7 +1,7 @@
 package nl.gideondk.raiku
 
 trait Enum[A] {
-  trait Value { self: A => }
+  trait Value { self: A ⇒ }
   val values: List[A]
 }
 

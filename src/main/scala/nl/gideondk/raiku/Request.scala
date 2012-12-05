@@ -33,11 +33,11 @@ trait Request extends Connection with ProtoBufConversion {
       promise
     }.point[IO]
 
-    errorCheckedValidatedFutureIORiakResponse(ValidatedFutureIO(ioAction.map(x => ValidatedFuture(x.future))))
+    errorCheckedValidatedFutureIORiakResponse(ValidatedFutureIO(ioAction.map(x ⇒ ValidatedFuture(x.future))))
   }
 
   def errorCheckedValidatedFutureIORiakResponse(vr: ValidatedFutureIO[RiakResponse]) = {
-    ValidatedFutureIO(vr.io.map(z => ValidatedFuture(z.future.map(x => x.flatMap(riakResponseToValidation)))))
+    ValidatedFutureIO(vr.run.map(z ⇒ ValidatedFuture(z.run.map(x ⇒ x.flatMap(riakResponseToValidation)))))
   }
 
   def riakResponseToValidation(resp: RiakResponse): Validation[Throwable, RiakResponse] = {

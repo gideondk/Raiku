@@ -24,15 +24,15 @@ final case class RpbGetClientIdResp(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbGetClientIdResp = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __clientId: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
 
-    def __newMerged = RpbGetClientIdResp(
-      __clientId)
+      def __newMerged = RpbGetClientIdResp(
+        __clientId)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __clientId = in.readBytes()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __clientId = in.readBytes()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -76,15 +76,15 @@ final case class RpbSetClientIdReq(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbSetClientIdReq = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __clientId: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
 
-    def __newMerged = RpbSetClientIdReq(
-      __clientId)
+      def __newMerged = RpbSetClientIdReq(
+        __clientId)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __clientId = in.readBytes()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __clientId = in.readBytes()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -168,7 +168,7 @@ final case class RpbGetReq(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbGetReq = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
     var __key: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
     var __r: Option[Int] = `r`
@@ -179,28 +179,28 @@ final case class RpbGetReq(
     var __head: Option[Boolean] = `head`
     var __deletedvclock: Option[Boolean] = `deletedvclock`
 
-    def __newMerged = RpbGetReq(
-      __bucket,
-      __key,
-      __r,
-      __pr,
-      __basicQuorum,
-      __notfoundOk,
-      __ifModified,
-      __head,
-      __deletedvclock)
+      def __newMerged = RpbGetReq(
+        __bucket,
+        __key,
+        __r,
+        __pr,
+        __basicQuorum,
+        __notfoundOk,
+        __ifModified,
+        __head,
+        __deletedvclock)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __bucket = in.readBytes()
-      case 18 => __key = in.readBytes()
-      case 24 => __r = in.readUInt32()
-      case 32 => __pr = in.readUInt32()
-      case 40 => __basicQuorum = in.readBool()
-      case 48 => __notfoundOk = in.readBool()
-      case 58 => __ifModified = in.readBytes()
-      case 64 => __head = in.readBool()
-      case 72 => __deletedvclock = in.readBool()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __bucket = in.readBytes()
+      case 18      ⇒ __key = in.readBytes()
+      case 24      ⇒ __r = in.readUInt32()
+      case 32      ⇒ __pr = in.readUInt32()
+      case 40      ⇒ __basicQuorum = in.readBool()
+      case 48      ⇒ __notfoundOk = in.readBool()
+      case 58      ⇒ __ifModified = in.readBytes()
+      case 64      ⇒ __head = in.readBool()
+      case 72      ⇒ __deletedvclock = in.readBool()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -259,7 +259,7 @@ final case class RpbGetResp(
   def clearUnchanged = copy(`unchanged` = None)
 
   def writeTo(output: com.google.protobuf.CodedOutputStream) {
-    for (_v <- `content`) output.writeMessage(1, _v)
+    for (_v ← `content`) output.writeMessage(1, _v)
     if (`vclock`.isDefined) output.writeBytes(2, `vclock`.get)
     if (`unchanged`.isDefined) output.writeBool(3, `unchanged`.get)
   }
@@ -267,7 +267,7 @@ final case class RpbGetResp(
   lazy val getSerializedSize = {
     import com.google.protobuf.CodedOutputStream._
     var size = 0
-    for (_v <- `content`) size += computeMessageSize(1, _v)
+    for (_v ← `content`) size += computeMessageSize(1, _v)
     if (`vclock`.isDefined) size += computeBytesSize(2, `vclock`.get)
     if (`unchanged`.isDefined) size += computeBoolSize(3, `unchanged`.get)
 
@@ -275,21 +275,21 @@ final case class RpbGetResp(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbGetResp = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     val __content: collection.mutable.Buffer[RpbContent] = `content`.toBuffer
     var __vclock: Option[com.google.protobuf.ByteString] = `vclock`
     var __unchanged: Option[Boolean] = `unchanged`
 
-    def __newMerged = RpbGetResp(
-      Vector(__content: _*),
-      __vclock,
-      __unchanged)
+      def __newMerged = RpbGetResp(
+        Vector(__content: _*),
+        __vclock,
+        __unchanged)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __content += readMessage[RpbContent](in, RpbContent.defaultInstance, _emptyRegistry)
-      case 18 => __vclock = in.readBytes()
-      case 24 => __unchanged = in.readBool()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __content += readMessage[RpbContent](in, RpbContent.defaultInstance, _emptyRegistry)
+      case 18      ⇒ __vclock = in.readBytes()
+      case 24      ⇒ __unchanged = in.readBool()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -387,7 +387,7 @@ final case class RpbPutReq(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbPutReq = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
     var __key: Option[com.google.protobuf.ByteString] = `key`
     var __vclock: Option[com.google.protobuf.ByteString] = `vclock`
@@ -400,32 +400,32 @@ final case class RpbPutReq(
     var __ifNoneMatch: Option[Boolean] = `ifNoneMatch`
     var __returnHead: Option[Boolean] = `returnHead`
 
-    def __newMerged = RpbPutReq(
-      __bucket,
-      __key,
-      __vclock,
-      __content,
-      __w,
-      __dw,
-      __returnBody,
-      __pw,
-      __ifNotModified,
-      __ifNoneMatch,
-      __returnHead)
+      def __newMerged = RpbPutReq(
+        __bucket,
+        __key,
+        __vclock,
+        __content,
+        __w,
+        __dw,
+        __returnBody,
+        __pw,
+        __ifNotModified,
+        __ifNoneMatch,
+        __returnHead)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __bucket = in.readBytes()
-      case 18 => __key = in.readBytes()
-      case 26 => __vclock = in.readBytes()
-      case 34 => __content = readMessage[RpbContent](in, __content, _emptyRegistry)
-      case 40 => __w = in.readUInt32()
-      case 48 => __dw = in.readUInt32()
-      case 56 => __returnBody = in.readBool()
-      case 64 => __pw = in.readUInt32()
-      case 72 => __ifNotModified = in.readBool()
-      case 80 => __ifNoneMatch = in.readBool()
-      case 88 => __returnHead = in.readBool()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __bucket = in.readBytes()
+      case 18      ⇒ __key = in.readBytes()
+      case 26      ⇒ __vclock = in.readBytes()
+      case 34      ⇒ __content = readMessage[RpbContent](in, __content, _emptyRegistry)
+      case 40      ⇒ __w = in.readUInt32()
+      case 48      ⇒ __dw = in.readUInt32()
+      case 56      ⇒ __returnBody = in.readBool()
+      case 64      ⇒ __pw = in.readUInt32()
+      case 72      ⇒ __ifNotModified = in.readBool()
+      case 80      ⇒ __ifNoneMatch = in.readBool()
+      case 88      ⇒ __returnHead = in.readBool()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -488,7 +488,7 @@ final case class RpbPutResp(
   def clearKey = copy(`key` = None)
 
   def writeTo(output: com.google.protobuf.CodedOutputStream) {
-    for (_v <- `content`) output.writeMessage(1, _v)
+    for (_v ← `content`) output.writeMessage(1, _v)
     if (`vclock`.isDefined) output.writeBytes(2, `vclock`.get)
     if (`key`.isDefined) output.writeBytes(3, `key`.get)
   }
@@ -496,7 +496,7 @@ final case class RpbPutResp(
   lazy val getSerializedSize = {
     import com.google.protobuf.CodedOutputStream._
     var size = 0
-    for (_v <- `content`) size += computeMessageSize(1, _v)
+    for (_v ← `content`) size += computeMessageSize(1, _v)
     if (`vclock`.isDefined) size += computeBytesSize(2, `vclock`.get)
     if (`key`.isDefined) size += computeBytesSize(3, `key`.get)
 
@@ -504,21 +504,21 @@ final case class RpbPutResp(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbPutResp = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     val __content: collection.mutable.Buffer[RpbContent] = `content`.toBuffer
     var __vclock: Option[com.google.protobuf.ByteString] = `vclock`
     var __key: Option[com.google.protobuf.ByteString] = `key`
 
-    def __newMerged = RpbPutResp(
-      Vector(__content: _*),
-      __vclock,
-      __key)
+      def __newMerged = RpbPutResp(
+        Vector(__content: _*),
+        __vclock,
+        __key)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __content += readMessage[RpbContent](in, RpbContent.defaultInstance, _emptyRegistry)
-      case 18 => __vclock = in.readBytes()
-      case 26 => __key = in.readBytes()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __content += readMessage[RpbContent](in, RpbContent.defaultInstance, _emptyRegistry)
+      case 18      ⇒ __vclock = in.readBytes()
+      case 26      ⇒ __key = in.readBytes()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -606,7 +606,7 @@ final case class RpbDelReq(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbDelReq = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
     var __key: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
     var __rw: Option[Int] = `rw`
@@ -617,28 +617,28 @@ final case class RpbDelReq(
     var __pw: Option[Int] = `pw`
     var __dw: Option[Int] = `dw`
 
-    def __newMerged = RpbDelReq(
-      __bucket,
-      __key,
-      __rw,
-      __vclock,
-      __r,
-      __w,
-      __pr,
-      __pw,
-      __dw)
+      def __newMerged = RpbDelReq(
+        __bucket,
+        __key,
+        __rw,
+        __vclock,
+        __r,
+        __w,
+        __pr,
+        __pw,
+        __dw)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __bucket = in.readBytes()
-      case 18 => __key = in.readBytes()
-      case 24 => __rw = in.readUInt32()
-      case 34 => __vclock = in.readBytes()
-      case 40 => __r = in.readUInt32()
-      case 48 => __w = in.readUInt32()
-      case 56 => __pr = in.readUInt32()
-      case 64 => __pw = in.readUInt32()
-      case 72 => __dw = in.readUInt32()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __bucket = in.readBytes()
+      case 18      ⇒ __key = in.readBytes()
+      case 24      ⇒ __rw = in.readUInt32()
+      case 34      ⇒ __vclock = in.readBytes()
+      case 40      ⇒ __r = in.readUInt32()
+      case 48      ⇒ __w = in.readUInt32()
+      case 56      ⇒ __pr = in.readUInt32()
+      case 64      ⇒ __pw = in.readUInt32()
+      case 72      ⇒ __dw = in.readUInt32()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -691,27 +691,27 @@ final case class RpbListBucketsResp(
   def clearBuckets = copy(`buckets` = Vector.empty[com.google.protobuf.ByteString])
 
   def writeTo(output: com.google.protobuf.CodedOutputStream) {
-    for (_v <- `buckets`) output.writeBytes(1, _v)
+    for (_v ← `buckets`) output.writeBytes(1, _v)
   }
 
   lazy val getSerializedSize = {
     import com.google.protobuf.CodedOutputStream._
     var size = 0
-    for (_v <- `buckets`) size += computeBytesSize(1, _v)
+    for (_v ← `buckets`) size += computeBytesSize(1, _v)
 
     size
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbListBucketsResp = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     val __buckets: collection.mutable.Buffer[com.google.protobuf.ByteString] = `buckets`.toBuffer
 
-    def __newMerged = RpbListBucketsResp(
-      Vector(__buckets: _*))
+      def __newMerged = RpbListBucketsResp(
+        Vector(__buckets: _*))
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __buckets += in.readBytes()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __buckets += in.readBytes()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -755,15 +755,15 @@ final case class RpbListKeysReq(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbListKeysReq = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
 
-    def __newMerged = RpbListKeysReq(
-      __bucket)
+      def __newMerged = RpbListKeysReq(
+        __bucket)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __bucket = in.readBytes()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __bucket = in.readBytes()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -803,32 +803,32 @@ final case class RpbListKeysResp(
   def clearDone = copy(`done` = None)
 
   def writeTo(output: com.google.protobuf.CodedOutputStream) {
-    for (_v <- `keys`) output.writeBytes(1, _v)
+    for (_v ← `keys`) output.writeBytes(1, _v)
     if (`done`.isDefined) output.writeBool(2, `done`.get)
   }
 
   lazy val getSerializedSize = {
     import com.google.protobuf.CodedOutputStream._
     var size = 0
-    for (_v <- `keys`) size += computeBytesSize(1, _v)
+    for (_v ← `keys`) size += computeBytesSize(1, _v)
     if (`done`.isDefined) size += computeBoolSize(2, `done`.get)
 
     size
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbListKeysResp = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     val __keys: collection.mutable.Buffer[com.google.protobuf.ByteString] = `keys`.toBuffer
     var __done: Option[Boolean] = `done`
 
-    def __newMerged = RpbListKeysResp(
-      Vector(__keys: _*),
-      __done)
+      def __newMerged = RpbListKeysResp(
+        Vector(__keys: _*),
+        __done)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __keys += in.readBytes()
-      case 16 => __done = in.readBool()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __keys += in.readBytes()
+      case 16      ⇒ __done = in.readBool()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -874,15 +874,15 @@ final case class RpbGetBucketReq(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbGetBucketReq = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
 
-    def __newMerged = RpbGetBucketReq(
-      __bucket)
+      def __newMerged = RpbGetBucketReq(
+        __bucket)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __bucket = in.readBytes()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __bucket = in.readBytes()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -926,15 +926,15 @@ final case class RpbGetBucketResp(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbGetBucketResp = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __props: RpbBucketProps = RpbBucketProps.defaultInstance
 
-    def __newMerged = RpbGetBucketResp(
-      __props)
+      def __newMerged = RpbGetBucketResp(
+        __props)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __props = readMessage[RpbBucketProps](in, __props, _emptyRegistry)
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __props = readMessage[RpbBucketProps](in, __props, _emptyRegistry)
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -982,18 +982,18 @@ final case class RpbSetBucketReq(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbSetBucketReq = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
     var __props: RpbBucketProps = RpbBucketProps.defaultInstance
 
-    def __newMerged = RpbSetBucketReq(
-      __bucket,
-      __props)
+      def __newMerged = RpbSetBucketReq(
+        __bucket,
+        __props)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __bucket = in.readBytes()
-      case 18 => __props = readMessage[RpbBucketProps](in, __props, _emptyRegistry)
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __bucket = in.readBytes()
+      case 18      ⇒ __props = readMessage[RpbBucketProps](in, __props, _emptyRegistry)
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -1043,18 +1043,18 @@ final case class RpbMapRedReq(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbMapRedReq = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __request: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
     var __contentType: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
 
-    def __newMerged = RpbMapRedReq(
-      __request,
-      __contentType)
+      def __newMerged = RpbMapRedReq(
+        __request,
+        __contentType)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __request = in.readBytes()
-      case 18 => __contentType = in.readBytes()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __request = in.readBytes()
+      case 18      ⇒ __contentType = in.readBytes()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -1112,21 +1112,21 @@ final case class RpbMapRedResp(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbMapRedResp = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __phase: Option[Int] = `phase`
     var __response: Option[com.google.protobuf.ByteString] = `response`
     var __done: Option[Boolean] = `done`
 
-    def __newMerged = RpbMapRedResp(
-      __phase,
-      __response,
-      __done)
+      def __newMerged = RpbMapRedResp(
+        __phase,
+        __response,
+        __done)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 8 => __phase = in.readUInt32()
-      case 18 => __response = in.readBytes()
-      case 24 => __done = in.readBool()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 8       ⇒ __phase = in.readUInt32()
+      case 18      ⇒ __response = in.readBytes()
+      case 24      ⇒ __done = in.readBool()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -1198,7 +1198,7 @@ final case class RpbIndexReq(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbIndexReq = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __bucket: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
     var __index: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
     var __qtype: RpbIndexReq.IndexQueryType.EnumVal = RpbIndexReq.IndexQueryType._UNINITIALIZED
@@ -1206,22 +1206,22 @@ final case class RpbIndexReq(
     var __rangeMin: Option[com.google.protobuf.ByteString] = `rangeMin`
     var __rangeMax: Option[com.google.protobuf.ByteString] = `rangeMax`
 
-    def __newMerged = RpbIndexReq(
-      __bucket,
-      __index,
-      __qtype,
-      __key,
-      __rangeMin,
-      __rangeMax)
+      def __newMerged = RpbIndexReq(
+        __bucket,
+        __index,
+        __qtype,
+        __key,
+        __rangeMin,
+        __rangeMax)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __bucket = in.readBytes()
-      case 18 => __index = in.readBytes()
-      case 24 => __qtype = RpbIndexReq.IndexQueryType.valueOf(in.readEnum())
-      case 34 => __key = in.readBytes()
-      case 42 => __rangeMin = in.readBytes()
-      case 50 => __rangeMax = in.readBytes()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __bucket = in.readBytes()
+      case 18      ⇒ __index = in.readBytes()
+      case 24      ⇒ __qtype = RpbIndexReq.IndexQueryType.valueOf(in.readEnum())
+      case 34      ⇒ __key = in.readBytes()
+      case 42      ⇒ __rangeMin = in.readBytes()
+      case 50      ⇒ __rangeMax = in.readBytes()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -1266,9 +1266,9 @@ object RpbIndexReq {
     val range_VALUE = 1
 
     def valueOf(id: Int) = id match {
-      case 0 => eq
-      case 1 => range
-      case _default => throw new UnknownEnumException(_default)
+      case 0        ⇒ eq
+      case 1        ⇒ range
+      case _default ⇒ throw new UnknownEnumException(_default)
     }
     val internalGetValueMap = new com.google.protobuf.Internal.EnumLiteMap[EnumVal] {
       def findValueByNumber(id: Int): EnumVal = valueOf(id)
@@ -1288,27 +1288,27 @@ final case class RpbIndexResp(
   def clearKeys = copy(`keys` = Vector.empty[com.google.protobuf.ByteString])
 
   def writeTo(output: com.google.protobuf.CodedOutputStream) {
-    for (_v <- `keys`) output.writeBytes(1, _v)
+    for (_v ← `keys`) output.writeBytes(1, _v)
   }
 
   lazy val getSerializedSize = {
     import com.google.protobuf.CodedOutputStream._
     var size = 0
-    for (_v <- `keys`) size += computeBytesSize(1, _v)
+    for (_v ← `keys`) size += computeBytesSize(1, _v)
 
     size
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbIndexResp = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     val __keys: collection.mutable.Buffer[com.google.protobuf.ByteString] = `keys`.toBuffer
 
-    def __newMerged = RpbIndexResp(
-      Vector(__keys: _*))
+      def __newMerged = RpbIndexResp(
+        Vector(__keys: _*))
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __keys += in.readBytes()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __keys += in.readBytes()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -1385,11 +1385,11 @@ final case class RpbContent(
     if (`charset`.isDefined) output.writeBytes(3, `charset`.get)
     if (`contentEncoding`.isDefined) output.writeBytes(4, `contentEncoding`.get)
     if (`vtag`.isDefined) output.writeBytes(5, `vtag`.get)
-    for (_v <- `links`) output.writeMessage(6, _v)
+    for (_v ← `links`) output.writeMessage(6, _v)
     if (`lastMod`.isDefined) output.writeUInt32(7, `lastMod`.get)
     if (`lastModUsecs`.isDefined) output.writeUInt32(8, `lastModUsecs`.get)
-    for (_v <- `usermeta`) output.writeMessage(9, _v)
-    for (_v <- `indexes`) output.writeMessage(10, _v)
+    for (_v ← `usermeta`) output.writeMessage(9, _v)
+    for (_v ← `indexes`) output.writeMessage(10, _v)
     if (`deleted`.isDefined) output.writeBool(11, `deleted`.get)
   }
 
@@ -1401,18 +1401,18 @@ final case class RpbContent(
     if (`charset`.isDefined) size += computeBytesSize(3, `charset`.get)
     if (`contentEncoding`.isDefined) size += computeBytesSize(4, `contentEncoding`.get)
     if (`vtag`.isDefined) size += computeBytesSize(5, `vtag`.get)
-    for (_v <- `links`) size += computeMessageSize(6, _v)
+    for (_v ← `links`) size += computeMessageSize(6, _v)
     if (`lastMod`.isDefined) size += computeUInt32Size(7, `lastMod`.get)
     if (`lastModUsecs`.isDefined) size += computeUInt32Size(8, `lastModUsecs`.get)
-    for (_v <- `usermeta`) size += computeMessageSize(9, _v)
-    for (_v <- `indexes`) size += computeMessageSize(10, _v)
+    for (_v ← `usermeta`) size += computeMessageSize(9, _v)
+    for (_v ← `indexes`) size += computeMessageSize(10, _v)
     if (`deleted`.isDefined) size += computeBoolSize(11, `deleted`.get)
 
     size
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbContent = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __value: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
     var __contentType: Option[com.google.protobuf.ByteString] = `contentType`
     var __charset: Option[com.google.protobuf.ByteString] = `charset`
@@ -1425,32 +1425,32 @@ final case class RpbContent(
     val __indexes: collection.mutable.Buffer[RpbPair] = `indexes`.toBuffer
     var __deleted: Option[Boolean] = `deleted`
 
-    def __newMerged = RpbContent(
-      __value,
-      __contentType,
-      __charset,
-      __contentEncoding,
-      __vtag,
-      Vector(__links: _*),
-      __lastMod,
-      __lastModUsecs,
-      Vector(__usermeta: _*),
-      Vector(__indexes: _*),
-      __deleted)
+      def __newMerged = RpbContent(
+        __value,
+        __contentType,
+        __charset,
+        __contentEncoding,
+        __vtag,
+        Vector(__links: _*),
+        __lastMod,
+        __lastModUsecs,
+        Vector(__usermeta: _*),
+        Vector(__indexes: _*),
+        __deleted)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __value = in.readBytes()
-      case 18 => __contentType = in.readBytes()
-      case 26 => __charset = in.readBytes()
-      case 34 => __contentEncoding = in.readBytes()
-      case 42 => __vtag = in.readBytes()
-      case 50 => __links += readMessage[RpbLink](in, RpbLink.defaultInstance, _emptyRegistry)
-      case 56 => __lastMod = in.readUInt32()
-      case 64 => __lastModUsecs = in.readUInt32()
-      case 74 => __usermeta += readMessage[RpbPair](in, RpbPair.defaultInstance, _emptyRegistry)
-      case 82 => __indexes += readMessage[RpbPair](in, RpbPair.defaultInstance, _emptyRegistry)
-      case 88 => __deleted = in.readBool()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __value = in.readBytes()
+      case 18      ⇒ __contentType = in.readBytes()
+      case 26      ⇒ __charset = in.readBytes()
+      case 34      ⇒ __contentEncoding = in.readBytes()
+      case 42      ⇒ __vtag = in.readBytes()
+      case 50      ⇒ __links += readMessage[RpbLink](in, RpbLink.defaultInstance, _emptyRegistry)
+      case 56      ⇒ __lastMod = in.readUInt32()
+      case 64      ⇒ __lastModUsecs = in.readUInt32()
+      case 74      ⇒ __usermeta += readMessage[RpbPair](in, RpbPair.defaultInstance, _emptyRegistry)
+      case 82      ⇒ __indexes += readMessage[RpbPair](in, RpbPair.defaultInstance, _emptyRegistry)
+      case 88      ⇒ __deleted = in.readBool()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -1526,21 +1526,21 @@ final case class RpbLink(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbLink = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __bucket: Option[com.google.protobuf.ByteString] = `bucket`
     var __key: Option[com.google.protobuf.ByteString] = `key`
     var __tag: Option[com.google.protobuf.ByteString] = `tag`
 
-    def __newMerged = RpbLink(
-      __bucket,
-      __key,
-      __tag)
+      def __newMerged = RpbLink(
+        __bucket,
+        __key,
+        __tag)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __bucket = in.readBytes()
-      case 18 => __key = in.readBytes()
-      case 26 => __tag = in.readBytes()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __bucket = in.readBytes()
+      case 18      ⇒ __key = in.readBytes()
+      case 26      ⇒ __tag = in.readBytes()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -1595,18 +1595,18 @@ final case class RpbBucketProps(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbBucketProps = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __nVal: Option[Int] = `nVal`
     var __allowMult: Option[Boolean] = `allowMult`
 
-    def __newMerged = RpbBucketProps(
-      __nVal,
-      __allowMult)
+      def __newMerged = RpbBucketProps(
+        __nVal,
+        __allowMult)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 8 => __nVal = in.readUInt32()
-      case 16 => __allowMult = in.readBool()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 8       ⇒ __nVal = in.readUInt32()
+      case 16      ⇒ __allowMult = in.readBool()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }

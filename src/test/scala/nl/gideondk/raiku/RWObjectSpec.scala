@@ -55,7 +55,7 @@ class RWObjectSpec extends Specification {
       val validation = client.store(rwObject).unsafeFulFill()
       val retRWObject = client.fetch("raiku_test_bucket", newId).unsafeFulFill.toOption.get.head
 
-      rwObject.binIndexes.get("organization_id").get.sortBy(x => x) == retRWObject.binIndexes.get("organization_id").get.sortBy(x => x)
+      rwObject.binIndexes.get("organization_id").get.sortBy(x ⇒ x) == retRWObject.binIndexes.get("organization_id").get.sortBy(x ⇒ x)
     }
     "be able to retrieve object by 2i" in {
       val newId = java.util.UUID.randomUUID.toString
@@ -69,15 +69,15 @@ class RWObjectSpec extends Specification {
       val rwObjectB = RaikuRWObject("raiku_test_bucket", anotherId, "this should be stored".getBytes, binIndexes = Map("organization_id" -> List(orgIdB, orgIdC)))
 
       val store = for {
-        _ <- client.store(rwObjectA)
-        _ <- client.store(rwObjectB)
+        _ ← client.store(rwObjectA)
+        _ ← client.store(rwObjectB)
       } yield ()
 
       store.unsafeFulFill
 
       val keysIO = for {
-        aKeys <- client.fetchKeysForBinIndexByValue("raiku_test_bucket", "organization_id", orgIdA)
-        cKeys <- client.fetchKeysForBinIndexByValue("raiku_test_bucket", "organization_id", orgIdC)
+        aKeys ← client.fetchKeysForBinIndexByValue("raiku_test_bucket", "organization_id", orgIdA)
+        cKeys ← client.fetchKeysForBinIndexByValue("raiku_test_bucket", "organization_id", orgIdC)
       } yield (aKeys, cKeys)
 
       val keys = keysIO.unsafeFulFill

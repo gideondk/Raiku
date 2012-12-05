@@ -69,14 +69,14 @@ private[raiku] class RaikuActor(config: RaikuConfig) extends Actor {
 
   def receive = {
     case IO.Connected(socket, address) ⇒
-      log.info("Successfully connected to " + address)
+      log.info("Successfully connected to "+address)
 
     case IO.Read(socket, bytes) ⇒
       state(socket)(IO Chunk bytes)
 
     case IO.Closed(socket: IO.SocketHandle, cause) ⇒ {
       removeSocket(socket)
-      log.info("Socket has closed, cause: " + cause)
+      log.info("Socket has closed, cause: "+cause)
     }
 
     case req @ RiakOperation(promise, bytes) ⇒
@@ -103,7 +103,7 @@ object Iteratees {
   final val readRiakResponse = for {
     frameLenBytes ← IO.take(4) // First 32 bits
     frameLen = frameLenBytes.iterator.getInt - 1
-    messageType <- IO.take(1) // Second 8 bits
+    messageType ← IO.take(1) // Second 8 bits
     frame ← IO.take(frameLen)
   } yield {
     RiakResponse(frameLen + 1, messageType.head.toInt, frame)

@@ -3,12 +3,11 @@ package com.basho.riak.protobuf
 import com.google.protobuf._
 import java.io.{ FilterInputStream, InputStream }
 
-/**
- * Message trait for messages generated with ScalaBuff.
- * Ordinarily Messages would have GeneratedMessageLite.Builder mixed in, but since it's a Java class, we can't do that.
- * Contains methods implementing the MessageLite.Builder Java interface, similar to ones in GeneratedMessageLite.Builder.
+/** Message trait for messages generated with ScalaBuff.
+ *  Ordinarily Messages would have GeneratedMessageLite.Builder mixed in, but since it's a Java class, we can't do that.
+ *  Contains methods implementing the MessageLite.Builder Java interface, similar to ones in GeneratedMessageLite.Builder.
  *
- * @author Sandro Gržičić
+ *  @author Sandro Gržičić
  */
 trait Message[MessageType <: MessageLite with MessageLite.Builder] extends MessageLite.Builder {
 
@@ -81,7 +80,8 @@ trait Message[MessageType <: MessageLite with MessageLite.Builder] extends Messa
       val limitedInput = new LimitedInputStream(input, size)
       mergeFrom(limitedInput, extensionRegistry)
       true
-    } else {
+    }
+    else {
       false
     }
   }
@@ -96,7 +96,8 @@ trait Message[MessageType <: MessageLite with MessageLite.Builder] extends Messa
       val size = CodedInputStream.readRawVarint32(firstByte, input)
       val limitedInput = new LimitedInputStream(input, size)
       Some(mergeFrom(limitedInput, extensionRegistry))
-    } else {
+    }
+    else {
       None
     }
   }
@@ -105,8 +106,7 @@ trait Message[MessageType <: MessageLite with MessageLite.Builder] extends Messa
     mergeDelimitedFromStream(input, ExtensionRegistryLite.getEmptyRegistry)
   }
 
-  /**
-   * See {@link com.google.protobuf.AbstractMessageLite.Builder#LimitedInputStream}.
+  /** See {@link com.google.protobuf.AbstractMessageLite.Builder#LimitedInputStream}.
    */
   private final class LimitedInputStream(
       val inputStream: InputStream, private var limit: Int) extends FilterInputStream(inputStream) {
@@ -120,7 +120,8 @@ trait Message[MessageType <: MessageLite with MessageLite.Builder] extends Messa
           limit -= 1
         }
         result
-      } else {
+      }
+      else {
         -1
       }
     }
@@ -133,7 +134,8 @@ trait Message[MessageType <: MessageLite with MessageLite.Builder] extends Messa
           limit -= result
         }
         result
-      } else {
+      }
+      else {
         -1
       }
     }
@@ -147,11 +149,10 @@ trait Message[MessageType <: MessageLite with MessageLite.Builder] extends Messa
     }
   }
 
-  /**
-   * See {@link com.google.protobuf.CodedInputStream#readMessage}.
+  /** See {@link com.google.protobuf.CodedInputStream#readMessage}.
    *
-   * CodedInputStream#readMessage attempts to mutate the passed Builder and discards the returned value,
-   * which we need, since our "Builders" (Messages) return a new instance whenever a mutation is performed.
+   *  CodedInputStream#readMessage attempts to mutate the passed Builder and discards the returned value,
+   *  which we need, since our "Builders" (Messages) return a new instance whenever a mutation is performed.
    */
   def readMessage[ReadMessageType <: MessageLite.Builder](in: CodedInputStream, message: ReadMessageType, extensionRegistry: ExtensionRegistryLite) = {
     val length = in.readRawVarint32()

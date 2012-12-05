@@ -26,8 +26,9 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
   implicit val yConverter = new RaikuConverter[Y] {
     def read(o: RaikuRWObject): ReadResult[Y] = try {
       yFormat.read(new String(o.value).asJson).success
-    } catch {
-      case e: Throwable => e.failure
+    }
+    catch {
+      case e: Throwable ⇒ e.failure
     }
     def write(bucket: String, o: Y): RaikuRWObject = RaikuRWObject(bucket, o.id, o.toJson.toString.getBytes,
       binIndexes = Map("group_id" -> List(o.groupId)), intIndexes = Map("age" -> List(o.age)))
@@ -43,32 +44,32 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
 
   "A bucket" should {
     "be able to store objects in timely fashion" in {
-      val acts = randomObjects.map(x => bucket << (x, w = 1))
+      val acts = randomObjects.map(x ⇒ bucket << (x, w = 1))
 
-      timed("Storing " + nrOfItems + " items sequentially (bad)", nrOfItems) {
-        acts.foreach { x =>
+      timed("Storing "+nrOfItems+" items sequentially (bad)", nrOfItems) {
+        acts.foreach { x ⇒
           x.unsafeFulFill(Duration(15, SECONDS))
         }
       }
 
       val futs = bucket <<* (randomObjects, w = 1)
-      timed("Storing " + nrOfItems + " items in parallel (good)", nrOfItems) {
+      timed("Storing "+nrOfItems+" items in parallel (good)", nrOfItems) {
         val status = futs.unsafeFulFill(Duration(15, SECONDS))
       }
     }
 
     "be able to fetch objects in timely fashion" in {
-      val acts = ids.map(x => bucket ? (x, r = 1))
+      val acts = ids.map(x ⇒ bucket ? (x, r = 1))
 
-      timed("Fetching " + nrOfItems + " items sequentially (bad)", nrOfItems) {
-        acts.foreach { x =>
+      timed("Fetching "+nrOfItems+" items sequentially (bad)", nrOfItems) {
+        acts.foreach { x ⇒
           x.unsafeFulFill(Duration(15, SECONDS))
         }
       }
 
       val futs = bucket ?* (ids, r = 1)
 
-      timed("Fetching " + nrOfItems + " items in parallel (good)", nrOfItems) {
+      timed("Fetching "+nrOfItems+" items in parallel (good)", nrOfItems) {
         val status = futs.unsafeFulFill(Duration(15, SECONDS))
       }
     }
@@ -76,7 +77,7 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
 
       val futs = bucket -* (randomObjects, r = 1, w = 1)
 
-      timed("Deleting " + nrOfItems + " items in parallel", nrOfItems) {
+      timed("Deleting "+nrOfItems+" items in parallel", nrOfItems) {
         val status = futs.unsafeFulFill(Duration(15, SECONDS))
       }
     }

@@ -26,18 +26,18 @@ final case class RpbErrorResp(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbErrorResp = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __errmsg: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
     var __errcode: Int = 0
 
-    def __newMerged = RpbErrorResp(
-      __errmsg,
-      __errcode)
+      def __newMerged = RpbErrorResp(
+        __errmsg,
+        __errcode)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __errmsg = in.readBytes()
-      case 16 => __errcode = in.readUInt32()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __errmsg = in.readBytes()
+      case 16      ⇒ __errcode = in.readUInt32()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -90,18 +90,18 @@ final case class RpbGetServerInfoResp(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbGetServerInfoResp = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __node: Option[com.google.protobuf.ByteString] = `node`
     var __serverVersion: Option[com.google.protobuf.ByteString] = `serverVersion`
 
-    def __newMerged = RpbGetServerInfoResp(
-      __node,
-      __serverVersion)
+      def __newMerged = RpbGetServerInfoResp(
+        __node,
+        __serverVersion)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __node = in.readBytes()
-      case 18 => __serverVersion = in.readBytes()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __node = in.readBytes()
+      case 18      ⇒ __serverVersion = in.readBytes()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }
@@ -153,18 +153,18 @@ final case class RpbPair(
   }
 
   def mergeFrom(in: com.google.protobuf.CodedInputStream, extensionRegistry: com.google.protobuf.ExtensionRegistryLite): RpbPair = {
-    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry => _emptyRegistry }
+    import com.google.protobuf.ExtensionRegistryLite.{ getEmptyRegistry ⇒ _emptyRegistry }
     var __key: com.google.protobuf.ByteString = com.google.protobuf.ByteString.EMPTY
     var __value: Option[com.google.protobuf.ByteString] = `value`
 
-    def __newMerged = RpbPair(
-      __key,
-      __value)
+      def __newMerged = RpbPair(
+        __key,
+        __value)
     while (true) in.readTag match {
-      case 0 => return __newMerged
-      case 10 => __key = in.readBytes()
-      case 18 => __value = in.readBytes()
-      case default => if (!in.skipField(default)) return __newMerged
+      case 0       ⇒ return __newMerged
+      case 10      ⇒ __key = in.readBytes()
+      case 18      ⇒ __value = in.readBytes()
+      case default ⇒ if (!in.skipField(default)) return __newMerged
     }
     null
   }

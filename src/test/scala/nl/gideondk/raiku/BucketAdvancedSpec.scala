@@ -27,8 +27,9 @@ class BucketAdvancedSpec extends Specification with DefaultJsonProtocol {
   implicit val yConverter = new RaikuConverter[Y] {
     def read(o: RaikuRWObject): ReadResult[Y] = try {
       yFormat.read(new String(o.value).asJson).success
-    } catch {
-      case e: Throwable => e.failure
+    }
+    catch {
+      case e: Throwable ⇒ e.failure
     }
     def write(bucket: String, o: Y): RaikuRWObject = RaikuRWObject(bucket, o.id, o.toJson.toString.getBytes,
       binIndexes = Map("group_id" -> List(o.groupId)), intIndexes = Map("age" -> List(o.age)))
@@ -44,8 +45,8 @@ class BucketAdvancedSpec extends Specification with DefaultJsonProtocol {
       val obj = Y(newId, "Matsuo Bashō", 41, groupId)
 
       val key = for {
-        _ <- bucket << obj
-        idxf <- bucket idx ("group_id", groupId)
+        _ ← bucket << obj
+        idxf ← bucket idx ("group_id", groupId)
       } yield idxf
 
       val res = key.unsafeFulFill
@@ -57,8 +58,8 @@ class BucketAdvancedSpec extends Specification with DefaultJsonProtocol {
       val obj = Y(newId, "Matsuo Bashō", 41, groupId)
 
       val keys = for {
-        _ <- bucket << obj
-        idxf <- bucket idx ("age", 41)
+        _ ← bucket << obj
+        idxf ← bucket idx ("age", 41)
       } yield idxf
 
       val res = keys.unsafeFulFill
@@ -73,15 +74,33 @@ class BucketAdvancedSpec extends Specification with DefaultJsonProtocol {
       val shiki = Y(secId, "Masaoka Shiki", 52, groupId)
 
       val keys = for {
-        _ <- bucket << basho
-        _ <- bucket << shiki
-        all <- bucket idx ("age", 40 to 60)
-        basho <- bucket idx ("age", 39 to 42)
-        shiki <- bucket idx ("age", 50 to 60)
+        _ ← bucket << basho
+        _ ← bucket << shiki
+        all ← bucket idx ("age", 40 to 60)
+        basho ← bucket idx ("age", 39 to 42)
+        shiki ← bucket idx ("age", 50 to 60)
       } yield (all, basho, shiki)
 
       val res = keys.unsafeFulFill.toOption.get
       res._1.contains(newId) && res._1.contains(secId) && res._2.contains(newId) && !res._2.contains(secId) && !res._3.contains(newId) && res._3.contains(secId)
+    }
+
+    "be able to use Scalaz functionality on ValidatedIOFutures" in {
+      val newId = java.util.UUID.randomUUID.toString
+      val secId = java.util.UUID.randomUUID.toString
+      val groupId = java.util.UUID.randomUUID.toString
+
+      val basho = Y(newId, "Matsuo Bashō", 41, groupId)
+      val shiki = Y(secId, "Masaoka Shiki", 52, groupId)
+
+      val all = for {
+        _ ← bucket << basho
+        _ ← bucket << shiki
+        all ← bucket idx ("age", 40 to 60) >>= ((x: List[String]) ⇒ bucket ?* x)
+      } yield (all)
+
+      val res = all.unsafeFulFill
+      res.isSuccess
     }
   }
 

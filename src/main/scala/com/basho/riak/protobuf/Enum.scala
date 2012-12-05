@@ -1,8 +1,7 @@
 package com.basho.riak.protobuf
 
-/**
- * Viktor Klang's Enum, modified for ScalaBuff for protobuf usage
- * Source: https://gist.github.com/1057513/
+/** Viktor Klang's Enum, modified for ScalaBuff for protobuf usage
+ *  Source: https://gist.github.com/1057513/
  */
 trait Enum {
 
@@ -14,8 +13,7 @@ trait Enum {
 
   private val _values = new AtomicReference(Vector[EnumVal]())
 
-  /**
-   * Add an EnumVal to our storage, using CCAS to make sure it's thread safe, returns the ordinal.
+  /** Add an EnumVal to our storage, using CCAS to make sure it's thread safe, returns the ordinal.
    */
   private final def addEnumVal(newVal: EnumVal): Int = {
     import _values.{ get, compareAndSet ⇒ CAS }
@@ -24,8 +22,7 @@ trait Enum {
     if ((get eq oldVec) && CAS(oldVec, newVec)) newVec.indexWhere(_ eq newVal) else addEnumVal(newVal)
   }
 
-  /**
-   * Get all the enums that exist for this type.
+  /** Get all the enums that exist for this type.
    */
   def values: Vector[EnumVal] = _values.get
 
@@ -41,24 +38,20 @@ trait Enum {
     lazy val getNumber = id
 
     override def toString = name
-    /**
-     * Enum Values with identical values are equal.
+    /** Enum Values with identical values are equal.
      */
     override def equals(other: Any) = other.isInstanceOf[Value] && this.id == other.asInstanceOf[Value].id
-    /**
-     * Enum Values with identical values return the same hashCode.
+    /** Enum Values with identical values return the same hashCode.
      */
     override def hashCode = 31 * (this.getClass.## + name.## + id)
   }
 
 }
 
-/**
- * Thrown when an unknown enum number is passed to the valueOf method of an Enum.
+/** Thrown when an unknown enum number is passed to the valueOf method of an Enum.
  */
-class UnknownEnumException(enumID: Int) extends RuntimeException("Unknown enum ID: " + enumID)
+class UnknownEnumException(enumID: Int) extends RuntimeException("Unknown enum ID: "+enumID)
 
-/**
- * Thrown when a required field with enum type is uninitialized on access attempt.
+/** Thrown when a required field with enum type is uninitialized on access attempt.
  */
-class UninitializedEnumException[T](name: String) extends RuntimeException("Enum not initialized: " + name)
+class UninitializedEnumException[T](name: String) extends RuntimeException("Enum not initialized: "+name)

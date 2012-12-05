@@ -36,8 +36,8 @@ class BucketSpec extends Specification {
       val obj = Z(newId, "Should also be stored")
 
       val retObj = for {
-        v <- bucket unsafeStoreNew obj
-        retObj <- bucket ? obj.id
+        v ← bucket unsafeStoreNew obj
+        retObj ← bucket ? obj.id
       } yield {
         retObj
       }
@@ -49,8 +49,8 @@ class BucketSpec extends Specification {
       val obj = Z(newId, "Should also be stored")
 
       val retObj = for {
-        v <- bucket unsafeStoreNew obj
-        retObj <- bucket ? obj.id
+        v ← bucket unsafeStoreNew obj
+        retObj ← bucket ? obj.id
       } yield {
         retObj
       }
@@ -58,8 +58,8 @@ class BucketSpec extends Specification {
       retObj.unsafeFulFill
 
       val updatedObj = for {
-        v <- bucket unsafeStoreNew obj
-        retObj <- bucket ? obj.id
+        v ← bucket unsafeStoreNew obj
+        retObj ← bucket ? obj.id
       } yield {
         retObj
       }
@@ -71,8 +71,8 @@ class BucketSpec extends Specification {
       val obj = Z(newId, "Should also be stored")
 
       val retObj = for {
-        v <- bucket << obj
-        retObj <- bucket ? obj.id
+        v ← bucket << obj
+        retObj ← bucket ? obj.id
       } yield {
         retObj
       }
@@ -80,8 +80,8 @@ class BucketSpec extends Specification {
       retObj.unsafeFulFill
 
       val updatedObj = for {
-        v <- bucket << obj
-        retObj <- bucket ? obj.id
+        v ← bucket << obj
+        retObj ← bucket ? obj.id
       } yield {
         retObj
       }
@@ -92,8 +92,8 @@ class BucketSpec extends Specification {
     "be able to persist multiple objects" in {
       val vec = List.fill(50)(Z(java.util.UUID.randomUUID.toString, "Should also be persisted"))
       val retObj = for {
-        vs <- bucket <<* vec
-        retObj <- bucket ?* vec.map(_.id)
+        vs ← bucket <<* vec
+        retObj ← bucket ?* vec.map(_.id)
       } yield retObj
 
       val res = retObj.unsafeFulFill
@@ -105,10 +105,10 @@ class BucketSpec extends Specification {
       val obj = Z(newId, "Should also be stored")
 
       val retObj = for {
-        v <- bucket << obj
-        firstRet <- bucket ? obj.id
-        _ <- bucket - obj
-        secRet <- bucket ? obj.id
+        v ← bucket << obj
+        firstRet ← bucket ? obj.id
+        _ ← bucket - obj
+        secRet ← bucket ? obj.id
       } yield {
         firstRet.isDefined && !secRet.isDefined
       }
@@ -120,10 +120,10 @@ class BucketSpec extends Specification {
     "shouldn't be able to fetch multiple deleted objects" in {
       val vec = List.fill(50)(Z(java.util.UUID.randomUUID.toString, "Should also be persisted"))
       val retObj = for {
-        vs <- bucket <<* vec
-        bef <- bucket ?* vec.map(_.id)
-        _ <- bucket -* vec
-        aft <- bucket ?* vec.map(_.id)
+        vs ← bucket <<* vec
+        bef ← bucket ?* vec.map(_.id)
+        _ ← bucket -* vec
+        aft ← bucket ?* vec.map(_.id)
       } yield {
         bef.length == 50 && aft.length == 0
       }
