@@ -6,11 +6,11 @@ object RaikuBuild extends Build {
   override lazy val settings = super.settings ++
     Seq(
       name := "raiku",
-      version := "0.1.2",
+      version := "0.1.3",
       organization := "nl.gideondk",
       parallelExecution in Test := false,
-      scalaVersion := "2.10.0-RC2",
-      crossScalaVersions := Seq("2.10.0-RC2"),
+      scalaVersion := "2.10.0",
+      crossScalaVersions := Seq("2.10.0"),
       resolvers ++= Seq("Typesafe Repository (releases)" at "http://repo.typesafe.com/typesafe/releases/",
                   "gideondk-repo" at "https://raw.github.com/gideondk/gideondk-mvn-repo/master",
                   "Scala Tools Repository (snapshots)" at "http://scala-tools.org/repo-snapshots",
@@ -20,12 +20,12 @@ object RaikuBuild extends Build {
                   "spray repo" at "http://repo.spray.io"))
 
   val appDependencies = Seq(
-      "org.scalaz" % "scalaz-core_2.10.0-RC2" % "7.0.0-M4" withSources(),
-      "org.scalaz" % "scalaz-effect_2.10.0-RC2" % "7.0.0-M4" withSources(),
+      "org.scalaz" %% "scalaz-core" % "7.0.0-M7" withSources(),
+      "org.scalaz" %% "scalaz-effect" % "7.0.0-M7" withSources(),
       "com.google.protobuf" % "protobuf-java" % "2.4.1" withSources(),
-      "org.specs2" % "specs2_2.10.0-RC2" % "1.12.2",
-      "io.spray" %%  "spray-json" % "1.2.2" cross CrossVersion.full,
-      "com.typesafe.akka" %% "akka-actor" % "2.1.0-RC2" cross CrossVersion.full
+      "org.specs2" %% "specs2" % "1.13",
+      "io.spray" %  "spray-json_2.10" % "1.2.3" withSources(),
+      "com.typesafe.akka" % "akka-actor_2.10" % "2.1.0" withSources()
   )
 
   lazy val root = Project(id = "raiku",
