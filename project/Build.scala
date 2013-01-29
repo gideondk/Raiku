@@ -23,9 +23,9 @@ object RaikuBuild extends Build {
       "org.scalaz" %% "scalaz-core" % "7.0.0-M7" withSources(),
       "org.scalaz" %% "scalaz-effect" % "7.0.0-M7" withSources(),
       "com.google.protobuf" % "protobuf-java" % "2.4.1" withSources(),
-      "org.specs2" %% "specs2" % "1.13",
-      "io.spray" %  "spray-json_2.10" % "1.2.3" withSources(),
-      "com.typesafe.akka" % "akka-actor_2.10" % "2.1.0" withSources()
+      "io.spray" %%  "spray-json" % "1.2.3" withSources(),
+      "com.typesafe.akka" %% "akka-actor" % "2.1.0" withSources(),
+      "org.specs2" %% "specs2" % "1.13"
   )
 
   lazy val root = Project(id = "raiku",
