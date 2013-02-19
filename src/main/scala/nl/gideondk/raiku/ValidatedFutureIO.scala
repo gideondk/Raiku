@@ -20,7 +20,6 @@ object ValidatedFuture {
       ValidatedFuture(fa.run.flatMap(validation ⇒ validation match {
         case Success(succ) ⇒ f(succ).run
         case Failure(fail) ⇒ Future(fail.failure)
-
       }))
   }
 
