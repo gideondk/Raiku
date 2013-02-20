@@ -1,4 +1,4 @@
-package nl.gideondk.raiku
+package nl.gideondk.raiku.commands
 
 trait RaikuArgument[T] {
   def v: Option[T]

@@ -1,6 +1,7 @@
 package nl.gideondk.raiku
 
 import akka.actor._
+import commands.RaikuRWObject
 import scala.concurrent._
 import scala.concurrent.duration._
 

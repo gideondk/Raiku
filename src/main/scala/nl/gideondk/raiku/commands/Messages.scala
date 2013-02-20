@@ -1,4 +1,4 @@
-package nl.gideondk.raiku
+package nl.gideondk.raiku.commands
 
 trait Enum[A] {
   trait Value { self: A ⇒ }

@@ -1,4 +1,4 @@
-package nl.gideondk.raiku
+package nl.gideondk.raiku.monads
 
 import scalaz._
 import Scalaz._

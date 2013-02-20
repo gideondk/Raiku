@@ -1,24 +1,15 @@
-package nl.gideondk.raiku
+package nl.gideondk.raiku.commands
 
-import akka.util.ByteString
-import java.io.DataOutputStream
-import com.basho.riak.protobuf.RiakKvPB._
-import com.basho.riak.protobuf.RpbGetReq
-import com.google.protobuf.CodedOutputStream
-import java.io.ByteArrayOutputStream
-
-import scala.concurrent.Promise
-import scala.concurrent.Future
 import com.basho.riak.protobuf._
-import akka.actor._
 
 import scalaz._
 import Scalaz._
-import effect._
 
-import com.google.protobuf._
+import nl.gideondk.raiku.monads._
+import nl.gideondk.raiku.actors._
 
 case class VClock(v: Array[Byte])
+
 case class VTag(v: Array[Byte])
 
 case class RaikuRWObject(bucket: String, key: String, value: Array[Byte], contentType: String = "text/plain",

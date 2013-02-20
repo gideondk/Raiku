@@ -3,6 +3,7 @@ package nl.gideondk.raiku
 // import org.scalatest.FunSuite
 // import org.scalatest.BeforeAndAfter
 import akka.actor._
+import commands.RaikuRWObject
 import scala.concurrent._
 import scala.concurrent.duration._
 

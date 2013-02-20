@@ -1,14 +1,8 @@
-package nl.gideondk.raiku
+package nl.gideondk.raiku.commands
 
 import akka.util.ByteString
-import java.io.DataOutputStream
-import com.basho.riak.protobuf.RiakKvPB._
-import com.basho.riak.protobuf.RpbGetReq
-import com.google.protobuf.CodedOutputStream
-import java.io.ByteArrayOutputStream
 
 import scala.concurrent.Promise
-import scala.concurrent.Future
 import com.basho.riak.protobuf._
 import akka.actor._
 
@@ -16,10 +10,14 @@ import scalaz._
 import Scalaz._
 import effect._
 
-import com.google.protobuf._
+import nl.gideondk.raiku.serialization.ProtoBufConversion
+import nl.gideondk.raiku.monads.{ ValidatedFuture, ValidatedFutureIO }
+import nl.gideondk.raiku.actors.{ RiakOperation, RiakResponse }
+import java.lang.Exception
 
 trait Connection {
   def system: ActorSystem
+
   def actor: ActorRef
 
   implicit val dispatcher = system.dispatcher

@@ -1,9 +1,14 @@
 package nl.gideondk
 
+import raiku.commands._
+import raiku.monads.{ ValidatedFuture, ValidatedFutureIO }
 import scalaz._
 import Scalaz._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scalaz.Success
+import scalaz.Failure
+import scala.Some
 
 package object raiku {
   implicit def stringToVClock(s: String): VClock = VClock(s.getBytes)

@@ -1,4 +1,4 @@
-package nl.gideondk.raiku
+package nl.gideondk.raiku.actors
 
 import scalaz._
 import Scalaz._
@@ -20,7 +20,6 @@ import akka.actor.OneForOneStrategy
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.concurrent.duration
 
 import akka.io.Tcp._
 
@@ -39,7 +38,7 @@ object RaikuActor {
     }
 }
 
-private class RaikuActor(config: RaikuConfig) extends Actor {
+private[raiku] class RaikuActor(config: RaikuConfig) extends Actor {
   val log = Logging(context.system, this)
   val address = new InetSocketAddress(config.host.host, config.host.port)
 
@@ -143,11 +142,14 @@ object Iteratees {
 }
 
 trait WorkerDisconnectedException extends Exception
+
 case class WorkerDisconnectedUnexpectedlyException extends WorkerDisconnectedException
+
 case class WorkerDisconnectedExpectedly extends WorkerDisconnectedException
 
 case class NoConnectionException extends Exception
 
 case object InitializeRouter
+
 case object ReconnectRouter
 
