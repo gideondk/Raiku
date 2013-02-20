@@ -34,7 +34,7 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
       binIndexes = Map("group_id" -> List(o.groupId)), intIndexes = Map("age" -> List(o.age)))
   }
 
-  val nrOfItems = 1000
+  val nrOfItems = 2000
 
   val randomObjects = List.fill(nrOfItems)(Y(java.util.UUID.randomUUID.toString, "Test Name", 25, "A")).toList
   val ids = randomObjects.map(_.id)
