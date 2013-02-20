@@ -15,8 +15,6 @@ import akka.routing._
 import scala.concurrent._
 import scala.concurrent.duration._
 
-case class InitializeRaikuClientActor(init: Promise[Unit])
-
 case class RaikuClient(config: RaikuConfig)(implicit val system: ActorSystem) extends RWRequests {
   val actor = system.actorOf(Props(new RaikuActor(config)))
 
@@ -27,6 +25,8 @@ case class RaikuClient(config: RaikuConfig)(implicit val system: ActorSystem) ex
 
 object RaikuClient {
   def apply(host: String, port: Int, connections: Int = 4)(implicit system: ActorSystem): RaikuClient = {
-    RaikuClient(RaikuConfig(RaikuHost(host, port), connections))
+    val client = RaikuClient(RaikuConfig(RaikuHost(host, port), connections))
+    client.actor ! InitializeRouter
+    client
   }
 }

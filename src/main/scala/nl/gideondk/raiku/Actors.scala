@@ -18,6 +18,10 @@ import akka.actor.SupervisorStrategy._
 import akka.routing.RandomRouter
 import akka.actor.OneForOneStrategy
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.concurrent.duration
+
 import akka.io.Tcp._
 
 private[raiku] case class RiakResponse(length: Int, messageType: Int, message: ByteString)
@@ -26,15 +30,12 @@ private[raiku] case class RiakOperation(promise: Promise[RiakResponse], bytes: B
 
 case class RaikuHost(host: String, port: Int)
 
-case class RaikuConfig(host: RaikuHost, connections: Int)
+case class RaikuConfig(host: RaikuHost, connections: Int, reconnectDelay: FiniteDuration = 5 seconds)
 
 object RaikuActor {
   val supervisorStrategy =
-    OneForOneStrategy(maxNrOfRetries = 8) {
-      case _: RaikuWorkerDisconnectedUnexpectedlyException ⇒ Restart
-      case _: RaikuWorkerNoTCPException ⇒ Restart
-      case _: NullPointerException ⇒ Restart
-      case _ ⇒ Escalate
+    OneForOneStrategy(maxNrOfRetries = 2) {
+      case _ ⇒ Restart
     }
 }
 
@@ -43,24 +44,40 @@ private class RaikuActor(config: RaikuConfig) extends Actor {
   val address = new InetSocketAddress(config.host.host, config.host.port)
 
   val tcp = akka.io.IO(Tcp)(context.system)
-  val router = context.system.actorOf(Props(new RaikuWorkerActor(tcp, address))
-    .withRouter(RandomRouter(nrOfInstances = config.connections, supervisorStrategy = RaikuActor.supervisorStrategy))
-    .withDispatcher("akka.actor.raiku-dispatcher"))
+  var router: Option[ActorRef] = None
+
+  def initialize {
+    router = Some(context.system.actorOf(Props(new RaikuWorkerActor(tcp, address))
+      .withRouter(RandomRouter(nrOfInstances = config.connections, supervisorStrategy = RaikuActor.supervisorStrategy))
+      .withDispatcher("akka.actor.raiku-dispatcher")))
+    context.watch(router.get)
+  }
 
   def receive = {
+    case InitializeRouter ⇒
+      log.debug("Raiku router initializing")
+      initialize
+
+    case ReconnectRouter ⇒
+      if (router.isEmpty) initialize
+
+    case Terminated(name) ⇒
+      router = None
+      log.debug("Raiku router died, restarting in: "+config.reconnectDelay.toString())
+      context.system.scheduler.scheduleOnce(config.reconnectDelay, self, ReconnectRouter)
+
     case req @ RiakOperation(promise, command) ⇒
-      router forward req
+      router match {
+        case Some(r) ⇒ r forward req
+        case None    ⇒ promise.failure(NoConnectionException())
+      }
   }
 }
 
 private class RaikuWorkerActor(tcp: ActorRef, address: InetSocketAddress) extends Actor with Stash {
-  import scala.concurrent.ExecutionContext.Implicits.global
-
   val state = IterateeRef.async
-  var tcpWorker: ActorRef = _
+  var tcpWorker: Option[ActorRef] = None
   val log = Logging(context.system, this)
-
-  var connected = false
 
   override def preStart = {
     tcp ! Connect(address)
@@ -74,38 +91,32 @@ private class RaikuWorkerActor(tcp: ActorRef, address: InetSocketAddress) extend
   def receive = {
     case Connected(remoteAddr, localAddr) ⇒
       sender ! Register(self)
-      tcpWorker = sender
-      connected = true
+      tcpWorker = sender.point[Option]
       unstashAll()
       log.debug("Raiku client worker connected to "+remoteAddr)
 
     case ErrorClosed(cause) ⇒
       log.error("Raiku client worker disconnected from Riak ("+address+") with cause: "+cause)
-      connected = false
-      throw new RaikuWorkerDisconnectedUnexpectedlyException
+      throw new WorkerDisconnectedUnexpectedlyException
 
     case PeerClosed ⇒
       log.error("Raiku client worker disconnected from Riak ("+address+")")
-      connected = false
-      throw new RaikuWorkerDisconnectedUnexpectedlyException
+      throw new WorkerDisconnectedUnexpectedlyException
 
     case ConfirmedClosed ⇒
       log.debug("Raiku client worker disconnected from Riak ("+address+")")
-      connected = false
 
     case m: ConnectionClosed ⇒
       log.error("Raiku client worker disconnected from Riak ("+address+")") // TODO: handle the specific cases
-      connected = false
-      throw new RaikuWorkerDisconnectedUnexpectedlyException
+      throw new WorkerDisconnectedUnexpectedlyException
 
     case Received(bytes: ByteString) ⇒
       state(akka.actor.IO.Chunk(bytes))
 
     case req @ RiakOperation(promise, command) ⇒
-      connected match {
-        case false ⇒
-          stash()
-        case true ⇒
+      tcpWorker match {
+        case None ⇒ stash()
+        case Some(w) ⇒
           for {
             _ ← state
             result ← Iteratees.readRiakResponse
@@ -113,8 +124,7 @@ private class RaikuWorkerActor(tcp: ActorRef, address: InetSocketAddress) extend
             promise.success(result)
             result
           }
-
-          tcpWorker ! Write(command)
+          w ! Write(command)
       }
   }
 }
@@ -132,10 +142,12 @@ object Iteratees {
   }
 }
 
-trait RaikuWorkerDisconnectedException extends Exception
+trait WorkerDisconnectedException extends Exception
+case class WorkerDisconnectedUnexpectedlyException extends WorkerDisconnectedException
+case class WorkerDisconnectedExpectedly extends WorkerDisconnectedException
 
-case class RaikuWorkerDisconnectedUnexpectedlyException extends RaikuWorkerDisconnectedException
+case class NoConnectionException extends Exception
 
-case class RaikuWorkerDisconnectedExpectedly extends RaikuWorkerDisconnectedException
+case object InitializeRouter
+case object ReconnectRouter
 
-case class RaikuWorkerNoTCPException extends Exception
