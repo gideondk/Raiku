@@ -35,7 +35,7 @@ case class RaikuConfig(host: RaikuHost, connections: Int)
 
 object RaikuActor {
   val supervisorStrategy =
-    OneForOneStrategy(maxNrOfRetries = 2) {
+    OneForOneStrategy(maxNrOfRetries = 8) {
       case _: RaikuWorkerDisconnectedUnexpectedlyException ⇒ Restart
       case _: RaikuWorkerNoTCPException ⇒ Restart
       case _: NullPointerException ⇒ Restart
@@ -79,11 +79,10 @@ private class RaikuWorkerActor(tcp: ActorRef, address: InetSocketAddress) extend
       sender ! Register(self)
       tcpWorker = sender
       log.debug("Raiku client worker connected to "+remoteAddr)
-      if (queue.length > 0)
-        queue.dequeueAll { req ⇒
-          self ! req
-          true
-        }
+      if (queue.length > 0) queue.dequeueAll { req ⇒
+        self ! req
+        true
+      }
 
     case ErrorClosed(cause) ⇒
       log.error("Raiku client worker disconnected from Riak ("+address+") with cause: "+cause)
