@@ -20,12 +20,6 @@ case class InitializeRaikuClientActor(init: Promise[Unit])
 case class RaikuClient(config: RaikuConfig)(implicit val system: ActorSystem) extends RWRequests {
   val actor = system.actorOf(Props(new RaikuActor(config)))
 
-  def initializeActor = {
-  	val initPromise = Promise[Unit]()
-  	actor ! InitializeRaikuClientActor(initPromise)
-  	initPromise.future
-  }
-
   def disconnect = {
     system stop actor
   }
@@ -33,8 +27,6 @@ case class RaikuClient(config: RaikuConfig)(implicit val system: ActorSystem) ex
 
 object RaikuClient {
   def apply(host: String, port: Int, connections: Int = 4)(implicit system: ActorSystem): RaikuClient = {
-    val client = RaikuClient(RaikuConfig(RaikuHost(host, port), connections))
-    Await.result(client.initializeActor, 5 seconds)
-    client
+    RaikuClient(RaikuConfig(RaikuHost(host, port), connections))
   }
 }

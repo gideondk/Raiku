@@ -19,7 +19,7 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
   sequential
 
   implicit val system = ActorSystem("perf-bucket-system")
-  val client = RaikuClient("localhost", 8087, 1)
+  val client = RaikuClient("localhost", 8087, 4)
 
   implicit val yFormat = jsonFormat4(Y)
 
