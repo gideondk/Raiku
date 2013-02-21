@@ -17,6 +17,7 @@ import nl.gideondk.raiku.serialization.ProtoBufConversion
 import nl.gideondk.raiku.mapreduce.MRResult
 
 private class RaikuMRWorkerActor(addr: InetSocketAddress) extends RaikuPBActor {
+  val workerDescription = "Raiku client MR worker"
   val address = addr
 
   override def specificMessageHandler = {
@@ -47,31 +48,31 @@ object MRIteratees extends MRConversion {
     messageType ← akka.actor.IO.take(1) // Second 8 bits
     frame ← akka.actor.IO.take(frameLen)
     next ← RiakMessageType.intToMessageType(messageType.asByteBuffer.getInt) match {
-        case RiakMessageType.RpbErrorResp ⇒
-          channel.end(new Exception(RpbErrorResp().mergeFrom(frame.toArray).errmsg))
-          akka.actor.IO.Iteratee()
+      case RiakMessageType.RpbErrorResp ⇒
+        channel.end(new Exception(RpbErrorResp().mergeFrom(frame.toArray).errmsg))
+        akka.actor.IO.Iteratee()
 
-        case RiakMessageType.RpbMapRedResp ⇒
-          val mrResp = RpbMapRedResp().mergeFrom(frame.toArray)
-          mrResp.done.getOrElse(false) match {
-            case false ⇒ try {
-              channel push mrRespToMRResult(mrResp)
-              readMRResponse(channel)
-            }
-            catch {
-              case e: Exception ⇒
-                channel end (new Exception("Couldn't parse map reduce response."))
-                akka.actor.IO.Iteratee()
-            }
-            case true ⇒
-              channel.eofAndEnd()
+      case RiakMessageType.RpbMapRedResp ⇒
+        val mrResp = RpbMapRedResp().mergeFrom(frame.toArray)
+        mrResp.done.getOrElse(false) match {
+          case false ⇒ try {
+            channel push mrRespToMRResult(mrResp)
+            readMRResponse(channel)
+          }
+          catch {
+            case e: Exception ⇒
+              channel end (new Exception("Couldn't parse map reduce response."))
               akka.actor.IO.Iteratee()
           }
+          case true ⇒
+            channel.eofAndEnd()
+            akka.actor.IO.Iteratee()
+        }
 
-        case _ ⇒
-          channel end (new Exception("Received unexepected message type"))
-          akka.actor.IO.Iteratee()
-      }
+      case _ ⇒
+        channel end (new Exception("Received unexepected message type"))
+        akka.actor.IO.Iteratee()
+    }
   } yield {
     ()
   }

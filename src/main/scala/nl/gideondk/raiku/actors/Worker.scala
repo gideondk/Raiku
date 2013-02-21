@@ -25,6 +25,7 @@ import akka.io.Tcp._
 import nl.gideondk.raiku.commands.{ RiakResponse, RiakOperation }
 
 private class RaikuWorkerActor(addr: InetSocketAddress) extends RaikuPBActor {
+  val workerDescription = "Raiku client worker"
   val address = addr
   def specificMessageHandler: Receive = {
     case req @ RiakOperation(promise, command) ⇒
