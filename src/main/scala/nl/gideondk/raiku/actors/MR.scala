@@ -46,8 +46,7 @@ object MRIteratees extends MRConversion {
     frameLen = frameLenBytes.iterator.getInt - 1
     messageType ← akka.actor.IO.take(1) // Second 8 bits
     frame ← akka.actor.IO.take(frameLen)
-    next ← {
-      val a: akka.actor.IO.Iteratee[Unit] = RiakMessageType.intToMessageType(messageType.asByteBuffer.getInt) match {
+    next ← RiakMessageType.intToMessageType(messageType.asByteBuffer.getInt) match {
         case RiakMessageType.RpbErrorResp ⇒
           channel.end(new Exception(RpbErrorResp().mergeFrom(frame.toArray).errmsg))
           akka.actor.IO.Iteratee()
@@ -68,14 +67,12 @@ object MRIteratees extends MRConversion {
               channel.eofAndEnd()
               akka.actor.IO.Iteratee()
           }
+
         case _ ⇒
           channel end (new Exception("Received unexepected message type"))
           akka.actor.IO.Iteratee()
       }
-      a
-    }
   } yield {
-
     ()
   }
 }
