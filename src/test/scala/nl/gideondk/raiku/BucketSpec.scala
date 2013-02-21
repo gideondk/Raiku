@@ -1,7 +1,7 @@
 package nl.gideondk.raiku
 
 import akka.actor._
-import commands.RaikuRWObject
+import commands.RWObject
 import scala.concurrent._
 import scala.concurrent.duration._
 
@@ -18,8 +18,8 @@ class BucketSpec extends Specification {
   val client = RaikuClient("localhost", 8087, 4)
 
   implicit val zConverter = new RaikuConverter[Z] {
-    def read(o: RaikuRWObject): ReadResult[Z] = Z(o.key, new String(o.value)).success
-    def write(bucket: String, o: Z): RaikuRWObject = RaikuRWObject(bucket, o.id, o.name.getBytes)
+    def read(o: RWObject): ReadResult[Z] = Z(o.key, new String(o.value)).success
+    def write(bucket: String, o: Z): RWObject = RWObject(bucket, o.id, o.name.getBytes)
   }
 
   val bucket = RaikuBucket[Z]("raiku_test_z_bucket", client)

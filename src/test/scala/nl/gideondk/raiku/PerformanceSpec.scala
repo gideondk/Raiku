@@ -1,7 +1,7 @@
 package nl.gideondk.raiku
 
 import akka.actor._
-import commands.RaikuRWObject
+import commands.RWObject
 import scala.concurrent._
 import scala.concurrent.duration._
 
@@ -25,13 +25,13 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
   implicit val yFormat = jsonFormat4(Y)
 
   implicit val yConverter = new RaikuConverter[Y] {
-    def read(o: RaikuRWObject): ReadResult[Y] = try {
+    def read(o: RWObject): ReadResult[Y] = try {
       yFormat.read(new String(o.value).asJson).success
     }
     catch {
       case e: Throwable ⇒ e.failure
     }
-    def write(bucket: String, o: Y): RaikuRWObject = RaikuRWObject(bucket, o.id, o.toJson.toString.getBytes,
+    def write(bucket: String, o: Y): RWObject = RWObject(bucket, o.id, o.toJson.toString.getBytes,
       binIndexes = Map("group_id" -> List(o.groupId)), intIndexes = Map("age" -> List(o.age)))
   }
 

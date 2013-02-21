@@ -11,7 +11,7 @@ import Scalaz._
 
 import com.google.protobuf.{ ByteString ⇒ ProtoBufByteString }
 import com.basho.riak.protobuf._
-import nl.gideondk.raiku.commands.{ RaikuRWObject, VTag, VClock, RiakMessageType }
+import nl.gideondk.raiku.commands.{ RWObject, VTag, VClock, RiakMessageType }
 
 trait ProtoBufConversion {
   implicit def stringToByteString(s: String): ProtoBufByteString = ProtoBufByteString.copyFromUtf8(s)
@@ -52,7 +52,7 @@ trait ProtoBufConversion {
     bsb.result
   }
 
-  def rwObjectToRpbContent(rw: RaikuRWObject) = {
+  def rwObjectToRpbContent(rw: RWObject) = {
     // TODO: implement links
     val indexes =
       rw.binIndexes.map(tpl ⇒ tpl._2.map(x ⇒ RpbPair(stringToByteString(tpl._1+"_bin"), stringToByteString(x).some))).flatten ++
@@ -77,11 +77,11 @@ trait ProtoBufConversion {
     val intIndexes: Map[String, List[Int]] = unDeSerIntIndexes.map(tpl ⇒ indexName(tpl._1) -> tpl._2.filter(x ⇒ x.isDefined).map(_.get.toStringUtf8.toInt))
     val binIndexes: Map[String, List[String]] = unDeSerBinIndexes.map(tpl ⇒ indexName(tpl._1) -> tpl._2.filter(x ⇒ x.isDefined).map(_.get.toStringUtf8))
 
-    RaikuRWObject(bucket, key, c.value.toByteArray, c.contentType.map(_.toStringUtf8).getOrElse("text/plain"), vClock,
+    RWObject(bucket, key, c.value.toByteArray, c.contentType.map(_.toStringUtf8).getOrElse("text/plain"), vClock,
       c.vtag.map(_.toByteArray).map(VTag(_)), c.lastMod, c.lastModUsecs, userMeta, intIndexes, binIndexes, c.deleted)
   }
 
-  def pbPutRespToRWObjects(key: String, bucket: String, gr: com.basho.riak.protobuf.RpbPutResp): List[RaikuRWObject] = {
+  def pbPutRespToRWObjects(key: String, bucket: String, gr: com.basho.riak.protobuf.RpbPutResp): List[RWObject] = {
     val content: Vector[RpbContent] = gr.content
     content.map {
       c ⇒
@@ -89,7 +89,7 @@ trait ProtoBufConversion {
     }.toList
   }
 
-  def pbGetRespToRWObjects(key: String, bucket: String, gr: com.basho.riak.protobuf.RpbGetResp): List[RaikuRWObject] = {
+  def pbGetRespToRWObjects(key: String, bucket: String, gr: com.basho.riak.protobuf.RpbGetResp): List[RWObject] = {
     val content: Vector[RpbContent] = gr.content
     content.map {
       c ⇒

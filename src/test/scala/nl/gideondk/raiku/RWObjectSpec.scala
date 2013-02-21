@@ -3,7 +3,7 @@ package nl.gideondk.raiku
 // import org.scalatest.FunSuite
 // import org.scalatest.BeforeAndAfter
 import akka.actor._
-import commands.RaikuRWObject
+import commands.RWObject
 import scala.concurrent._
 import scala.concurrent.duration._
 
@@ -22,13 +22,13 @@ class RWObjectSpec extends Specification {
     "be able to store rw objects into Riak" in {
       val newId = java.util.UUID.randomUUID.toString
 
-      val rwObject = RaikuRWObject("raiku_test_bucket", newId, "this should be stored".getBytes)
-      val validation: Validation[Throwable, List[RaikuRWObject]] = client.store(rwObject).unsafeFulFill()
+      val rwObject = RWObject("raiku_test_bucket", newId, "this should be stored".getBytes)
+      val validation: Validation[Throwable, List[RWObject]] = client.store(rwObject).unsafeFulFill()
       validation.isSuccess
     }
     "return stored items properly" in {
       val newId = java.util.UUID.randomUUID.toString
-      val rwObject = RaikuRWObject("raiku_test_bucket", newId, "this should be stored".getBytes)
+      val rwObject = RWObject("raiku_test_bucket", newId, "this should be stored".getBytes)
       val validation = client.store(rwObject).unsafeFulFill
 
       val retRWObject = client.fetch("raiku_test_bucket", newId).unsafeFulFill
@@ -37,7 +37,7 @@ class RWObjectSpec extends Specification {
     }
     "delete object properly" in {
       val newId = java.util.UUID.randomUUID.toString
-      val rwObject = RaikuRWObject("raiku_test_bucket", newId, "this should be stored".getBytes)
+      val rwObject = RWObject("raiku_test_bucket", newId, "this should be stored".getBytes)
       val validation = client.store(rwObject).unsafeFulFill
 
       client.delete(rwObject).unsafeFulFill
@@ -52,7 +52,7 @@ class RWObjectSpec extends Specification {
       val orgIdA = java.util.UUID.randomUUID.toString
       val orgIdB = java.util.UUID.randomUUID.toString
 
-      val rwObject = RaikuRWObject("raiku_test_bucket", newId, "this should be stored".getBytes, binIndexes = Map("organization_id" -> List(orgIdA, orgIdB)))
+      val rwObject = RWObject("raiku_test_bucket", newId, "this should be stored".getBytes, binIndexes = Map("organization_id" -> List(orgIdA, orgIdB)))
       val validation = client.store(rwObject).unsafeFulFill()
       val retRWObject = client.fetch("raiku_test_bucket", newId).unsafeFulFill.toOption.get.head
 
@@ -66,8 +66,8 @@ class RWObjectSpec extends Specification {
       val orgIdB = java.util.UUID.randomUUID.toString
       val orgIdC = java.util.UUID.randomUUID.toString
 
-      val rwObjectA = RaikuRWObject("raiku_test_bucket", newId, "this should be stored".getBytes, binIndexes = Map("organization_id" -> List(orgIdA, orgIdB)))
-      val rwObjectB = RaikuRWObject("raiku_test_bucket", anotherId, "this should be stored".getBytes, binIndexes = Map("organization_id" -> List(orgIdB, orgIdC)))
+      val rwObjectA = RWObject("raiku_test_bucket", newId, "this should be stored".getBytes, binIndexes = Map("organization_id" -> List(orgIdA, orgIdB)))
+      val rwObjectB = RWObject("raiku_test_bucket", anotherId, "this should be stored".getBytes, binIndexes = Map("organization_id" -> List(orgIdB, orgIdC)))
 
       val store = for {
         _ ← client.store(rwObjectA)

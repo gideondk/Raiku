@@ -12,8 +12,16 @@ import effect._
 
 import nl.gideondk.raiku.serialization.ProtoBufConversion
 import nl.gideondk.raiku.monads.{ ValidatedFuture, ValidatedFutureIO }
-import nl.gideondk.raiku.actors.{ RiakOperation, RiakResponse }
+
 import java.lang.Exception
+import play.api.libs.iteratee.Enumerator
+import nl.gideondk.raiku.mapreduce.MRResult
+
+private[raiku] case class RiakResponse(length: Int, messageType: Int, message: ByteString)
+
+private[raiku] case class RiakOperation(promise: Promise[RiakResponse], command: ByteString)
+
+private[raiku] case class RiakMROperation(promise: Promise[Enumerator[MRResult]], command: ByteString)
 
 trait Connection {
   def system: ActorSystem
@@ -24,7 +32,7 @@ trait Connection {
 }
 
 trait Request extends Connection with ProtoBufConversion {
-  def ?>(op: ByteString): ValidatedFutureIO[RiakResponse] = {
+  def buildRequest(op: ByteString): ValidatedFutureIO[RiakResponse] = {
     val ioAction = {
       val promise = Promise[RiakResponse]()
       actor ! RiakOperation(promise, op)
@@ -43,5 +51,17 @@ trait Request extends Connection with ProtoBufConversion {
       new Exception(RpbErrorResp().mergeFrom(resp.message.toArray).errmsg).failure
     else
       resp.success
+  }
+}
+
+trait MRRequest extends Connection with ProtoBufConversion {
+  def buildMRRequest(op: ByteString): ValidatedFutureIO[Enumerator[MRResult]] = {
+    val ioAction = {
+      val promise = Promise[Enumerator[MRResult]]()
+      actor ! RiakMROperation(promise, op)
+      promise
+    }.point[IO]
+
+    ValidatedFutureIO(ioAction.map(x ⇒ ValidatedFuture(x.future)))
   }
 }

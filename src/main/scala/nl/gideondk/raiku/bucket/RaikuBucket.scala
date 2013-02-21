@@ -10,9 +10,9 @@ import nl.gideondk.raiku.commands._
 trait RaikuConverter[T] {
   type ReadResult[T] = Validation[Throwable, T]
 
-  def read(o: RaikuRWObject): ReadResult[T]
+  def read(o: RWObject): ReadResult[T]
 
-  def write(bucket: String, o: T): RaikuRWObject
+  def write(bucket: String, o: T): RWObject
 }
 
 case class RaikuBucketProperties(nVal: Option[Int], allowMulti: Option[Boolean])
@@ -67,7 +67,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
     val (nR, pR) = (List(r.v, config.r.v).flatten headOption, List(pr.v, config.pr.v).flatten headOption)
     ValidatedFutureIORWListToValidatedFutureIOOptRW(client.fetch(bucketName, converted.key, nR, pR, basicQuorum.v, notFoundOk.v, deletedvclock = deletedVClock.v))
       .flatMap {
-        fetchObj: Option[RaikuRWObject] ⇒
+        fetchObj: Option[RWObject] ⇒
           val (nW, nDw, nPw) = (List(w.v, config.w.v).flatten headOption, List(dw.v, config.dw.v).flatten headOption, List(pw.v, config.pw.v).flatten headOption)
           // Clobber converter as default
           val storeObj = converter.write(bucketName, obj).copy(vClock = fetchObj.map(_.vClock).getOrElse(None))

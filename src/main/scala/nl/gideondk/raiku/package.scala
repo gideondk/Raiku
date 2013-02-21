@@ -33,7 +33,7 @@ package object raiku {
   implicit def booleanToReturnBodyArgument(b: Boolean): ReturnBodyArgument = ReturnBodyArgument(Option(b))
   implicit def booleanToDeletedVClockArgument(b: Boolean): DeletedVClockArgument = DeletedVClockArgument(Option(b))
 
-  implicit def ValidatedFutureIORWListToValidatedFutureIOOptT[T](v: ValidatedFutureIO[List[RaikuRWObject]])(implicit converter: RaikuConverter[T]): ValidatedFutureIO[Option[T]] = {
+  implicit def ValidatedFutureIORWListToValidatedFutureIOOptT[T](v: ValidatedFutureIO[List[RWObject]])(implicit converter: RaikuConverter[T]): ValidatedFutureIO[Option[T]] = {
     ValidatedFutureIO(v.run.map {
       x ⇒
         ValidatedFuture(x.run.map { v ⇒
@@ -47,15 +47,15 @@ package object raiku {
     })
   }
 
-  implicit def ValidatedFutureIORWListToValidatedFutureIOOptRW(v: ValidatedFutureIO[List[RaikuRWObject]]): ValidatedFutureIO[Option[RaikuRWObject]] = {
+  implicit def ValidatedFutureIORWListToValidatedFutureIOOptRW(v: ValidatedFutureIO[List[RWObject]]): ValidatedFutureIO[Option[RWObject]] = {
     ValidatedFutureIO(v.run.map {
       x ⇒
         ValidatedFuture(x.run.map { v ⇒
           v match {
             case Success(List(obj)) ⇒ Some(obj).success
             case Success(List())    ⇒ none.success[Throwable]
-            case Success(List(_*))  ⇒ new Exception("There were siblings").failure[Option[RaikuRWObject]]
-            case Failure(fail)      ⇒ fail.failure[Option[RaikuRWObject]]
+            case Success(List(_*))  ⇒ new Exception("There were siblings").failure[Option[RWObject]]
+            case Failure(fail)      ⇒ fail.failure[Option[RWObject]]
           }
         })
     })

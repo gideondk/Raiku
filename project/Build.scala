@@ -26,6 +26,7 @@ object RaikuBuild extends Build {
       "com.google.protobuf" % "protobuf-java" % "2.4.1" withSources(),
       "io.spray" %%  "spray-json" % "1.2.3" withSources(),
       "com.typesafe.akka" % "akka-actor_2.10" % "2.2-SNAPSHOT" withSources(),
+      "play" %% "play-iteratees" % "2.1.0" withSources(),
       "org.specs2" %% "specs2" % "1.13"
   )
 
