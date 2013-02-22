@@ -1,12 +1,8 @@
 package nl.gideondk.raiku.mapreduce
 
 import scalaz._
-import Scalaz._
 
-import spray.json._
 import scala.concurrent.duration._
-
-case class MRResult(phase: Int, result: JsValue)
 
 case class MapReduceJob(input: MapReduceInput, mrPipe: MapReducePipe, timeout: FiniteDuration = 60 seconds) {
   def wait(duration: FiniteDuration) = this.copy(timeout = duration)
@@ -18,7 +14,8 @@ trait MapReduceInput {
 
 trait BucketMapReduceInput extends MapReduceInput {
   def bucket: String
-  def keyFilters: Set[Set[String]]
+
+  def keyFilters: Option[Set[Set[String]]]
 }
 
 trait ObjectBasedMapReducedInput extends MapReduceInput
@@ -37,11 +34,13 @@ trait IdxMapReduceInput extends MapReduceInput {
 
 trait BinIdxMapReduceInput extends IdxMapReduceInput {
   def indexKey: String
+
   def indexValue: String
 }
 
 trait IntIdxMapReduceInput extends IdxMapReduceInput {
   def indexKey: String
+
   def indexValue: Either[Int, Range]
 }
 
@@ -49,22 +48,32 @@ object MR {
   def items(bucketAndKeys: Set[(String, String)]) = new ItemMapReduceInput {
     val objs = bucketAndKeys
   }
+
+  def bucket(name: String) = new BucketMapReduceInput {
+    val bucket: String = name
+
+    val keyFilters = None
+  }
 }
 
 case class MapReducePipe(phases: NonEmptyList[MapReducePhase]) {
   def |*(m: MapPhase) = MapReducePipe(phases :::> List(m))
+
   def |-(r: ReducePhase) = MapReducePipe(phases :::> List(r))
 }
 
 trait MapReducePhase {
   def fn: MapReduceFunction
+
   def arg: Option[String]
+
   def keep: Boolean
 
   override def toString = "("+fn.value+", "+arg+", "+keep+")"
 }
 
 trait MapPhase extends MapReducePhase
+
 trait ReducePhase extends MapReducePhase
 
 object MapPhase {
@@ -92,4 +101,5 @@ trait MapReduceFunction {
 }
 
 case class MRBuiltinFunction(value: String) extends MapReduceFunction
+
 case class MRFunction(value: String) extends MapReduceFunction

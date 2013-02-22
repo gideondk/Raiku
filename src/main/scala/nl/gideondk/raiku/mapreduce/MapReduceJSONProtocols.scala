@@ -32,15 +32,25 @@ object MapReduceJsonProtocol extends DefaultJsonProtocol {
 
   implicit object BucketMapReduceInputJsonFormat extends RootJsonWriter[BucketMapReduceInput] {
     def write(p: BucketMapReduceInput) = {
-      JsObject(
-        "bucket" -> JsString(p.bucket),
-        "key_filters" -> JsArray(p.keyFilters.map(x ⇒ JsArray(x.map(JsString(_)).toList)).toList))
+      p.keyFilters match {
+        case None ⇒ JsString(p.bucket)
+        case Some(filters) ⇒
+          JsObject(
+            "bucket" -> JsString(p.bucket),
+            "key_filters" -> JsArray(filters.map(x ⇒ JsArray(x.map(JsString(_)).toList)).toList))
+      }
     }
   }
 
   implicit object ItemMapReduceInputJsonFormat extends RootJsonWriter[ItemMapReduceInput] {
     def write(p: ItemMapReduceInput) = {
       JsArray(p.objs.map(tpl ⇒ JsArray(JsString(tpl._1), JsString(tpl._2))).toList)
+    }
+  }
+
+  implicit object AnnotatedMapReduceInputJsonFormat extends RootJsonWriter[AnnotatedMapReduceInput] {
+    def write(p: AnnotatedMapReduceInput) = {
+      JsArray(p.objs.map(tpl ⇒ JsArray(JsString(tpl._1), JsString(tpl._2), JsString(tpl._3))).toList)
     }
   }
 
@@ -71,17 +81,15 @@ object MapReduceJsonProtocol extends DefaultJsonProtocol {
     }
   }
 
-  implicit object AnnotatedMapReduceInputJsonFormat extends RootJsonWriter[AnnotatedMapReduceInput] {
-    def write(p: AnnotatedMapReduceInput) = {
-      JsArray(p.objs.map(tpl ⇒ JsArray(JsString(tpl._1), JsString(tpl._2), JsString(tpl._3))).toList)
-    }
-  }
-
   implicit object MapReduceJobJsonFormat extends RootJsonWriter[MapReduceJob] {
     def write(p: MapReduceJob) = {
       JsObject(
         p.input match {
-          case x: ItemMapReduceInput ⇒ "inputs" -> ItemMapReduceInputJsonFormat.write(x)
+          case x: BucketMapReduceInput    ⇒ "inputs" -> BucketMapReduceInputJsonFormat.write(x)
+          case x: ItemMapReduceInput      ⇒ "inputs" -> ItemMapReduceInputJsonFormat.write(x)
+          case x: AnnotatedMapReduceInput ⇒ "inputs" -> AnnotatedMapReduceInputJsonFormat.write(x)
+          case x: BinIdxMapReduceInput    ⇒ "inputs" -> BinIdxMapReduceInputJsonFormat.write(x)
+          case x: IntIdxMapReduceInput    ⇒ "inputs" -> IntIdxMapReduceInputJsonFormat.write(x)
         },
         "query" -> MapReducePipeJsonFormat.write(p.mrPipe),
         "timeout" -> JsNumber(p.timeout.toMillis))

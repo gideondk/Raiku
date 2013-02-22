@@ -4,11 +4,17 @@ import commands.RWObject
 import mapreduce._
 
 import scalaz._
+
+import scala.concurrent.Await
 import Scalaz._
 import spray.json._
 
 import org.specs2.mutable.Specification
 import akka.actor.ActorSystem
+
+import scala.concurrent.Future
+import scala.util.Random
+import play.api.libs.iteratee.{ Enumerator, Iteratee }
 
 class MapReduceSpec extends Specification with DefaultJsonProtocol {
   import nl.gideondk.raiku.mapreduce.MapReduceJsonProtocol._
@@ -77,6 +83,31 @@ class MapReduceSpec extends Specification with DefaultJsonProtocol {
         "timeout" -> JsNumber(60000))
 
       json == comparable
+    }
+  }
+
+  "A bucket based MR job" should {
+    "return the correct results" in {
+      import scala.concurrent.ExecutionContext.Implicits.global
+      val duration = scala.concurrent.duration.pairIntToDuration((60, scala.concurrent.duration.SECONDS))
+      val groupIds = Vector.fill(10)(java.util.UUID.randomUUID.toString)
+      val rnd = new scala.util.Random
+      val vec = List.fill(5000)(Y.apply(java.util.UUID.randomUUID.toString, "NAME", rnd.nextInt(99), Random.shuffle(groupIds).head))
+      (bucket <<* vec).unsafeFulFill(duration)
+
+      val mapToNumber = MRFunction("function() {return [1]; }")
+      val reduceSum = MRBuiltinFunction("Riak.reduceSum")
+
+      val mrJob = MR.bucket(bucket.bucketName) |>> (MapPhase(mapToNumber, k = true) |- ReducePhase(reduceSum, k = true))
+
+      (client mapReduce mrJob).unsafeFulFill(duration) match {
+        case Failure(e) ⇒ throw e
+        case Success(results) ⇒
+          val firstPhase = results(0)
+          val secondPhase = results(1)
+
+          firstPhase.elements.length == 5000 && secondPhase.elements.head == JsNumber(5000)
+      }
     }
   }
 }

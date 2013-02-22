@@ -15,13 +15,13 @@ import nl.gideondk.raiku.monads.{ ValidatedFuture, ValidatedFutureIO }
 
 import java.lang.Exception
 import play.api.libs.iteratee.Enumerator
-import nl.gideondk.raiku.mapreduce.MRResult
+import spray.json.JsValue
 
 private[raiku] case class RiakResponse(length: Int, messageType: Int, message: ByteString)
 
 private[raiku] case class RiakOperation(promise: Promise[RiakResponse], command: ByteString)
 
-private[raiku] case class RiakMROperation(promise: Promise[Enumerator[MRResult]], command: ByteString)
+private[raiku] case class RiakMROperation(promise: Promise[Enumerator[Enumerator[JsValue]]], command: ByteString)
 
 trait Connection {
   def system: ActorSystem
@@ -55,9 +55,9 @@ trait Request extends Connection with ProtoBufConversion {
 }
 
 trait MRRequest extends Connection with ProtoBufConversion {
-  def buildMRRequest(op: ByteString): ValidatedFutureIO[Enumerator[MRResult]] = {
+  def buildMRRequest(op: ByteString): ValidatedFutureIO[Enumerator[Enumerator[JsValue]]] = {
     val ioAction = {
-      val promise = Promise[Enumerator[MRResult]]()
+      val promise = Promise[Enumerator[Enumerator[JsValue]]]()
       actor ! RiakMROperation(promise, op)
       promise
     }.point[IO]
