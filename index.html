@@ -1,0 +1,201 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Raiku by gideondk</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Raiku</h1>
+        <p>A non-blocking - Akka IO driven - Riak client for Scala with a cute DSL</p>
+
+        <p class="view"><a href="https://github.com/gideondk/Raiku">View the Project on GitHub <small>gideondk/Raiku</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/gideondk/Raiku/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/gideondk/Raiku/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/gideondk/Raiku">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>Raiku</h1>
+
+<blockquote>
+<p>Petals of the mountain rose</p>
+
+<p>Fall now and then,</p>
+
+<p>To the sound of the waterfall?</p>
+</blockquote>
+
+<h2>Overview</h2>
+
+<p>Raiku is to Riak as a waterfall is to Akka; a simple Riak client which lets Riak flow to your Scala applications.</p>
+
+<p>It's targeted as a non-blocking, performance focused, full-scale alternative to the java Riak driver. </p>
+
+<p>Based on Akka IO, it uses the iteratee pattern and actors to create the best throughput possible.</p>
+
+<h2>Status</h2>
+
+<p>The client should currently treated as a proof of concept, but is stable enough to try out in hobby-projects.</p>
+
+<p><strong>Currently available in the client:</strong></p>
+
+<ul>
+<li>Writing low-level protobuf style read-write objects through a RaikuClient;</li>
+<li>Doing this non-blocking through multiple sockets, handled by a single actor;</li>
+<li>Writing, fetching and deleting single or multiple objects at once;</li>
+<li>Querying items on 2i, based on binary or integral indexes (ranges also supported);</li>
+<li>Sequencing and continuing multiple operations using monad transformers (ValidatedFuture, ValidatedFutureIO).</li>
+</ul><p><strong>The following is currently missing in the client, but will be added soon:</strong></p>
+
+<ul>
+<li>Map/Reduce functionality;</li>
+<li>Link walking;</li>
+<li>Custom mutations / conflict resolutions;</li>
+<li>Connection pooling;</li>
+<li>Retriers;</li>
+<li>Durable mailboxes;</li>
+<li>Least-connection-error-based router / pool;</li>
+<li>Full iteratee-based reactive-mongo like goodness.</li>
+</ul><h2>Architecture</h2>
+
+<p>The client uses Akka IO and iteratees to send and receive protocol buffer encoded data streams over TCP sockets.</p>
+
+<p>Protocol Buffer messages are transformed into case classes using ScalaBuff, Riak PBC Content classes are serialized into <em>RWObjects</em>, which are case classes, containing all information needed to write objects back into Riak.</p>
+
+<p>You can use the client to fetch, store and delete these "low level" objects, but it's wiser to use the RaikuBucket to store objects converted using a RaikuConverter implementation. </p>
+
+<p>You are free to use any value serialisation method available, but I recommended to use the Spray JSON package (behaves very good in multi-threaded environments).</p>
+
+<p>All operations return a value in a monad transformer (<code>ValidatedFutureIO</code>) which combines a <code>Validation</code>, <code>Future</code> and <code>IO</code> monad into one type: most (if not all) exceptions will be caught in the validation monad, all async actions are abstracted into a future monad and all IO actions are as pure as possible by using the Scalaz IO monad.</p>
+
+<p>Use <code>unsafePerformIO</code> to expose the Future, or use <code>unsafeFulFill(d: Duration)</code> to perform IO and wait (blocking) on the future.</p>
+
+<h2>DSL</h2>
+
+<p>You can use the <em>normal</em> functions to store, fetch or delete objects:</p>
+
+<p><code>fetch</code> / <code>fetchMany</code></p>
+
+<p><code>store</code> / <code>storeMany</code></p>
+
+<p><code>delete</code> / <code>deleteMany</code></p>
+
+<p>Or to fetch keys on 2i:</p>
+
+<p><code>fetchKeysForBinIndexByValue</code></p>
+
+<p><code>fetchKeysForIntIndexByValue</code></p>
+
+<p><code>fetchKeysForIntIndexByValueRange</code></p>
+
+<p>If you like to take a walk on the wild side, you can try the (currently quite primitive) DSL to do these actions:</p>
+
+<p><strong>Fetching objects</strong></p>
+
+<pre><code>persons ?    personId
+persons ?*  List(personIdA, personIdB)
+</code></pre>
+
+<p><strong>Storing objects</strong>
+<pre><code>persons &lt;&lt;    Person("Basho", 42, "Japan")
+persons &lt;&lt;*  List(Person("Basho", 42, "Japan"), Person("Shiki", 52, "Japan"))
+</code></pre></p>
+
+<p><strong>Deleting objects</strong></p>
+
+<pre><code>persons -    Person("Basho", 42, "Japan")
+persons -*   List(Person("Basho", 42, "Japan"), Person("Shiki", 52, "Japan"))
+</code></pre>
+
+<p><strong>Querying objects based on 2i</strong></p>
+
+<pre><code>persons idx  ("age", 42)
+persons idx  ("country", "Japan")
+persons idx  ("age", 39 to 50)
+</code></pre>
+
+<h2>Usage</h2>
+
+<p>Using the client / bucket is quite simple, check the code of the tests to see all functionality. But it basically comes down to this:</p>
+
+<p><strong>Create a client:</strong>
+<pre><code>implicit val system = ActorSystem("system")
+val client = RaikuClient("localhost", 8087, 4)
+</code></pre></p>
+
+<p><strong>Create a converter:</strong></p>
+
+<pre><code>implicit val yFormat = jsonFormat4(Y)
+
+implicit val yConverter = new RaikuConverter[Y] {
+    def read(o: RaikuRWObject): ReadResult[Y] = try {
+        yFormat.read(new String(o.value).asJson).success
+    } catch {
+        case e : Throwable =&gt; e.failure
+    }
+    def write(bucket: String, o: Y): RaikuRWObject = RaikuRWObject(bucket, o.id, o.toJson.toString.getBytes, binIndexes = Map("group_id" -&gt; List(o.groupId)), intIndexes = Map("age" -&gt; List(o.age)))
+}
+</code></pre>
+
+<p><strong>Finally, create the bucket:</strong></p>
+
+<pre><code>val bucket = RaikuBucket[Y]("raiku_test_y_bucket", client)
+</code></pre>
+
+<h2>Monadic behavior</h2>
+
+<p>You can use the monadic behavior of <code>ValidatedFutureIO[T]</code> to combine multiple requests:</p>
+
+<p><pre><code>val objs: ValidatedFutureIO[List[Person]] = for {
+    keys &lt;- persons idx ("age", 39 to 50)
+    objs &lt;- persons ?* keys
+} yield objs
+</code></pre></p>
+
+<p>Or better, using Scalaz:</p>
+
+<pre><code>persons idx ("age", 39 to 50) &gt;&gt;= ((x: List[String]) =&gt; bucket ?* x)</code></pre>
+
+<p>Or if you want to run queries in parrallel:</p>
+
+<p><pre><code>val storePersons = persons &lt;&lt;* perObjs
+val storeCountries = countries &lt;&lt;* countryObjs
+ValidatedFutureIO.sequence(List(storePersons, storeCountries))</code></pre></p>
+
+<h2>Credits</h2>
+
+<p>Lots of credits go to <a href="https://github.com/jrwest">Jordan West</a> for the structure of his Scaliak driver,
+and to <a href="https://github.com/SandroGrzicic">Sandro Gržičić</a> for the ScalaBuff implementation.</p>
+
+<h2>License</h2>
+
+<p>Copyright © 2012 Gideon de Kok</p>
+
+<p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at</p>
+
+<p><a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+
+<p>Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/gideondk">gideondk</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
