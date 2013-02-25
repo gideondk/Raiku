@@ -1,33 +1,33 @@
 package nl.gideondk.raiku.mapreduce
 
-import spray.json._
+import spray.json.{ DefaultJsonProtocol, JsArray, JsBoolean, JsNumber, JsObject, JsString, JsValue, RootJsonWriter }
 
 object MapReduceJsonProtocol extends DefaultJsonProtocol {
+
   implicit object MapReducePhaseJsonFormat extends RootJsonWriter[MapReducePhase] {
     def write(p: MapReducePhase) = {
       val jsMap = Map(
         "language" -> JsString("javascript"),
         p.fn match {
-          case x: MRBuiltinFunction ⇒
+          case x: BuildInMapReduceFunction ⇒
             "name" -> JsString(x.value)
-          case x: MRFunction ⇒
+          case x: MapReduceFunction ⇒
             "source" -> JsString(x.value)
-        },
-        "keep" -> JsBoolean(p.keep))
-      JsObject(if (p.arg.isDefined) jsMap ++ Map("args" -> JsString(p.arg.get)) else jsMap)
+        }) +
+        (if (p.isInstanceOf[NonKeepedMapReducePhase]) ("keep" -> JsBoolean(false)) else ("keep" -> JsBoolean(true))) ++
+        p.args.map(x ⇒ Map("args" -> x)).getOrElse(Map.empty[String, JsValue])
+      JsObject(jsMap)
     }
   }
 
-  implicit object MapReducePipeJsonFormat extends RootJsonWriter[MapReducePipe] {
-    def write(p: MapReducePipe) = {
-      JsArray(
-        p.phases.map {
-          _ match {
-            case x: MapPhase    ⇒ JsObject("map" -> MapReducePhaseJsonFormat.write(x))
-            case x: ReducePhase ⇒ JsObject("reduce" -> MapReducePhaseJsonFormat.write(x))
-          }
-        } list)
-    }
+  implicit def phasesListFormat[T <: MapReducePhase] = new RootJsonWriter[List[T]] {
+    def write(phases: List[T]) = JsArray(
+      phases.map {
+        _ match {
+          case x: MPhase ⇒ JsObject("map" -> MapReducePhaseJsonFormat.write(x))
+          case x: RPhase ⇒ JsObject("reduce" -> MapReducePhaseJsonFormat.write(x))
+        }
+      })
   }
 
   implicit object BucketMapReduceInputJsonFormat extends RootJsonWriter[BucketMapReduceInput] {
@@ -80,19 +80,18 @@ object MapReduceJsonProtocol extends DefaultJsonProtocol {
       }
     }
   }
-
-  implicit object MapReduceJobJsonFormat extends RootJsonWriter[MapReduceJob] {
-    def write(p: MapReduceJob) = {
-      JsObject(
-        p.input match {
-          case x: BucketMapReduceInput    ⇒ "inputs" -> BucketMapReduceInputJsonFormat.write(x)
-          case x: ItemMapReduceInput      ⇒ "inputs" -> ItemMapReduceInputJsonFormat.write(x)
-          case x: AnnotatedMapReduceInput ⇒ "inputs" -> AnnotatedMapReduceInputJsonFormat.write(x)
-          case x: BinIdxMapReduceInput    ⇒ "inputs" -> BinIdxMapReduceInputJsonFormat.write(x)
-          case x: IntIdxMapReduceInput    ⇒ "inputs" -> IntIdxMapReduceInputJsonFormat.write(x)
-        },
-        "query" -> MapReducePipeJsonFormat.write(p.mrPipe),
-        "timeout" -> JsNumber(p.timeout.toMillis))
-    }
-  }
+  //  implicit def mapReduceJobJsonFormat[T] = new RootJsonWriter[MapReduceJob[T]] {
+  //    def write(p: MapReduceJob[T])(implicit tl: shapeless.ToList[T, MapReducePhase]) = {
+  //      JsObject(
+  //        p.input match {
+  //          case x: BucketMapReduceInput    ⇒ "inputs" -> BucketMapReduceInputJsonFormat.write(x)
+  //          case x: ItemMapReduceInput      ⇒ "inputs" -> ItemMapReduceInputJsonFormat.write(x)
+  //          case x: AnnotatedMapReduceInput ⇒ "inputs" -> AnnotatedMapReduceInputJsonFormat.write(x)
+  //          case x: BinIdxMapReduceInput    ⇒ "inputs" -> BinIdxMapReduceInputJsonFormat.write(x)
+  //          case x: IntIdxMapReduceInput    ⇒ "inputs" -> IntIdxMapReduceInputJsonFormat.write(x)
+  //        },
+  //        "query" -> phasesListFormat.write(p.phases.toList),
+  //        "timeout" -> JsNumber(p.timeout.toMillis))
+  //    }
+  //  }
 }

@@ -2,22 +2,25 @@ package nl.gideondk.raiku
 
 import commands.RWObject
 import mapreduce._
-
 import scalaz._
-
 import scala.concurrent.Await
 import Scalaz._
 import spray.json._
-
 import org.specs2.mutable.Specification
 import akka.actor.ActorSystem
-
 import scala.concurrent.Future
 import scala.util.Random
 import play.api.libs.iteratee.{ Enumerator, Iteratee }
 
+import shapeless._
+import HList._
+import Typeable._
+import Traversables._
+
 class MapReduceSpec extends Specification with DefaultJsonProtocol {
   import nl.gideondk.raiku.mapreduce.MapReduceJsonProtocol._
+
+  def typed[T](t: ⇒ T) {}
 
   implicit val system = ActorSystem("bucket-system")
   val client = RaikuClient("localhost", 8087, 4)
@@ -39,50 +42,25 @@ class MapReduceSpec extends Specification with DefaultJsonProtocol {
 
   sequential
 
-  "A map reduce phase" should {
-    "be run in correct sequence" in {
-      val a = MRBuiltinFunction("Riak.mapValuesJson")
-      val b = MRBuiltinFunction("Riak.filterNotFound")
-      val c = MRBuiltinFunction("Riak.reduceSum")
-      val d = MRBuiltinFunction("Riak.reduceMin")
+  "A map reduce phases" should {
+    "be build correctly" in {
+      val a = BuildInMapFunction("Riak.mapValuesJson")
+      val b = BuildInMapFunction("Riak.filterNotFound")
+      val c = BuildInReduceFunction("Riak.reduceSum")
+      val d = BuildInReduceFunction("Riak.reduceMin")
 
-      val r = MapPhase(a) |* MapPhase(b) |- ReducePhase(c) |- ReducePhase(d)
-      val rl = r.phases.list
-      rl(0).fn == a && rl(1).fn == b && rl(2).fn == c && rl(3).fn == d
-    }
-  }
+      val eee = MapReducePhases(HNil, NonKeepedMapPhase(a))
 
-  "A map reduce job" should {
-    "be able to be serialized correctly" in {
-      val buildInFunction = MRBuiltinFunction("Riak.mapValuesJson")
-      val customFunction = MRFunction("""function(values, arg){
-       return values.reduce(function(acc, item){
-       for(state in item){
-         if(acc[state])
-          acc[state] += item[state];
-         else
-          acc[state] = item[state];
-       }
-       return acc;
-     });
-    }""")
+      val mrJob = MR.items(Set(("persons", "a"), ("persons", "b"))) |>> a >-> c
 
-      val mrJob = MR.items(Set(("persons", "a"), ("persons", "b"))) |>> (MapPhase(buildInFunction) |- ReducePhase(customFunction, k = true))
-      val json = MapReduceJobJsonFormat.write(mrJob)
-      val comparable = JsObject(
-        "inputs" -> JsArray(JsArray(List(JsString("persons"), JsString("a"))), JsArray(List(JsString("persons"), JsString("b")))),
-        "query" -> JsArray(
-          JsObject("map" -> JsObject(
-            "language" -> JsString("javascript"),
-            "name" -> JsString(buildInFunction.value),
-            "keep" -> JsBoolean(false))),
-          JsObject("reduce" -> JsObject(
-            "language" -> JsString("javascript"),
-            "source" -> JsString(customFunction.value),
-            "keep" -> JsBoolean(true)))),
-        "timeout" -> JsNumber(60000))
+      typed[NonKeepedMapPhase :: ReducePhase :: HNil](mrJob.phases)
 
-      json == comparable
+      buildInMapFunctionToMapReducePhases(a)
+
+      val r = MR.items(Set(("persons", "a"), ("persons", "b"))) |>> buildInMapFunctionToMapReducePhases(a) >-> b >=> c >-> d
+
+      typed[NonKeepedMapPhase :: MapPhase :: NonKeepedReducePhase :: ReducePhase :: HNil](r.phases)
+      true
     }
   }
 
@@ -91,22 +69,20 @@ class MapReduceSpec extends Specification with DefaultJsonProtocol {
       import scala.concurrent.ExecutionContext.Implicits.global
       val duration = scala.concurrent.duration.pairIntToDuration((60, scala.concurrent.duration.SECONDS))
       val groupIds = Vector.fill(10)(java.util.UUID.randomUUID.toString)
+      val n = 5000
       val rnd = new scala.util.Random
-      val vec = List.fill(5000)(Y.apply(java.util.UUID.randomUUID.toString, "NAME", rnd.nextInt(99), Random.shuffle(groupIds).head))
+      val vec = List.fill(n)(Y.apply(java.util.UUID.randomUUID.toString, "NAME", rnd.nextInt(99), Random.shuffle(groupIds).head))
       (bucket <<* vec).unsafeFulFill(duration)
 
-      val mapToNumber = MRFunction("function() {return [1]; }")
-      val reduceSum = MRBuiltinFunction("Riak.reduceSum")
+      val mapToNumber = MapFunction("function() {return [1]; }")
+      val reduceSum = BuildInReduceFunction("Riak.reduceSum")
 
-      val mrJob = MR.bucket(bucket.bucketName) |>> (MapPhase(mapToNumber, k = true) |- ReducePhase(reduceSum, k = true))
+      val mrJob = MR.bucket(bucket.bucketName) |>> mapToNumber >=> reduceSum
+      val phases = mrJob.phases
 
-      (client mapReduce mrJob).unsafeFulFill(duration) match {
+      val res = (client mapReduce mrJob).unsafeFulFill(duration) match {
         case Failure(e) ⇒ throw e
-        case Success(results) ⇒
-          val firstPhase = results(0)
-          val secondPhase = results(1)
-
-          firstPhase.elements.length == 5000 && secondPhase.elements.head == JsNumber(5000)
+        case Success(r) ⇒ r._1.length == n && r._2(0) == JsNumber(n)
       }
     }
   }

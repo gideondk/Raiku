@@ -1,28 +1,11 @@
 package nl.gideondk.raiku.actors
 
-import scalaz._
-import Scalaz._
-
-import akka.actor.IO.IterateeRef
-import akka.actor._
-import akka.util.ByteString
-import akka.event.Logging
-
-import akka.io._
-
-import scala.concurrent.Promise
-
 import java.net.InetSocketAddress
 
-import akka.actor.SupervisorStrategy._
-import akka.routing.RandomRouter
-import akka.actor.OneForOneStrategy
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
-
-import akka.io.Tcp._
-import nl.gideondk.raiku.commands.{ RiakResponse, RiakOperation }
+import akka.actor.actorRef2Scala
+import akka.io.Tcp.Write
+import nl.gideondk.raiku.commands.RiakOperation
+import nl.gideondk.raiku.commands.RiakResponse
 
 private class RaikuWorkerActor(addr: InetSocketAddress) extends RaikuPBActor {
   val workerDescription = "Raiku client worker"

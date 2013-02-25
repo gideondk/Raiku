@@ -2,19 +2,20 @@ package nl.gideondk.raiku.actors
 
 import java.net.InetSocketAddress
 
-import akka.actor._
-import akka.util.ByteString
-import akka.event.Logging
-
-import scala.concurrent.Promise
-
-import akka.routing.RandomRouter
-import akka.actor.SupervisorStrategy._
-import akka.actor.OneForOneStrategy
-
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
-import nl.gideondk.raiku.commands.{ RiakMROperation, RiakOperation }
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.FiniteDuration
+
+import akka.actor.Actor
+import akka.actor.ActorRef
+import akka.actor.OneForOneStrategy
+import akka.actor.Props
+import akka.actor.SupervisorStrategy.Restart
+import akka.actor.Terminated
+import akka.event.Logging
+import akka.routing.RandomRouter
+import nl.gideondk.raiku.commands.RiakMROperation
+import nl.gideondk.raiku.commands.RiakOperation
 
 case class RaikuHost(host: String, port: Int)
 
@@ -77,10 +78,10 @@ private[raiku] class RaikuActor(config: RaikuConfig) extends Actor {
         case None    ⇒ promise.failure(NoConnectionException())
       }
 
-    case req @ RiakMROperation(promise, command) ⇒
+    case req: RiakMROperation ⇒
       mrRouter match {
         case Some(r) ⇒ r forward req
-        case None    ⇒ promise.failure(NoConnectionException())
+        case None    ⇒ req.promise.failure(NoConnectionException())
       }
   }
 }

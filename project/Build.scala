@@ -14,10 +14,13 @@ object RaikuBuild extends Build {
       resolvers ++= Seq("Typesafe Repository (releases)" at "http://repo.typesafe.com/typesafe/releases/",
                   "Typesafe Repository (snapshots)" at "http://repo.typesafe.com/typesafe/snapshots/",
                   "gideondk-repo" at "https://raw.github.com/gideondk/gideondk-mvn-repo/master",
+                  
                   "Scala Tools Repository (snapshots)" at "http://scala-tools.org/repo-snapshots",
                   "Scala Tools Repository (releases)"  at "http://scala-tools.org/repo-releases",
+
+                  "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
                   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
-                  "repo.codahale.com" at "http://repo.codahale.com",
+                  
                   "spray repo" at "http://repo.spray.io"))
 
   val appDependencies = Seq(
@@ -27,6 +30,7 @@ object RaikuBuild extends Build {
       "io.spray" %%  "spray-json" % "1.2.3" withSources(),
       "com.typesafe.akka" % "akka-actor_2.10" % "2.2-SNAPSHOT" withSources(),
       "play" %% "play-iteratees" % "2.1.0" withSources(),
+      "com.chuusai" % "shapeless_2.10.0" % "1.2.4" withSources(),
       "org.specs2" %% "specs2" % "1.13"
   )
 
