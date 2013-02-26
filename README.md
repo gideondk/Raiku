@@ -145,13 +145,13 @@ The defined input can be used to be injected into the several phases:
 
 By Riak default, the last phase is automatically returned. Other phases can be returned by using the `>=>` between two phases (as opposed to the normal `>->`).
 
-The run the job, the job is send to the client using the `mapReduce` function.
+Contructed jobs can be send to the client using the `mapReduce` function:
 
 <notextile><pre><code>client mapReduce job
 res0: Tuple2[List[JsValue], List[JsValue]]
 </code></pre></notextile>
 
-This enables you to use the MapReduce results in a type safe manner (without run-time checking on the amount of phases). If you want to use the results from a MapReduce job in a Reactive manner, the `streamMapReduce` function can be send to the client:
+This enables you to use the MapReduce results in a type safe manner. To use the results from a MapReduce job in a reactive manner, the `streamMapReduce` function can be send to the client:
 
 <notextile><pre><code>client streamMapReduce job
 res0: Tuple2[Enumerator[JsValue], Enumerator[JsValue]]
