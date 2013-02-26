@@ -1,6 +1,7 @@
 package nl.gideondk
 
 import raiku.commands._
+import raiku.serialization._
 import raiku.monads.{ ValidatedFuture, ValidatedFutureIO }
 import scalaz._
 import Scalaz._

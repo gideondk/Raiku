@@ -109,8 +109,8 @@ trait MapReducePoly {
   object combineFutures extends Poly2 {
     implicit def caseUnitToListFut = at[ValidatedFutureIO[Unit], Future[List[JsValue]]]((c, s) ⇒ c.flatMap { x ⇒ ValidatedFutureIO(s.map(y ⇒ (y :: HNil).tupled)) })
     implicit def caseFutToFut[T <: Product, A <: HList, B <: HList](implicit hlister: HListerAux[T, A],
-                                                                  prepend: PrependAux[A, shapeless.::[List[spray.json.JsValue], shapeless.HNil], B],
-                                                                  tupler: Tupler[B]) =
+                                                                    prepend: PrependAux[A, shapeless.::[List[spray.json.JsValue], shapeless.HNil], B],
+                                                                    tupler: Tupler[B]) =
       at[ValidatedFutureIO[T], Future[List[JsValue]]]((c, s) ⇒ c.flatMap { x ⇒ ValidatedFutureIO(s.map(y ⇒ (x.hlisted :+ y).tupled)) })
   }
 

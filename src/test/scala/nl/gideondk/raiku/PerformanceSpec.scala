@@ -15,6 +15,7 @@ import org.specs2.matcher.Matcher
 
 import scala.concurrent._
 import scala.concurrent.duration._
+import play.api.libs.iteratee.Iteratee
 
 class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
   sequential
@@ -72,6 +73,12 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
 
       timed("Fetching "+nrOfItems+" items in parallel (good)", nrOfItems) {
         val status = futs.unsafeFulFill(Duration(15, SECONDS))
+      }
+
+      timed("Streaming "+nrOfItems+" items", nrOfItems) {
+        val enum = bucket.enumerateMany(ids, r = 1)
+        val results = enum |>>> Iteratee.getChunks
+        Await.result(results, Duration(15, SECONDS))
       }
     }
     "be able to delete objects in timely fashion" in {

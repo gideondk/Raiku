@@ -1,19 +1,19 @@
-package nl.gideondk.raiku
+package nl.gideondk.raiku.bucket
 
+import nl.gideondk.raiku._
 import monads.ValidatedFutureIO
 import scalaz._
 import Scalaz._
 
+import scala.concurrent._
+import ExecutionContext.Implicits.global
+
 import com.basho.riak.protobuf._
 import nl.gideondk.raiku.commands._
-
-trait RaikuConverter[T] {
-  type ReadResult[T] = Validation[Throwable, T]
-
-  def read(o: RWObject): ReadResult[T]
-
-  def write(bucket: String, o: T): RWObject
-}
+import nl.gideondk.raiku.serialization._
+import play.api.libs.iteratee._
+import Enumerator._
+import spray.json.JsValue
 
 case class RaikuBucketProperties(nVal: Option[Int], allowMulti: Option[Boolean])
 
@@ -44,10 +44,9 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
                 pr: PRArgument = PRArgument(),
                 basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
                 notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-                ifModified: IfModifiedArgument = IfModifiedArgument(),
                 onlyHead: OnlyHeadArgument = OnlyHeadArgument(),
                 deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): ValidatedFutureIO[List[T]] = {
-    ValidatedFutureIO.sequence(keys.map(fetch(_, r, pr, basicQuorum, notFoundOk, ifModified, onlyHead, deletedVClock))).map(_.flatten)
+    ValidatedFutureIO.sequence(keys.map(fetch(_, r, pr, basicQuorum, notFoundOk, IfModifiedArgument(None), onlyHead, deletedVClock))).map(_.flatten)
   }
 
   def store(obj: T,
@@ -80,7 +79,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
      * Only to be used when you are *absolutely* sure this object doesn't already exists.
      *
      * Some parameters (like ifNonModified, ifNonMatched) won't make sense for this purpose, 
-     * leaving them here if you wan't to misuse this function for other purposes.
+     * leaving them here if you want to misuse this function for other purposes.
      *
      * Not integrated in DSL, unsafe should stay unsafe ;-)
     */
@@ -105,29 +104,25 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
                 pr: PRArgument = PRArgument(),
                 basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
                 notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-                deletedVClock: DeletedVClockArgument = DeletedVClockArgument(),
                 w: WArgument = WArgument(),
                 dw: DWArgument = DWArgument(),
                 returnBody: ReturnBodyArgument = ReturnBodyArgument(),
                 pw: PWArgument = PWArgument(),
-                ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
                 ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
                 returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[List[T]] = {
-    ValidatedFutureIO.sequence(objs.map(store(_, r, pr, basicQuorum, notFoundOk, deletedVClock, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead))).map(_.flatten)
+    ValidatedFutureIO.sequence(objs.map(store(_, r, pr, basicQuorum, notFoundOk, DeletedVClockArgument(None), w, dw, returnBody, pw, IfNotModifiedArgument(None), ifNonMatched, returnHead))).map(_.flatten)
   }
 
   def unsafeStoreManyNew(objs: List[T],
                          basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
                          notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-                         deletedVClock: DeletedVClockArgument = DeletedVClockArgument(),
                          w: WArgument = WArgument(),
                          dw: DWArgument = DWArgument(),
                          returnBody: ReturnBodyArgument = ReturnBodyArgument(),
                          pw: PWArgument = PWArgument(),
-                         ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
                          ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
                          returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[List[T]] = {
-    ValidatedFutureIO.sequence(objs.map(unsafeStoreNew(_, basicQuorum, notFoundOk, deletedVClock, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead))).map(_.flatten)
+    ValidatedFutureIO.sequence(objs.map(unsafeStoreNew(_, basicQuorum, notFoundOk, DeletedVClockArgument(None), w, dw, returnBody, pw, IfNotModifiedArgument(None), ifNonMatched, returnHead))).map(_.flatten)
   }
 
   def delete(obj: T,
@@ -182,10 +177,9 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
          pr: PRArgument = PRArgument(),
          basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
          notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-         ifModified: IfModifiedArgument = IfModifiedArgument(),
          onlyHead: OnlyHeadArgument = OnlyHeadArgument(),
          deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): ValidatedFutureIO[List[T]] =
-    fetchMany(keys, r, pr, basicQuorum, notFoundOk, ifModified, onlyHead, deletedVClock)
+    fetchMany(keys, r, pr, basicQuorum, notFoundOk, onlyHead, deletedVClock)
 
   def <<(obj: T,
          r: RArgument = RArgument(),
@@ -207,15 +201,13 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
           pr: PRArgument = PRArgument(),
           basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
           notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-          deletedVClock: DeletedVClockArgument = DeletedVClockArgument(),
           w: WArgument = WArgument(),
           dw: DWArgument = DWArgument(),
           returnBody: ReturnBodyArgument = ReturnBodyArgument(),
           pw: PWArgument = PWArgument(),
-          ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
           ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
           returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[List[T]] =
-    storeMany(objs, r, pr, basicQuorum, notFoundOk, deletedVClock, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead)
+    storeMany(objs, r, pr, basicQuorum, notFoundOk, w, dw, returnBody, pw, ifNonMatched, returnHead)
 
   def -(obj: T,
         rw: RWArgument = RWArgument(),
@@ -244,3 +236,4 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
   def idx(idxk: String, idxv: Range): ValidatedFutureIO[List[String]] =
     fetchKeysForIntIndexByValueRange(idxk, idxv)
 }
+
