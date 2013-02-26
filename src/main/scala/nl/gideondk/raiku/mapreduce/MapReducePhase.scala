@@ -27,6 +27,7 @@ object MapReducePhases {
   }
 }
 
+// TODO: fix this DRY insulting madness!
 trait MapReducePhasesRHead[T <: HList] extends MapReducePhases[T, NonKeepedMapPhase] {
   import MapReducePhases._
   import Prepend._
