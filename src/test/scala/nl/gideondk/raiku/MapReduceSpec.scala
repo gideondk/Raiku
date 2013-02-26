@@ -19,11 +19,11 @@ import Traversables._
 
 class MapReduceSpec extends Specification with DefaultJsonProtocol {
   import nl.gideondk.raiku.mapreduce.MapReduceJsonProtocol._
+  sequential
 
   def typed[T](t: ⇒ T) {}
 
-  implicit val system = ActorSystem("bucket-system")
-  val client = RaikuClient("localhost", 8087, 4)
+  val client = DB.client
 
   implicit val yFormat = jsonFormat4(Y)
 
@@ -40,7 +40,13 @@ class MapReduceSpec extends Specification with DefaultJsonProtocol {
 
   val bucket = RaikuBucket[Y]("raiku_test_z_bucket_"+java.util.UUID.randomUUID.toString, client)
 
-  sequential
+  import scala.concurrent.ExecutionContext.Implicits.global
+  val duration = scala.concurrent.duration.pairIntToDuration((60, scala.concurrent.duration.SECONDS))
+  val groupIds = Vector.fill(10)(java.util.UUID.randomUUID.toString)
+  val n = 5000
+  val rnd = new scala.util.Random
+  val vec = List.fill(n)(Y.apply(java.util.UUID.randomUUID.toString, "NAME", rnd.nextInt(99), Random.shuffle(groupIds).head))
+  (bucket <<* vec).unsafeFulFill(duration)
 
   "A map reduce phases" should {
     "be build correctly" in {
@@ -66,14 +72,6 @@ class MapReduceSpec extends Specification with DefaultJsonProtocol {
 
   "A bucket based MR job" should {
     "return the correct results" in {
-      import scala.concurrent.ExecutionContext.Implicits.global
-      val duration = scala.concurrent.duration.pairIntToDuration((60, scala.concurrent.duration.SECONDS))
-      val groupIds = Vector.fill(10)(java.util.UUID.randomUUID.toString)
-      val n = 5000
-      val rnd = new scala.util.Random
-      val vec = List.fill(n)(Y.apply(java.util.UUID.randomUUID.toString, "NAME", rnd.nextInt(99), Random.shuffle(groupIds).head))
-      (bucket <<* vec).unsafeFulFill(duration)
-
       val mapToNumber = MapFunction("function() {return [1]; }")
       val reduceSum = BuildInReduceFunction("Riak.reduceSum")
 
@@ -83,6 +81,72 @@ class MapReduceSpec extends Specification with DefaultJsonProtocol {
       val res = (client mapReduce mrJob).unsafeFulFill(duration) match {
         case Failure(e) ⇒ throw e
         case Success(r) ⇒ r._1.length == n && r._2(0) == JsNumber(n)
+      }
+    }
+  }
+
+  "A input based MR job" should {
+    "return the correct results" in {
+
+      val mapToNumber = MapFunction("function() {return [1]; }")
+      val reduceSum = BuildInReduceFunction("Riak.reduceSum")
+
+      val mrJob = MR.items(Set((bucket.bucketName, vec(0).id), (bucket.bucketName, vec(1).id))) |>> mapToNumber >=> reduceSum
+      val phases = mrJob.phases
+
+      val res = (client mapReduce mrJob).unsafeFulFill(duration) match {
+        case Failure(e) ⇒ throw e
+        case Success(r) ⇒ r._1.length == 2 && r._2(0) == JsNumber(2)
+      }
+    }
+  }
+
+  "A idx based MR job" should {
+    "return the correct results for binary indexes" in {
+
+      val mapToNumber = MapFunction("function() {return [1]; }")
+      val reduceSum = BuildInReduceFunction("Riak.reduceSum")
+
+      val mrJob = MR.binIdx(bucket.bucketName, "group_id", groupIds(0)) |>> mapToNumber >=> reduceSum
+      val phases = mrJob.phases
+
+      val correctItems = vec.filter(_.groupId == groupIds(0))
+
+      val res = (client mapReduce mrJob).unsafeFulFill(duration) match {
+        case Failure(e) ⇒ throw e
+        case Success(r) ⇒ r._1.length == correctItems.length && r._2(0) == JsNumber(correctItems.length)
+      }
+    }
+
+    "return the correct results for int indexes" in {
+
+      val mapToNumber = MapFunction("function() {return [1]; }")
+      val reduceSum = BuildInReduceFunction("Riak.reduceSum")
+
+      val mrJob = MR.intIdx(bucket.bucketName, "age", 22) |>> mapToNumber >=> reduceSum
+      val phases = mrJob.phases
+
+      val correctItems = vec.filter(_.age == 22)
+
+      val res = (client mapReduce mrJob).unsafeFulFill(duration) match {
+        case Failure(e) ⇒ throw e
+        case Success(r) ⇒ r._1.length == correctItems.length && r._2(0) == JsNumber(correctItems.length)
+      }
+    }
+
+    "return the correct results for range indexes" in {
+
+      val mapToNumber = MapFunction("function() {return [1]; }")
+      val reduceSum = BuildInReduceFunction("Riak.reduceSum")
+
+      val mrJob = MR.rangeIdx(bucket.bucketName, "age", 50 to 70) |>> mapToNumber >=> reduceSum
+      val phases = mrJob.phases
+
+      val correctItems = vec.filter(x ⇒ x.age >= 50 && x.age <= 70)
+
+      val res = (client mapReduce mrJob).unsafeFulFill(duration) match {
+        case Failure(e) ⇒ throw e
+        case Success(r) ⇒ r._1.length == correctItems.length && r._2(0) == JsNumber(correctItems.length)
       }
     }
   }

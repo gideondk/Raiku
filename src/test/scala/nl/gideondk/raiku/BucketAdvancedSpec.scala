@@ -20,8 +20,7 @@ case class Y(id: String, name: String, age: Int, groupId: String)
 
 class BucketAdvancedSpec extends Specification with DefaultJsonProtocol {
 
-  implicit val system = ActorSystem("adv-bucket-system")
-  val client = RaikuClient("localhost", 8087, 4)
+  val client = DB.client
 
   implicit val yFormat = jsonFormat4(Y)
 
@@ -105,8 +104,4 @@ class BucketAdvancedSpec extends Specification with DefaultJsonProtocol {
     }
   }
 
-  step {
-    client.disconnect
-    system.shutdown()
-  }
 }

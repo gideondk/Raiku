@@ -1,6 +1,5 @@
-package nl.gideondk.raiku.bucket
+package nl.gideondk.raiku
 
-import nl.gideondk.raiku._
 import monads.ValidatedFutureIO
 import scalaz._
 import Scalaz._
@@ -55,6 +54,23 @@ case class RaikuReactiveBucket[T](bucketName: String, client: RaikuClient, confi
     enum &> fetchEnumeratee(r, pr, basicQuorum, notFoundOk, onlyHead) |>>> Iteratee.fold(List[T]())((result, chunk) ⇒ result ++ chunk.toList)
   }
 
+  def storeEnumeratee(r: RArgument = RArgument(),
+                      pr: PRArgument = PRArgument(),
+                      basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+                      notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
+                      w: WArgument = WArgument(),
+                      dw: DWArgument = DWArgument(),
+                      pw: PWArgument = PWArgument(),
+                      returnBody: ReturnBodyArgument = ReturnBodyArgument(),
+                      ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument()): Enumeratee[T, Option[T]] = {
+    Enumeratee.mapM[T](x ⇒ normalBucket.store(x, r, pr, basicQuorum, notFoundOk, DeletedVClockArgument(None), w, dw, returnBody, pw, IfNotModifiedArgument(None), ifNonMatched, ReturnHeadArgument(None)).unsafePerformIO.run.flatMap { z ⇒
+      z match {
+        case Success(s) ⇒ Future(s)
+        case Failure(e) ⇒ Future.failed(e)
+      }
+    })
+  }
+
   def storeIteratee(r: RArgument = RArgument(),
                     pr: PRArgument = PRArgument(),
                     basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
@@ -63,10 +79,12 @@ case class RaikuReactiveBucket[T](bucketName: String, client: RaikuClient, confi
                     dw: DWArgument = DWArgument(),
                     pw: PWArgument = PWArgument(),
                     ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument()): Iteratee[T, Int] = {
-    Iteratee.foldM(0)((result, chunk) ⇒ normalBucket.store(chunk, r, pr, basicQuorum, notFoundOk, DeletedVClockArgument(None), w, dw, ReturnBodyArgument(None), pw, IfNotModifiedArgument(None), ifNonMatched, ReturnHeadArgument(None)).unsafePerformIO.run.flatMap(z ⇒ z match {
-      case Success(s) ⇒ Future(result + 1)
-      case Failure(e) ⇒ Future.failed(e)
-    }))
+    Iteratee.foldM(0) { (result, chunk) ⇒
+      normalBucket.store(chunk, r, pr, basicQuorum, notFoundOk, DeletedVClockArgument(None), w, dw, ReturnBodyArgument(None), pw, IfNotModifiedArgument(None), ifNonMatched, ReturnHeadArgument(None)).unsafePerformIO.run.flatMap(z ⇒ z match {
+        case Success(s) ⇒ Future(result + 1)
+        case Failure(e) ⇒ Future.failed(e)
+      })
+    }
   }
 
   def store(enum: Enumerator[T],
@@ -79,6 +97,18 @@ case class RaikuReactiveBucket[T](bucketName: String, client: RaikuClient, confi
             pw: PWArgument = PWArgument(),
             ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument()): Future[Int] =
     enum |>>> storeIteratee(r, pr, basicQuorum, notFoundOk, w, dw, pw, ifNonMatched)
+
+  def deleteEnumeratee(rw: RWArgument = RWArgument(),
+                       r: RArgument = RArgument(),
+                       w: WArgument = WArgument(),
+                       pr: PRArgument = PRArgument(),
+                       pw: PWArgument = PWArgument(),
+                       dw: DWArgument = DWArgument()): Enumeratee[T, Unit] = {
+    Enumeratee.mapM[T](x ⇒ normalBucket.delete(x, rw, r, w, pr, pw, dw).unsafePerformIO.run.flatMap(z ⇒ z match {
+      case Success(s) ⇒ Future(s)
+      case Failure(e) ⇒ Future.failed(e)
+    }))
+  }
 
   def deleteIteratee(rw: RWArgument = RWArgument(),
                      r: RArgument = RArgument(),

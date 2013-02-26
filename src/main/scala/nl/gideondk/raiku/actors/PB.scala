@@ -45,18 +45,18 @@ trait RaikuPBActor extends Actor with Stash {
       log.debug(workerDescription+" connected to "+remoteAddr)
 
     case ErrorClosed(cause) ⇒
-      log.error(workerDescription+" disconnected from Riak ("+address+") with cause: "+cause)
+      log.debug(workerDescription+" disconnected from Riak ("+address+") with cause: "+cause)
       throw new WorkerDisconnectedUnexpectedlyException
 
     case PeerClosed ⇒
-      log.error(workerDescription+" disconnected from Riak ("+address+")")
+      log.debug(workerDescription+" disconnected from Riak ("+address+")")
       throw new WorkerDisconnectedUnexpectedlyException
 
     case ConfirmedClosed ⇒
       log.debug(workerDescription+" disconnected from Riak ("+address+")")
 
     case m: ConnectionClosed ⇒
-      log.error(workerDescription+" disconnected from Riak ("+address+")") // TODO: handle the specific cases
+      log.debug(workerDescription+" disconnected from Riak ("+address+")") // TODO: handle the specific cases
       throw new WorkerDisconnectedUnexpectedlyException
 
     case Received(bytes: ByteString) ⇒

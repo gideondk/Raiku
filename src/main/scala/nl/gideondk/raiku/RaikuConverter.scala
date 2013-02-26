@@ -1,4 +1,4 @@
-package nl.gideondk.raiku.serialization
+package nl.gideondk.raiku
 
 import scalaz._
 import Scalaz._

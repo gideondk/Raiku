@@ -15,7 +15,7 @@ case class RaikuClient(config: RaikuConfig)(implicit val system: ActorSystem) ex
 }
 
 object RaikuClient {
-  def apply(host: String, port: Int, connections: Int = 6, mrConnections: Int = 2)(implicit system: ActorSystem): RaikuClient = {
+  def apply(host: String, port: Int, connections: Int = 4, mrConnections: Int = 2)(implicit system: ActorSystem): RaikuClient = {
     val client = RaikuClient(RaikuConfig(RaikuHost(host, port), connections, mrConnections))
     client.actor ! InitializeRouters
     client

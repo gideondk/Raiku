@@ -1,6 +1,5 @@
-package nl.gideondk.raiku.bucket
+package nl.gideondk.raiku
 
-import nl.gideondk.raiku._
 import monads.ValidatedFutureIO
 import scalaz._
 import Scalaz._

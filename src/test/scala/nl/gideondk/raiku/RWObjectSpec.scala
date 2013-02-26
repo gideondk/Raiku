@@ -15,8 +15,7 @@ import org.specs2.matcher.Matcher
 
 class RWObjectSpec extends Specification {
 
-  implicit val system = ActorSystem("rw-system")
-  val client = RaikuClient("localhost", 8087, 4)
+  val client = DB.client
 
   "A client" should {
     "be able to store rw objects into Riak" in {
@@ -86,8 +85,4 @@ class RWObjectSpec extends Specification {
     }
   }
 
-  step {
-    client.disconnect
-    system.shutdown()
-  }
 }

@@ -14,8 +14,7 @@ import org.specs2.matcher.Matcher
 case class Z(id: String, name: String)
 
 class BucketSpec extends Specification {
-  implicit val system = ActorSystem("bucket-system")
-  val client = RaikuClient("localhost", 8087, 4)
+  val client = DB.client
 
   implicit val zConverter = new RaikuConverter[Z] {
     def read(o: RWObject): ReadResult[Z] = Z(o.key, new String(o.value)).success
@@ -132,10 +131,5 @@ class BucketSpec extends Specification {
       val res = retObj.unsafeFulFill
       res.isSuccess && res.toOption.get == true
     }
-  }
-
-  step {
-    client.disconnect
-    system.shutdown()
   }
 }

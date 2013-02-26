@@ -58,8 +58,8 @@ object MapReduceJsonProtocol extends DefaultJsonProtocol {
     def write(p: BinIdxMapReduceInput) = {
       JsObject(
         "bucket" -> JsString(p.bucket),
-        "index" -> JsString(p.indexKey),
-        "value" -> JsString(p.indexValue))
+        "index" -> JsString(p.indexKey+"_bin"),
+        "key" -> JsString(p.indexValue))
     }
   }
 
@@ -69,29 +69,15 @@ object MapReduceJsonProtocol extends DefaultJsonProtocol {
         case Left(x) ⇒
           JsObject(
             "bucket" -> JsString(p.bucket),
-            "index" -> JsString(p.indexKey),
-            "value" -> JsNumber(x))
+            "index" -> JsString(p.indexKey+"_int"),
+            "key" -> JsNumber(x))
         case Right(x) ⇒
           JsObject(
             "bucket" -> JsString(p.bucket),
-            "index" -> JsString(p.indexKey),
+            "index" -> JsString(p.indexKey+"_int"),
             "start" -> JsNumber(x.head),
             "end" -> JsNumber(x.last))
       }
     }
   }
-  //  implicit def mapReduceJobJsonFormat[T] = new RootJsonWriter[MapReduceJob[T]] {
-  //    def write(p: MapReduceJob[T])(implicit tl: shapeless.ToList[T, MapReducePhase]) = {
-  //      JsObject(
-  //        p.input match {
-  //          case x: BucketMapReduceInput    ⇒ "inputs" -> BucketMapReduceInputJsonFormat.write(x)
-  //          case x: ItemMapReduceInput      ⇒ "inputs" -> ItemMapReduceInputJsonFormat.write(x)
-  //          case x: AnnotatedMapReduceInput ⇒ "inputs" -> AnnotatedMapReduceInputJsonFormat.write(x)
-  //          case x: BinIdxMapReduceInput    ⇒ "inputs" -> BinIdxMapReduceInputJsonFormat.write(x)
-  //          case x: IntIdxMapReduceInput    ⇒ "inputs" -> IntIdxMapReduceInputJsonFormat.write(x)
-  //        },
-  //        "query" -> phasesListFormat.write(p.phases.toList),
-  //        "timeout" -> JsNumber(p.timeout.toMillis))
-  //    }
-  //  }
 }
