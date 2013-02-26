@@ -165,12 +165,10 @@ Because Riak doens't support bulk inserts, bulk fetches or cursors, the Reactive
 
 Because of the nature of Riak and Iteratees, fetching isn't done in parallel, resulting in (possible) lower performance then the normal API but shouldn't consume additional resources as opposed to the normal functionality. 
 
-The `RaikuReactiveBucket` exposes the normal `fetch`, `store` and `delete` functionality to be used in combination with `Enumerators` instead of Lists of keys. `Iteratees` are added as end-points for a reactive data flow. `Enumeratees` are implemented to be used in more complex compositions:
+The `RaikuReactiveBucket` exposes the normal `fetch`, `store` and `delete` functionality to be used in combination with `Enumerators` instead of Lists of keys. `Iteratees` are added as end-points for a reactive data flow. `Enumeratees` are implemented to be used in more complex (like this silly) compositions:
 
-<notextile><pre><code>Enumerator(randomObjects: _*) &> 
-bucket.storeEnumeratee(returnBody = true) &>
-Enumeratee.filter(_.isDefined) &> Enumeratee.map(x ⇒ x.get) &> bucket.deleteEnumeratee() |>>> 
-Iteratee.fold(0) { (result, chunk) ⇒ result + 1 }
+<notextile><pre><code>Enumerator(randomObjects: _*) &> bucket.storeEnumeratee(returnBody = true) &> Enumeratee.filter(_.isDefined) &> 
+Enumeratee.map(x ⇒ x.get) &> bucket.deleteEnumeratee() |>>> Iteratee.fold(0) { (result, chunk) ⇒ result + 1 }
 </code></pre></notextile>
 
 ## Monadic behavior
