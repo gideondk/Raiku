@@ -48,7 +48,7 @@
 
 <h2>Status</h2>
 
-<p>The client should currently treated as a proof of concept, but is stable enough to try out in hobby-projects.</p>
+<p>The client should currently treated as a proof of concept, but is stable enough to try out in smaller projects (although the client is used in production in serveral applications).</p>
 
 <p><strong>Currently available in the client:</strong></p>
 
@@ -57,18 +57,17 @@
 <li>Doing this non-blocking through multiple sockets, handled by a single actor;</li>
 <li>Writing, fetching and deleting single or multiple objects at once;</li>
 <li>Querying items on 2i, based on binary or integral indexes (ranges also supported);</li>
-<li>Sequencing and continuing multiple operations using monad transformers (ValidatedFuture, ValidatedFutureIO).</li>
+<li>Sequencing and continuing multiple operations using monad transformers (ValidatedFuture, ValidatedFutureIO);</li>
+<li>Reactive Map/Reduce functionality;</li>
+<li>Auto-Reconnecting client with retrier functionality;</li>
+<li>Naive Reactive bucket for reactive data flows.</li>
 </ul><p><strong>The following is currently missing in the client, but will be added soon:</strong></p>
 
 <ul>
-<li>Map/Reduce functionality;</li>
 <li>Link walking;</li>
 <li>Custom mutations / conflict resolutions;</li>
-<li>Connection pooling;</li>
-<li>Retriers;</li>
 <li>Durable mailboxes;</li>
 <li>Least-connection-error-based router / pool;</li>
-<li>Full iteratee-based reactive-mongo like goodness.</li>
 </ul><h2>Architecture</h2>
 
 <p>The client uses Akka IO and iteratees to send and receive protocol buffer encoded data streams over TCP sockets.</p>
@@ -82,50 +81,6 @@
 <p>All operations return a value in a monad transformer (<code>ValidatedFutureIO</code>) which combines a <code>Validation</code>, <code>Future</code> and <code>IO</code> monad into one type: most (if not all) exceptions will be caught in the validation monad, all async actions are abstracted into a future monad and all IO actions are as pure as possible by using the Scalaz IO monad.</p>
 
 <p>Use <code>unsafePerformIO</code> to expose the Future, or use <code>unsafeFulFill(d: Duration)</code> to perform IO and wait (blocking) on the future.</p>
-
-<h2>DSL</h2>
-
-<p>You can use the <em>normal</em> functions to store, fetch or delete objects:</p>
-
-<p><code>fetch</code> / <code>fetchMany</code></p>
-
-<p><code>store</code> / <code>storeMany</code></p>
-
-<p><code>delete</code> / <code>deleteMany</code></p>
-
-<p>Or to fetch keys on 2i:</p>
-
-<p><code>fetchKeysForBinIndexByValue</code></p>
-
-<p><code>fetchKeysForIntIndexByValue</code></p>
-
-<p><code>fetchKeysForIntIndexByValueRange</code></p>
-
-<p>If you like to take a walk on the wild side, you can try the (currently quite primitive) DSL to do these actions:</p>
-
-<p><strong>Fetching objects</strong></p>
-
-<pre><code>persons ?    personId
-persons ?*  List(personIdA, personIdB)
-</code></pre>
-
-<p><strong>Storing objects</strong>
-<pre><code>persons &lt;&lt;    Person("Basho", 42, "Japan")
-persons &lt;&lt;*  List(Person("Basho", 42, "Japan"), Person("Shiki", 52, "Japan"))
-</code></pre></p>
-
-<p><strong>Deleting objects</strong></p>
-
-<pre><code>persons -    Person("Basho", 42, "Japan")
-persons -*   List(Person("Basho", 42, "Japan"), Person("Shiki", 52, "Japan"))
-</code></pre>
-
-<p><strong>Querying objects based on 2i</strong></p>
-
-<pre><code>persons idx  ("age", 42)
-persons idx  ("country", "Japan")
-persons idx  ("age", 39 to 50)
-</code></pre>
 
 <h2>Usage</h2>
 
@@ -154,6 +109,110 @@ implicit val yConverter = new RaikuConverter[Y] {
 
 <pre><code>val bucket = RaikuBucket[Y]("raiku_test_y_bucket", client)
 </code></pre>
+
+<h2>DSL</h2>
+
+<p>You can use the <em>normal</em> functions to store, fetch or delete objects:</p>
+
+<p><code>fetch</code> / <code>fetchMany</code></p>
+
+<p><code>store</code> / <code>storeMany</code></p>
+
+<p><code>delete</code> / <code>deleteMany</code></p>
+
+<p>Or to fetch keys on 2i:</p>
+
+<p><code>fetchKeysForBinIndexByValue</code></p>
+
+<p><code>fetchKeysForIntIndexByValue</code></p>
+
+<p><code>fetchKeysForIntIndexByValueRange</code></p>
+
+<p>If you like to take a walk on the wild side, you can try the (currently quite primitive) DSL to do these actions:</p>
+
+<p><strong>Fetching objects</strong></p>
+
+<pre><code>persons ?   personId
+persons ?*  List(personIdA, personIdB)
+</code></pre>
+
+<p><strong>Storing objects</strong>
+<pre><code>persons &lt;&lt;   Person("Basho", 42, "Japan")
+persons &lt;&lt;*  List(Person("Basho", 42, "Japan"), Person("Shiki", 52, "Japan"))
+</code></pre></p>
+
+<p><strong>Deleting objects</strong></p>
+
+<pre><code>persons -    Person("Basho", 42, "Japan")
+persons -*   List(Person("Basho", 42, "Japan"), Person("Shiki", 52, "Japan"))
+</code></pre>
+
+<p><strong>Querying objects based on 2i</strong></p>
+
+<pre><code>persons idx  ("age", 42)
+persons idx  ("country", "Japan")
+persons idx  ("age", 39 to 50)
+</code></pre>
+
+<h2>MapReduce</h2>
+
+<p>Raiku features full MapReduce support through both a <em>Reactive API</em> as through normal <code>Futures</code>. </p>
+
+<p>One important thing to note is that the MapReduce functionality is run through different actors / sockets then the normal functionality. MapReduce jobs therefor won't consume or block the normal flow of the client.</p>
+
+<p>MapReduce can be used through a unique DSL, starting with the creation of input for the MapReduce job, for instance (all options can be found in source and tests):</p>
+
+<p><code>MR.bucket(bucketName: String)</code>: for a bucket based job</p>
+
+<p><code>MR.items(bucketAndKeys: Set[(String, String)])</code>: for a item based job</p>
+
+<p><code>MR.binIdx(bucketName: String, idx: String, idxv: String)</code>: for a index based job</p>
+
+<h3>Phases</h3>
+
+<p>After creation of the specific input, several functions can be defined to be used as phases within the MapReduce job.</p>
+
+<p><pre><code>val a = BuildInMapFunction("Riak.mapValuesJson")
+val b = BuildInMapFunction("Riak.filterNotFound")
+val c = BuildInReduceFunction("Riak.reduceSum")
+val d = BuildInReduceFunction("Riak.reduceMin")
+</code></pre></p>
+
+<p>The defined input can be used to be injected into the several phases:
+<pre><code>val job = input |&gt;&gt; a &gt;-&gt; b &gt;=&gt; c &gt;-&gt; d
+</code></pre></p>
+
+<p>By Riak default, the last phase is automatically returned. Other phases can be returned by using the <code>&gt;=&gt;</code> between two phases (as opposed to the normal <code>&gt;-&gt;</code>).</p>
+
+<p>The run the job, the job is send to the client using the <code>mapReduce</code> function.</p>
+
+<p><pre><code>client mapReduce job
+res0: Tuple2[List[JsValue], List[JsValue]]
+</code></pre></p>
+
+<p>This enables you to use the MapReduce results in a type safe manner (without run-time checking on the amount of phases). If you want to use the results from a MapReduce job in a Reactive manner, the <code>streamMapReduce</code> function can be send to the client:</p>
+
+<p><pre><code>client streamMapReduce job
+res0: Tuple2[Enumerator[JsValue], Enumerator[JsValue]]
+</code></pre></p>
+
+<p>Returning a <code>Tuple</code> of <code>Play</code> powered broadcast <code>Enumerators</code>, streaming multiple results in a <em>map phase</em> and streaming a single result during a <em>reduce phase</em>.</p>
+
+<h2>Reactive API</h2>
+
+<p>To expose further reactive functionality for usage in your favorite reactive web stack, the client is implementing a naive <em>Reactive API</em>.</p>
+
+<p>Because Riak doens't support bulk inserts, bulk fetches or cursors, the Reactive API won't give you additional performance on top of the multi-fetch &amp; multi-store <code>Future</code> implementation. But enables you to compose data flows in a more natural way, leveraging the awesome Reactive API <code>Play2.0</code> exposes. </p>
+
+<p>Because of the nature of Riak and Iteratees, fetching isn't done in parallel, resulting in (possible) lower performance then the normal API but shouldn't consume additional resources as opposed to the normal functionality. </p>
+
+<p>The <code>RaikuReactiveBucket</code> exposes the normal <code>fetch</code>, <code>store</code> and <code>delete</code> functionality to be used in combination with <code>Enumerators</code> instead of Lists of keys. <code>Iteratees</code> are added as end-points for a reactive data flow. <code>Enumeratees</code> are implemented to be used in more complex compositions:</p>
+
+<p><pre><code>Enumerator(randomObjects: <em>*) &amp;&gt; 
+bucket.storeEnumeratee(returnBody = true) &amp;&gt;
+Enumeratee.filter(</em>.isDefined) &amp;&gt; Enumeratee.map(x ⇒ x.get) &amp;&gt; bucket.deleteEnumeratee() |&gt;&gt;&gt; 
+Iteratee.fold(0) { (result, chunk) ⇒ result + 1 }
+</code></pre></p>
 
 <h2>Monadic behavior</h2>
 
