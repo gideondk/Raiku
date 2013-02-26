@@ -27,7 +27,7 @@ The client should currently treated as a proof of concept, but is stable enough 
 * Querying items on 2i, based on binary or integral indexes (ranges also supported);
 * Sequencing and continuing multiple operations using monad transformers (ValidatedFuture, ValidatedFutureIO);
 * Reactive Map/Reduce functionality;
-* Auto-Reconnecting client with retrier functionality;
+* Auto-reconnecting client;
 * Naive Reactive bucket for reactive data flows.
 
 **The following is currently missing in the client, but will be added soon:**
@@ -36,6 +36,7 @@ The client should currently treated as a proof of concept, but is stable enough 
 * Custom mutations / conflict resolutions;
 * Durable mailboxes;
 * Least-connection-error-based router / pool;
+* Retrier functionality.
 
 ## Architecture
 
