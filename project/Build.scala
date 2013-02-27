@@ -11,6 +11,9 @@ object RaikuBuild extends Build {
       parallelExecution in Test := false,
       scalaVersion := "2.10.0",
       crossScalaVersions := Seq("2.10.0"),
+      
+      publishTo := Some(Resolver.file("file", new File("/Users/gideondk/Development/gideondk-mvn-repo"))),
+
       resolvers ++= Seq("Typesafe Repository (releases)" at "http://repo.typesafe.com/typesafe/releases/",
                   "Typesafe Repository (snapshots)" at "http://repo.typesafe.com/typesafe/snapshots/",
                   "gideondk-repo" at "https://raw.github.com/gideondk/gideondk-mvn-repo/master",
