@@ -18,6 +18,7 @@ import scala.concurrent.duration._
 import play.api.libs.iteratee.Iteratee
 
 import serialization._
+import monads._
 
 class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
   sequential
@@ -50,14 +51,14 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
     "be able to store objects in timely fashion" in {
       val acts = randomObjects.map(x ⇒ bucket << (x, w = 1))
 
-      timed("Storing "+nrOfItems+" items sequentially (bad)", nrOfItems) {
+      timed("Storing "+nrOfItems+" items sequentially", nrOfItems) {
         acts.foreach { x ⇒
           x.unsafeFulFill(Duration(15, SECONDS))
         }
       }
 
       val futs = bucket <<* (randomObjects, w = 1)
-      timed("Storing "+nrOfItems+" items in parallel (good)", nrOfItems) {
+      timed("Storing "+nrOfItems+" items in parallel", nrOfItems) {
         val status = futs.unsafeFulFill(Duration(15, SECONDS))
       }
     }
@@ -65,7 +66,7 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
     "be able to fetch objects in timely fashion" in {
       val acts = ids.map(x ⇒ bucket ? (x, r = 1))
 
-      timed("Fetching "+nrOfItems+" items sequentially (bad)", nrOfItems) {
+      timed("Fetching "+nrOfItems+" items sequentially", nrOfItems) {
         acts.foreach { x ⇒
           x.unsafeFulFill(Duration(15, SECONDS))
         }
@@ -73,16 +74,26 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
 
       val futs = bucket ?* (ids, r = 1)
 
-      timed("Fetching "+nrOfItems+" items in parallel (good)", nrOfItems) {
+      timed("Fetching "+nrOfItems+" items in parallel", nrOfItems) {
         val status = futs.unsafeFulFill(Duration(15, SECONDS))
       }
-
-      //      timed("Streaming "+nrOfItems+" items", nrOfItems) {
-      //        val enum = bucket.enumerateMany(ids, r = 1)
-      //        val results = enum |>>> Iteratee.getChunks
-      //        Await.result(results, Duration(15, SECONDS))
-      //      }
     }
+
+    "be able to fetch keys on indexes in timely fashion" in {
+      val acts = for (i ← 0 to 100) yield { bucket idx ("age", 25) }
+      timed("Fetching "+nrOfItems+" index keys sequentially", nrOfItems * 100) {
+        acts.foreach { x ⇒
+          x.unsafeFulFill(Duration(15, SECONDS))
+        }
+      }
+
+      val parActs = for (i ← 0 to 100) yield { bucket idx ("age", 25) }
+      val seq = ValidatedFutureIO.sequence(parActs.toList)
+      timed("Fetching "+nrOfItems+" index keys in parallel", nrOfItems * 100) {
+        seq.unsafeFulFill(Duration(15, SECONDS))
+      }
+    }
+
     "be able to delete objects in timely fashion" in {
 
       val futs = bucket -* (randomObjects, r = 1, w = 1)
