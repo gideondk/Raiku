@@ -65,7 +65,7 @@ case class RaikuReactiveBucket[T](bucketName: String, client: RaikuClient, confi
                       pw: PWArgument = PWArgument(),
                       returnBody: ReturnBodyArgument = ReturnBodyArgument(),
                       ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument()): Enumeratee[T, Option[T]] =
-    Enumeratee.mapM[T](x ⇒ unwrapValidation(normalBucket.store(x, r, pr, basicQuorum, notFoundOk, DeletedVClockArgument(None), w, dw, returnBody,
+    Enumeratee.mapM[T](x ⇒ unwrapValidation(normalBucket.store(x, r, pr, basicQuorum, notFoundOk, w, dw, returnBody,
       pw, IfNotModifiedArgument(None), ifNonMatched, ReturnHeadArgument(None)).unsafePerformIO.run))
 
   /** Iteratee[T, Int] consuming objects until EOF, returning the count of the stored items afterwards
@@ -80,7 +80,7 @@ case class RaikuReactiveBucket[T](bucketName: String, client: RaikuClient, confi
                     pw: PWArgument = PWArgument(),
                     ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument()): Iteratee[T, Int] = {
     Iteratee.foldM(0) { (result, chunk) ⇒
-      normalBucket.store(chunk, r, pr, basicQuorum, notFoundOk, DeletedVClockArgument(None), w, dw, ReturnBodyArgument(None), pw, IfNotModifiedArgument(None), ifNonMatched, ReturnHeadArgument(None)).unsafePerformIO.run.flatMap(z ⇒ z match {
+      normalBucket.store(chunk, r, pr, basicQuorum, notFoundOk, w, dw, ReturnBodyArgument(None), pw, IfNotModifiedArgument(None), ifNonMatched, ReturnHeadArgument(None)).unsafePerformIO.run.flatMap(z ⇒ z match {
         case Success(s) ⇒ Future(result + 1)
         case Failure(e) ⇒ Future.failed(e)
       })
@@ -110,7 +110,7 @@ case class RaikuReactiveBucket[T](bucketName: String, client: RaikuClient, confi
                        pr: PRArgument = PRArgument(),
                        pw: PWArgument = PWArgument(),
                        dw: DWArgument = DWArgument()): Enumeratee[T, Unit] =
-    Enumeratee.mapM[T](x ⇒ unwrapValidation(normalBucket.delete(x, rw, r, w, pr, pw, dw).unsafePerformIO.run))
+    Enumeratee.mapM[T](x ⇒ unwrapValidation(normalBucket.delete(x, rw, VClockArgument(None), r, w, pr, pw, dw).unsafePerformIO.run))
 
   /** Iteratee[T, Int] consuming objects until EOF, returning the count of the deleted items afterwards
    */
@@ -121,7 +121,7 @@ case class RaikuReactiveBucket[T](bucketName: String, client: RaikuClient, confi
                      pr: PRArgument = PRArgument(),
                      pw: PWArgument = PWArgument(),
                      dw: DWArgument = DWArgument()): Iteratee[T, Int] = {
-    Iteratee.foldM(0)((result, chunk) ⇒ normalBucket.delete(chunk, rw, r, w, pr, pw, dw).unsafePerformIO.run.flatMap(z ⇒ z match {
+    Iteratee.foldM(0)((result, chunk) ⇒ normalBucket.delete(chunk, rw, VClockArgument(None), r, w, pr, pw, dw).unsafePerformIO.run.flatMap(z ⇒ z match {
       case Success(s) ⇒ Future(result + 1)
       case Failure(e) ⇒ Future.failed(e)
     }))

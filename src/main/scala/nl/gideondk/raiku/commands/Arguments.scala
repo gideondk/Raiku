@@ -30,6 +30,7 @@ case class ReturnHeadArgument(v: Option[Boolean] = None) extends RaikuBooleanArg
 case class ReturnBodyArgument(v: Option[Boolean] = None) extends RaikuBooleanArgument
 
 case class DeletedVClockArgument(v: Option[Boolean] = None) extends RaikuBooleanArgument
+case class VClockArgument(v: Option[VClock] = None) extends RaikuVClockArgument
 
 object RaikuArgument {
 
