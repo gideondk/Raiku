@@ -34,6 +34,8 @@ package object raiku {
   implicit def booleanToReturnBodyArgument(b: Boolean): ReturnBodyArgument = ReturnBodyArgument(Option(b))
   implicit def booleanToDeletedVClockArgument(b: Boolean): DeletedVClockArgument = DeletedVClockArgument(Option(b))
 
+  implicit def vclockToVClockArgument(v: VClock): VClockArgument = VClockArgument(Option(v))
+
   implicit def ValidatedFutureIORWListToValidatedFutureIOOptT[T](v: ValidatedFutureIO[List[RWObject]])(implicit converter: RaikuConverter[T]): ValidatedFutureIO[Option[T]] = {
     ValidatedFutureIO(v.run.map {
       x ⇒
