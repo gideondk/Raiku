@@ -22,12 +22,12 @@ The client should currently treated as a proof of concept, but is stable enough 
 **Currently available in the client:**
 
 * Writing low-level protobuf style read-write objects through a RaikuClient;
-* Doing this non-blocking through multiple actors, handled by a single supervisor;
+* Doing this non-blocking through multiple sockets, handled by a single actor;
 * Writing, fetching and deleting single or multiple objects at once;
 * Querying items on 2i, based on binary or integral indexes (ranges also supported);
 * Sequencing and continuing multiple operations using monad transformers (ValidatedFuture, ValidatedFutureIO);
 * Reactive Map/Reduce functionality;
-* Auto-reconnecting client;
+* Auto-Reconnecting client with retrier functionality;
 * Naive Reactive bucket for reactive data flows.
 
 **The following is currently missing in the client, but will be added soon:**
@@ -36,7 +36,6 @@ The client should currently treated as a proof of concept, but is stable enough 
 * Custom mutations / conflict resolutions;
 * Durable mailboxes;
 * Least-connection-error-based router / pool;
-* Retrier functionality.
 
 ## Architecture
 
@@ -51,6 +50,23 @@ You are free to use any value serialisation method available, but I recommended 
 All operations return a value in a monad transformer (<code>ValidatedFutureIO</code>) which combines a <code>Validation</code>, <code>Future</code> and <code>IO</code> monad into one type: most (if not all) exceptions will be caught in the validation monad, all async actions are abstracted into a future monad and all IO actions are as pure as possible by using the Scalaz IO monad.
 
 Use <code>unsafePerformIO</code> to expose the Future, or use <code>unsafeFulFill(d: Duration)</code> to perform IO and wait (blocking) on the future.
+
+## Installation
+
+You can use Raiku by source (by publishing it into your local Ivy repository): 
+
+<notextile><pre><code>./sbt publish-local
+</code></pre></notextile>
+
+Or by adding the repo: 
+<notextile><pre><code>"gideondk-repo" at "https://raw.github.com/gideondk/gideondk-mvn-repo/master"</code></pre></notextile>
+
+to your SBT configuration and adding the `SNAPSHOT` to your library dependencies:
+
+<notextile><pre><code>libraryDependencies ++= Seq(
+	"nl.gideondk" %% "raiku" % "0.3.1-SNAPSHOT"
+) 
+</code></pre></notextile>
 
 ## Usage
 Using the client / bucket is quite simple, check the code of the tests to see all functionality. But it basically comes down to this:
@@ -145,13 +161,13 @@ The defined input can be used to be injected into the several phases:
 
 By Riak default, the last phase is automatically returned. Other phases can be returned by using the `>=>` between two phases (as opposed to the normal `>->`).
 
-Contructed jobs can be send to the client using the `mapReduce` function:
+The run the job, the job is send to the client using the `mapReduce` function.
 
 <notextile><pre><code>client mapReduce job
 res0: Tuple2[List[JsValue], List[JsValue]]
 </code></pre></notextile>
 
-This enables you to use the MapReduce results in a type safe manner. To use the results from a MapReduce job in a reactive manner, the `streamMapReduce` function can be send to the client:
+This enables you to use the MapReduce results in a type safe manner (without run-time checking on the amount of phases). If you want to use the results from a MapReduce job in a Reactive manner, the `streamMapReduce` function can be send to the client:
 
 <notextile><pre><code>client streamMapReduce job
 res0: Tuple2[Enumerator[JsValue], Enumerator[JsValue]]
@@ -166,10 +182,12 @@ Because Riak doens't support bulk inserts, bulk fetches or cursors, the Reactive
 
 Because of the nature of Riak and Iteratees, fetching isn't done in parallel, resulting in (possible) lower performance then the normal API but shouldn't consume additional resources as opposed to the normal functionality. 
 
-The `RaikuReactiveBucket` exposes the normal `fetch`, `store` and `delete` functionality to be used in combination with `Enumerators` instead of Lists of keys. `Iteratees` are added as end-points for a reactive data flow. `Enumeratees` are implemented to be used in more complex (like this silly) compositions:
+The `RaikuReactiveBucket` exposes the normal `fetch`, `store` and `delete` functionality to be used in combination with `Enumerators` instead of Lists of keys. `Iteratees` are added as end-points for a reactive data flow. `Enumeratees` are implemented to be used in more complex compositions:
 
-<notextile><pre><code>Enumerator(randomObjects: _*) &> bucket.storeEnumeratee(returnBody = true) &> Enumeratee.filter(_.isDefined) &> 
-Enumeratee.map(x ⇒ x.get) &> bucket.deleteEnumeratee() |>>> Iteratee.fold(0) { (result, chunk) ⇒ result + 1 }
+<notextile><pre><code>Enumerator(randomObjects: _*) &> 
+bucket.storeEnumeratee(returnBody = true) &>
+Enumeratee.filter(_.isDefined) &> Enumeratee.map(x ⇒ x.get) &> bucket.deleteEnumeratee() |>>> 
+Iteratee.fold(0) { (result, chunk) ⇒ result + 1 }
 </code></pre></notextile>
 
 ## Monadic behavior
