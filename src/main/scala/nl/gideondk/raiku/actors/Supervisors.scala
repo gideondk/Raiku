@@ -37,14 +37,14 @@ private[raiku] class RaikuActor(config: RaikuConfig) extends Actor {
   def initialize {
     router = Some(context.system.actorOf(Props(new RaikuWorkerActor(address))
       .withRouter(RandomRouter(nrOfInstances = config.connections, supervisorStrategy = RaikuActor.supervisorStrategy))
-      .withDispatcher("akka.actor.raiku-dispatcher")))
+      .withDispatcher("nl.gideondk.raiku.raiku-dispatcher")))
     context.watch(router.get)
   }
 
   def initializeMR {
     mrRouter = Some(context.system.actorOf(Props(new RaikuMRWorkerActor(address))
       .withRouter(RandomRouter(nrOfInstances = config.connections, supervisorStrategy = RaikuActor.supervisorStrategy))
-      .withDispatcher("akka.actor.raiku-dispatcher")))
+      .withDispatcher("nl.gideondk.raiku.raiku-dispatcher")))
     context.watch(mrRouter.get)
   }
 
