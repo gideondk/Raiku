@@ -68,6 +68,15 @@ to your SBT configuration and adding the `SNAPSHOT` to your library dependencies
 ) 
 </code></pre></notextile>
 
+### Play Framework 2.0
+For usage in combination with Play2.0, you have to use a Play2.0 version compiled against Akka 2.2, until Akka 2.2 integration is pushed into mainstream, you can find a version at: [https://github.com/gideondk/Play2.0](https://github.com/gideondk/Play20).
+
+When using the trunk version, remember to set:
+<notextile><pre><code>addSbtPlugin("play" % "sbt-plugin" % "2.2-SNAPSHOT")</code></pre></notextile>
+
+In your `plugins.sbt` to actually use the new Play version in your project.
+
+
 ## Usage
 Using the client / bucket is quite simple, check the code of the tests to see all functionality. But it basically comes down to this:
 
