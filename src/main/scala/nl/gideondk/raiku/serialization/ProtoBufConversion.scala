@@ -44,6 +44,7 @@ trait ProtoBufConversion {
   def request(messageType: RiakMessageType, message: Array[Byte]): ByteString = {
     val bsb = ByteString.newBuilder
     val cos = new DataOutputStream(bsb.asOutputStream)
+
     cos.writeInt(message.length + 1)
     cos.write(RiakMessageType.messageTypeToInt(messageType))
     cos.write(message)

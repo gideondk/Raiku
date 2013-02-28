@@ -42,7 +42,9 @@ object RaikuBuild extends Build {
     settings = Project.defaultSettings ++ Seq(
       libraryDependencies ++= appDependencies
     ) ++ Format.settings
-  )
+  ).configs(Benchmark).settings(inConfig(Benchmark)(Defaults.configSettings ++ Format.settings) : _*)
+
+  lazy val Benchmark = config("benchmark") extend(Test)
 }
 
 object Format {
