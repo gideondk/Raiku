@@ -18,7 +18,6 @@ import play.api.libs.iteratee.Iteratee
 import scala.util.Random
 
 trait ShortPerformanceTest extends PerformanceTest {
-	println("***\n* Generating test items")
 	val groupIds = List.fill(100)(Data.generateId)
 
 	val groups = groupIds.map(x => WorkGroup(x, "WorkGroup"))
@@ -40,13 +39,13 @@ trait ShortPerformanceTest extends PerformanceTest {
 		MessageBox(Data.generateId, from, to, messages.toList)
 	}
 
-	println("*\n* Generated\n")
-
 	def run:Unit = {
 		storeGroupsSequentially
 		storeGroupsParrallel
 		storeEtc
 		storageLargeDocFormat
+
+		fetchSingleBucketParallel
 
 		fetchCountriesSequential
 		fetchCountriesParallel
@@ -70,7 +69,7 @@ trait ShortPerformanceTest extends PerformanceTest {
 		val comActs = ValidatedFutureIO.sequence(mulActs.toList)
 
 		timed("Storing " + groups.length + " groups in parallel into Riak (10 times)", groups.length * 10) {
-			comActs.unsafeFulFill(15 seconds)
+			val a = comActs.unsafeFulFill(15 seconds)
 		}
 	}
 
@@ -87,7 +86,7 @@ trait ShortPerformanceTest extends PerformanceTest {
 
 		timed("Storing " + totalLength + " items in parallel into Riak (5 times)", totalLength * 5) {
 			for (i <- 0 to 4) {
-				ioActs(i).unsafeFulFill(20 seconds)
+				val a = ioActs(i).unsafeFulFill(20 seconds)
 			}
 		}
 	}
@@ -96,6 +95,17 @@ trait ShortPerformanceTest extends PerformanceTest {
 		timed("Storing " + messageBoxes.length + " large items (~150k json) in parallel into Riak (100 times)", messageBoxes.length * 20) {
 			for (i <- 1 to 20) {
 				(DB.messageBoxBucket <<* messageBoxes).unsafeFulFill(20 seconds)
+			}
+		}
+	}
+
+	def fetchSingleBucketParallel {
+		val personIds = persons.map(_.email)
+
+		timed("Fetching " + personIds.length + " items in parallel from Riak (10 times)", personIds.length * 20) {
+			for (i <- 1 to 20) {	
+				val act = DB.personBucket ?* personIds
+				act.unsafeFulFill(5 seconds)
 			}
 		}
 	}
