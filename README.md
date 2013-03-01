@@ -22,12 +22,13 @@ The client should currently treated as a proof of concept, but is stable enough 
 **Currently available in the client:**
 
 * Writing low-level protobuf style read-write objects through a RaikuClient;
-* Doing this non-blocking through multiple sockets, handled by a single actor;
+* Doing this non-blocking through multiple actors, handled by a single supervisor;
 * Writing, fetching and deleting single or multiple objects at once;
 * Querying items on 2i, based on binary or integral indexes (ranges also supported);
 * Sequencing and continuing multiple operations using monad transformers (ValidatedFuture, ValidatedFutureIO);
 * Reactive Map/Reduce functionality;
 * Auto-Reconnecting client with retrier functionality;
+* Different actor pools for *normal* and MR requests;
 * Naive Reactive bucket for reactive data flows.
 
 **The following is currently missing in the client, but will be added soon:**
