@@ -55,15 +55,15 @@ trait MapReduce extends Connection with ProtoBufConversion with MapReducePoly {
     request(RiakMessageType.RpbMapRedReq, RpbMapRedReq(jsonJob.compactPrint, "application/json"))
   }
 
-  def streamMapReduce[A <: HList: <<:[MapReducePhase]#λ, B <: HList, C <: HList, D <: HList, E <: HList, F <: HList, G <: Product, H <: Product](job: MapReduceJob[A])(implicit f1: FilterNotAux[A, NonKeepedMapPhase, B],
-                                                                                                                                                                       f2: FilterNotAux[B, NonKeepedReducePhase, C],
-                                                                                                                                                                       l: shapeless.Length[C],
-                                                                                                                                                                       m1: shapeless.MapperAux[MapReduce.this.newEnumeratorAndChannel.type, C, D],
-                                                                                                                                                                       m2: shapeless.MapperAux[MapReduce.this.onlyEnumerators.type, D, E],
-                                                                                                                                                                       m3: shapeless.MapperAux[MapReduce.this.onlyChannels.type, D, F],
-                                                                                                                                                                       t: TuplerAux[E, G],
-                                                                                                                                                                       tl: ToList[A, MapReducePhase],
-                                                                                                                                                                       tl2: ToList[F, Concurrent.Channel[JsValue]]): ValidatedFutureIO[G] = {
+  def streamMapReduce[A <: HList: <<:[MapReducePhase]#λ, B <: HList, C <: HList, D <: HList, E <: HList, F <: HList, G <: Product](job: MapReduceJob[A])(implicit f1: FilterNotAux[A, NonKeepedMapPhase, B],
+                                                                                                                                                         f2: FilterNotAux[B, NonKeepedReducePhase, C],
+                                                                                                                                                         l: shapeless.Length[C],
+                                                                                                                                                         m1: shapeless.MapperAux[MapReduce.this.newEnumeratorAndChannel.type, C, D],
+                                                                                                                                                         m2: shapeless.MapperAux[MapReduce.this.onlyEnumerators.type, D, E],
+                                                                                                                                                         m3: shapeless.MapperAux[MapReduce.this.onlyChannels.type, D, F],
+                                                                                                                                                         t: TuplerAux[E, G],
+                                                                                                                                                         tl: ToList[A, MapReducePhase],
+                                                                                                                                                         tl2: ToList[F, Concurrent.Channel[JsValue]]): ValidatedFutureIO[G] = {
     val phases = job.phases.filterNot[NonKeepedMapPhase].filterNot[NonKeepedReducePhase]
     val req = buildJobRequest(job)
     val channelsAndEnumerators = mrPhasesToBroadcastEnumerators(phases)
@@ -72,16 +72,16 @@ trait MapReduce extends Connection with ProtoBufConversion with MapReducePoly {
     mrRequest(RiakMROperation(Promise[Unit](), channels, req)).map(_ ⇒ enums)
   }
 
-  def mapReduce[A <: HList: <<:[MapReducePhase]#λ, B <: HList, C <: HList, D <: HList, E <: HList, F <: HList, G <: HList, H <: HList, I <: Product](job: MapReduceJob[A])(implicit f1: FilterNotAux[A, NonKeepedMapPhase, B],
-                                                                                                                                                                           f2: FilterNotAux[B, NonKeepedReducePhase, C],
-                                                                                                                                                                           l: shapeless.Length[C],
-                                                                                                                                                                           m1: shapeless.MapperAux[MapReduce.this.newEnumeratorAndChannel.type, C, D],
-                                                                                                                                                                           m2: shapeless.MapperAux[MapReduce.this.onlyEnumerators.type, D, E],
-                                                                                                                                                                           m3: shapeless.MapperAux[MapReduce.this.onlyChannels.type, D, F],
-                                                                                                                                                                           m4: shapeless.MapperAux[MapReduce.this.consumeEnumerator.type, E, G],
-                                                                                                                                                                           folder: shapeless.LeftFolder[G, ValidatedFutureIO[Unit], MapReduce.this.combineFutures.type],
-                                                                                                                                                                           tl: ToList[A, MapReducePhase],
-                                                                                                                                                                           tl2: ToList[F, Concurrent.Channel[JsValue]]) = {
+  def mapReduce[A <: HList: <<:[MapReducePhase]#λ, B <: HList, C <: HList, D <: HList, E <: HList, F <: HList, G <: HList](job: MapReduceJob[A])(implicit f1: FilterNotAux[A, NonKeepedMapPhase, B],
+                                                                                                                                                 f2: FilterNotAux[B, NonKeepedReducePhase, C],
+                                                                                                                                                 l: shapeless.Length[C],
+                                                                                                                                                 m1: shapeless.MapperAux[MapReduce.this.newEnumeratorAndChannel.type, C, D],
+                                                                                                                                                 m2: shapeless.MapperAux[MapReduce.this.onlyEnumerators.type, D, E],
+                                                                                                                                                 m3: shapeless.MapperAux[MapReduce.this.onlyChannels.type, D, F],
+                                                                                                                                                 m4: shapeless.MapperAux[MapReduce.this.consumeEnumerator.type, E, G],
+                                                                                                                                                 folder: shapeless.LeftFolder[G, ValidatedFutureIO[Unit], MapReduce.this.combineFutures.type],
+                                                                                                                                                 tl: ToList[A, MapReducePhase],
+                                                                                                                                                 tl2: ToList[F, Concurrent.Channel[JsValue]]) = {
     val phases = job.phases.filterNot[NonKeepedMapPhase].filterNot[NonKeepedReducePhase]
     val req = buildJobRequest(job)
     val channelsAndEnumerators = mrPhasesToBroadcastEnumerators(phases)
