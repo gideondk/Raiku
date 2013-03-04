@@ -1,8 +1,10 @@
 import sbt._
 import Keys._
 
-object RaikuBuild extends Build {
+import org.ensime.sbt.Plugin.Settings.ensimeConfig
+import org.ensime.sbt.util.SExp._
 
+object RaikuBuild extends Build {
   override lazy val settings = super.settings ++
     Seq(
       name := "raiku",
@@ -11,7 +13,26 @@ object RaikuBuild extends Build {
       parallelExecution in Test := false,
       scalaVersion := "2.10.0",
       crossScalaVersions := Seq("2.10.0"),
-      
+      ensimeConfig := sexp(
+        key(":compiler-args"), sexp("-Ywarn-dead-code", "-Ywarn-shadowing"),
+        key(":formatting-prefs"), sexp(
+          key(":alignParameters"), true,
+          key(":AlignSingleLineCaseStatements"), true,
+          key(":CompactControlReadability"), true,
+          key(":CompactStringConcatenation"), true,
+          key(":DoubleIndentClassDeclaration"), true,
+          key(":IndentLocalDefs"), true,
+          key(":IndentPackageBlocks"), true,
+          key(":IndentSpaces"), 2,
+          key(":MultilineScaladocCommentsStartOnFirstLine"), true,
+          key(":PreserveSpaceBeforeArguments"), false,
+          key(":PreserveDanglingCloseParenthesis"), false,
+          key(":RewriteArrowSymbols"), true,
+          key(":SpaceBeforeColon"), false,
+          key(":SpaceInsideBrackets"), false,
+          key("SpacesWithinPatternBinders"), true
+        )
+      ),
       publishTo := Some(Resolver.file("file", new File("/Users/gideondk/Development/gideondk-mvn-repo"))),
 
       resolvers ++= Seq("Typesafe Repository (releases)" at "http://repo.typesafe.com/typesafe/releases/",
@@ -41,8 +62,8 @@ object RaikuBuild extends Build {
     base = file("."),
     settings = Project.defaultSettings ++ Seq(
       libraryDependencies ++= appDependencies
-    ) ++ Format.settings
-  ).configs(Benchmark).settings(inConfig(Benchmark)(Defaults.configSettings ++ Format.settings) : _*)
+    )
+  ).configs(Benchmark).settings(inConfig(Benchmark)(Defaults.configSettings) : _*)
 
   lazy val Benchmark = config("benchmark") extend(Test)
 }
