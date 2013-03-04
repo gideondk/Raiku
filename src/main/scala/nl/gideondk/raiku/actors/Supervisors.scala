@@ -2,7 +2,6 @@ package nl.gideondk.raiku.actors
 
 import java.net.InetSocketAddress
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.duration.FiniteDuration
 
@@ -29,6 +28,7 @@ object RaikuActor {
 }
 
 private[raiku] class RaikuActor(config: RaikuConfig) extends Actor {
+  import context.dispatcher
   val log = Logging(context.system, this)
   val address = new InetSocketAddress(config.host.host, config.host.port)
   var router: Option[ActorRef] = None

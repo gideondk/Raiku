@@ -37,7 +37,7 @@ private class RaikuMRWorkerActor(addr: InetSocketAddress) extends RaikuPBActor {
             _ ← state
             _ ← iteratees.foldLeft(akka.actor.IO.Iteratee())((a, b) ⇒ a.flatMap(_ ⇒ b))
           } yield ()
-          w ! Write(req.command)
+          write(req.command)
       }
   }
 }

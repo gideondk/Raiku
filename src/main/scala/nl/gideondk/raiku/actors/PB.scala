@@ -2,6 +2,8 @@ package nl.gideondk.raiku.actors
 
 import java.net.InetSocketAddress
 
+import scala.collection.mutable.Queue
+
 import scalaz._
 import Scalaz._
 
@@ -13,9 +15,9 @@ import akka.event.Logging
 import akka.io._
 import akka.io.Tcp._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 trait RaikuPBActor extends Actor with Stash {
+  import context.dispatcher
+
   def address: InetSocketAddress
 
   def workerDescription: String
@@ -25,6 +27,9 @@ trait RaikuPBActor extends Actor with Stash {
   val log = Logging(context.system, this)
 
   val tcp = akka.io.IO(Tcp)(context.system)
+
+  val writeQueue = Queue[ByteString]()
+  var writeAvailable = true
 
   override def preStart = {
     tcp ! Connect(address)
@@ -61,7 +66,31 @@ trait RaikuPBActor extends Actor with Stash {
 
     case Received(bytes: ByteString) ⇒
       state(akka.actor.IO.Chunk(bytes))
+
+    case CommandFailed(cmd: Command) ⇒
+    // TODO: Implement retrier functionality
+
+    case WriteAck ⇒
+      writeAvailable = true
+      if (writeQueue.length > 0)
+        write(writeQueue.dequeue())
+  }
+
+  def write(bs: ByteString) = {
+    if (writeAvailable) {
+      tcpWorker match {
+        case None ⇒ throw new Exception("Trying to write to a undefined worker")
+        case Some(w) ⇒
+          writeAvailable = false
+          w ! Write(bs, WriteAck)
+      }
+    }
+    else {
+      writeQueue enqueue bs
+    }
   }
 
   def receive = specificMessageHandler orElse genericMessageHandler
 }
+
+case object WriteAck

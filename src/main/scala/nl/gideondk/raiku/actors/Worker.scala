@@ -22,7 +22,7 @@ private class RaikuWorkerActor(addr: InetSocketAddress) extends RaikuPBActor {
             promise.success(result)
             result
           }
-          w ! Write(command)
+          write(command)
       }
   }
 }
