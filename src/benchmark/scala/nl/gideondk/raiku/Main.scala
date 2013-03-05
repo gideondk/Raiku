@@ -24,9 +24,9 @@ object Main extends App {
   }
 
   def runLongTests = {
-    (new LongPerformanceTest {}).run
-    DB.client disconnect
+//    (new LongPerformanceTest {}).run
+  //  DB.client disconnect
 
-    DB.system.shutdown()
+  //  DB.system.shutdown()
   }
 }
