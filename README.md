@@ -52,6 +52,8 @@ All operations return a value in a monad transformer (<code>ValidatedFutureIO</c
 
 Use <code>unsafePerformIO</code> to expose the Future, or use <code>unsafeFulFill(d: Duration)</code> to perform IO and wait (blocking) on the future.
 
+For more information about the inner workings of Raiku, a blog post is available through the LAB050 site: [The anatomy of Raiku](http://lab050.com/blog/2013/3/6/the-anatomy-of-raiku-a-akka-based-riak-client)
+
 ## Installation
 
 You can use Raiku by source (by publishing it into your local Ivy repository): 
