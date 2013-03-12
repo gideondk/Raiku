@@ -11,7 +11,7 @@
 
 Raiku is to Riak as a waterfall is to Akka; a simple Riak client which lets Riak flow to your Scala applications.
 
-It's targeted as a non-blocking, performance focused, full-scale alternative to the java Riak driver. 
+It's targeted as a non-blocking, performance focused, full-scale alternative to the java Riak driver.
 
 Based on Akka IO, it uses the iteratee pattern and actors to create the best throughput possible.
 
@@ -44,7 +44,7 @@ The client uses Akka IO and iteratees to send and receive protocol buffer encode
 
 Protocol Buffer messages are transformed into case classes using ScalaBuff, Riak PBC Content classes are serialized into *RWObjects*, which are case classes, containing all information needed to write objects back into Riak.
 
-You can use the client to fetch, store and delete these "low level" objects, but it's wiser to use the RaikuBucket to store objects converted using a RaikuConverter implementation. 
+You can use the client to fetch, store and delete these "low level" objects, but it's wiser to use the RaikuBucket to store objects converted using a RaikuConverter implementation.
 
 You are free to use any value serialisation method available, but I recommended to use the Spray JSON package (behaves very good in multi-threaded environments).
 
@@ -54,19 +54,19 @@ Use <code>unsafePerformIO</code> to expose the Future, or use <code>unsafeFulFil
 
 ## Installation
 
-You can use Raiku by source (by publishing it into your local Ivy repository): 
+You can use Raiku by source (by publishing it into your local Ivy repository):
 
 <notextile><pre><code>./sbt publish-local
 </code></pre></notextile>
 
-Or by adding the repo: 
+Or by adding the repo:
 <notextile><pre><code>"gideondk-repo" at "https://raw.github.com/gideondk/gideondk-mvn-repo/master"</code></pre></notextile>
 
 to your SBT configuration and adding the `SNAPSHOT` to your library dependencies:
 
 <notextile><pre><code>libraryDependencies ++= Seq(
-	"nl.gideondk" %% "raiku" % "0.3.2-SNAPSHOT"
-) 
+	"nl.gideondk" %% "raiku" % "0.3.4-SNAPSHOT"
+)
 </code></pre></notextile>
 
 ### Play Framework 2.0
@@ -144,7 +144,7 @@ persons idx	 ("age", 39 to 50)
 </code></pre>
 
 ## MapReduce
-Raiku features full MapReduce support through both a *Reactive API* as through normal `Futures`. 
+Raiku features full MapReduce support through both a *Reactive API* as through normal `Futures`.
 
 One important thing to note is that the MapReduce functionality is run through different actors / sockets then the normal functionality. MapReduce jobs therefor won't consume or block the normal flow of the client.
 
@@ -188,15 +188,15 @@ Returning a `Tuple` of `Play` powered broadcast `Enumerators`, streaming multipl
 ## Reactive API
 To expose further reactive functionality for usage in your favorite reactive web stack, the client is implementing a naive *Reactive API*.
 
-Because Riak doens't support bulk inserts, bulk fetches or cursors, the Reactive API won't give you additional performance on top of the multi-fetch & multi-store `Future` implementation. But enables you to compose data flows in a more natural way, leveraging the awesome Reactive API `Play2.0` exposes. 
+Because Riak doens't support bulk inserts, bulk fetches or cursors, the Reactive API won't give you additional performance on top of the multi-fetch & multi-store `Future` implementation. But enables you to compose data flows in a more natural way, leveraging the awesome Reactive API `Play2.0` exposes.
 
-Because of the nature of Riak and Iteratees, fetching isn't done in parallel, resulting in (possible) lower performance then the normal API but shouldn't consume additional resources as opposed to the normal functionality. 
+Because of the nature of Riak and Iteratees, fetching isn't done in parallel, resulting in (possible) lower performance then the normal API but shouldn't consume additional resources as opposed to the normal functionality.
 
 The `RaikuReactiveBucket` exposes the normal `fetch`, `store` and `delete` functionality to be used in combination with `Enumerators` instead of Lists of keys. `Iteratees` are added as end-points for a reactive data flow. `Enumeratees` are implemented to be used in more complex compositions:
 
-<notextile><pre><code>Enumerator(randomObjects: _*) &> 
+<notextile><pre><code>Enumerator(randomObjects: _*) &>
 bucket.storeEnumeratee(returnBody = true) &>
-Enumeratee.filter(_.isDefined) &> Enumeratee.map(x ⇒ x.get) &> bucket.deleteEnumeratee() |>>> 
+Enumeratee.filter(_.isDefined) &> Enumeratee.map(x ⇒ x.get) &> bucket.deleteEnumeratee() |>>>
 Iteratee.fold(0) { (result, chunk) ⇒ result + 1 }
 </code></pre></notextile>
 

@@ -8,7 +8,7 @@ object RaikuBuild extends Build {
   override lazy val settings = super.settings ++
     Seq(
       name := "raiku",
-      version := "0.3.2-SNAPSHOT",
+      version := "0.3.4-SNAPSHOT",
       organization := "nl.gideondk",
       parallelExecution in Test := false,
       scalaVersion := "2.10.0",
@@ -38,13 +38,13 @@ object RaikuBuild extends Build {
       resolvers ++= Seq("Typesafe Repository (releases)" at "http://repo.typesafe.com/typesafe/releases/",
                   "Typesafe Repository (snapshots)" at "http://repo.typesafe.com/typesafe/snapshots/",
                   "gideondk-repo" at "https://raw.github.com/gideondk/gideondk-mvn-repo/master",
-                  
+
                   "Scala Tools Repository (snapshots)" at "http://scala-tools.org/repo-snapshots",
                   "Scala Tools Repository (releases)"  at "http://scala-tools.org/repo-releases",
 
                   "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
                   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
-                  
+
                   "spray repo" at "http://repo.spray.io"))
 
   val appDependencies = Seq(
@@ -63,7 +63,7 @@ object RaikuBuild extends Build {
     settings = Project.defaultSettings ++ Seq(
       libraryDependencies ++= appDependencies
     )
-  ).configs(Benchmark).settings(inConfig(Benchmark)(Defaults.configSettings) : _*)
+  ).configs(Benchmark).settings(inConfig(Benchmark)(Defaults.configSettings) : _*).settings(Format.settings : _*)
 
   lazy val Benchmark = config("benchmark") extend(Test)
 }
