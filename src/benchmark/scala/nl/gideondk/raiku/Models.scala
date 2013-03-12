@@ -33,34 +33,32 @@ case class MessageBox(objectId: String, from: String, to: String, messages: List
 case class WorkGroupMessage(objectId: String, text: String, fromPerson: String, to: String, created: Int)
 
 object TestSerialization extends DefaultJsonProtocol {
-	implicit val countryFormat = jsonFormat2(Country)
-	implicit val cityFormat = jsonFormat3(City)
-	implicit val streetFormat = jsonFormat3(Street)
-	implicit val addressFormat = jsonFormat3(Address)
+  implicit val countryFormat = jsonFormat2(Country)
+  implicit val cityFormat = jsonFormat3(City)
+  implicit val streetFormat = jsonFormat3(Street)
+  implicit val addressFormat = jsonFormat3(Address)
 
-	implicit val personFormat = jsonFormat6(Person)
-	implicit val workGroupFormat = jsonFormat2(WorkGroup)
+  implicit val personFormat = jsonFormat6(Person)
+  implicit val workGroupFormat = jsonFormat2(WorkGroup)
 
-	implicit val messageFormat = jsonFormat3(Message)
-	implicit val messageBoxFormat = jsonFormat4(MessageBox)
+  implicit val messageFormat = jsonFormat3(Message)
+  implicit val messageBoxFormat = jsonFormat4(MessageBox)
 
-	implicit val workGroupMessageFormat = jsonFormat5(WorkGroupMessage)
+  implicit val workGroupMessageFormat = jsonFormat5(WorkGroupMessage)
 
   implicit val countryConverter = new RaikuConverter[Country] {
     def read(o: RWObject): ReadResult[Country] = try {
       countryFormat.read(new String(o.value).asJson).success
-    }
-    catch {
+    } catch {
       case e: Throwable ⇒ e.failure
     }
     def write(bucket: String, o: Country): RWObject = RWObject(bucket, o.objectId, o.toJson.toString.getBytes)
-	}
+  }
 
   implicit val cityConverter = new RaikuConverter[City] {
     def read(o: RWObject): ReadResult[City] = try {
       cityFormat.read(new String(o.value).asJson).success
-    }
-    catch {
+    } catch {
       case e: Throwable ⇒ e.failure
     }
     def write(bucket: String, o: City): RWObject = RWObject(bucket, o.objectId, o.toJson.toString.getBytes,
@@ -70,8 +68,7 @@ object TestSerialization extends DefaultJsonProtocol {
   implicit val streetConverter = new RaikuConverter[Street] {
     def read(o: RWObject): ReadResult[Street] = try {
       streetFormat.read(new String(o.value).asJson).success
-    }
-    catch {
+    } catch {
       case e: Throwable ⇒ e.failure
     }
     def write(bucket: String, o: Street): RWObject = RWObject(bucket, o.objectId, o.toJson.toString.getBytes,
@@ -81,8 +78,7 @@ object TestSerialization extends DefaultJsonProtocol {
   implicit val personConverter = new RaikuConverter[Person] {
     def read(o: RWObject): ReadResult[Person] = try {
       personFormat.read(new String(o.value).asJson).success
-    }
-    catch {
+    } catch {
       case e: Throwable ⇒ e.failure
     }
     def write(bucket: String, o: Person): RWObject = RWObject(bucket, o.email, o.toJson.toString.getBytes,
@@ -92,8 +88,7 @@ object TestSerialization extends DefaultJsonProtocol {
   implicit val workGroupConverter = new RaikuConverter[WorkGroup] {
     def read(o: RWObject): ReadResult[WorkGroup] = try {
       workGroupFormat.read(new String(o.value).asJson).success
-    }
-    catch {
+    } catch {
       case e: Throwable ⇒ e.failure
     }
     def write(bucket: String, o: WorkGroup): RWObject = RWObject(bucket, o.objectId, o.toJson.toString.getBytes)
@@ -113,41 +108,42 @@ object TestSerialization extends DefaultJsonProtocol {
   implicit val messageBoxConverter = new RaikuConverter[MessageBox] {
     def read(o: RWObject): ReadResult[MessageBox] = try {
       messageBoxFormat.read(new String(o.value).asJson).success
-    }
-    catch {
+    } catch {
       case e: Throwable ⇒ e.failure
     }
     def write(bucket: String, o: MessageBox): RWObject = RWObject(bucket, o.objectId, o.toJson.toString.getBytes,
-    	binIndexes = Map("from" -> List(o.from), "to" -> List(o.to)))
+      binIndexes = Map("from" -> List(o.from), "to" -> List(o.to)))
   }
 
   implicit val workGroupMessageConverter = new RaikuConverter[WorkGroupMessage] {
     def read(o: RWObject): ReadResult[WorkGroupMessage] = try {
       workGroupMessageFormat.read(new String(o.value).asJson).success
-    }
-    catch {
+    } catch {
       case e: Throwable ⇒ e.failure
     }
     def write(bucket: String, o: WorkGroupMessage): RWObject = RWObject(bucket, o.objectId, o.toJson.toString.getBytes,
-    	binIndexes = Map("from_person" -> List(o.fromPerson), "to" -> List(o.to)), intIndexes = Map("created" -> List(o.created)))
+      binIndexes = Map("from_person" -> List(o.fromPerson), "to" -> List(o.to)), intIndexes = Map("created" -> List(o.created)))
   }
 }
 
 object DB {
-	import TestSerialization._
+  import TestSerialization._
 
-	implicit val system = ActorSystem("perf-bucket-system")
-	val client = RaikuClient("localhost", 8087, 4)
+  implicit val system = ActorSystem("perf-bucket-system")
+  val client = RaikuClient("localhost", 8087, 4)
 
-	val groupBucket = RaikuBucket[WorkGroup]("raiku_perf_test_group_bucket", client)
+  val groupBucket = RaikuBucket[WorkGroup]("raiku_perf_test_group_bucket", client)
 
-	val countryBucket = RaikuBucket[Country]("raiku_perf_test_country_bucket", client)
-	val cityBucket = RaikuBucket[City]("raiku_perf_test_city_bucket", client)
-	val streetBucket = RaikuBucket[Street]("raiku_perf_test_street_bucket", client)
+  val countryBucket = RaikuBucket[Country]("raiku_perf_test_country_bucket", client)
+  val cityBucket = RaikuBucket[City]("raiku_perf_test_city_bucket", client)
+  val streetBucket = RaikuBucket[Street]("raiku_perf_test_street_bucket", client)
 
-	val personBucket = RaikuBucket[Person]("raiku_perf_test_person_bucket", client)
+  val personBucket = RaikuBucket[Person]("raiku_perf_test_person_bucket", client)
 
-	val messageBoxBucket = RaikuBucket[MessageBox]("raiku_perf_test_message_box_bucket", client)
+  val messageBoxBucket = RaikuBucket[MessageBox]("raiku_perf_test_message_box_bucket", client)
 
-	def workGroupMessageBucket(groupId: String) = RaikuBucket[WorkGroupMessage]("raiku_perf_test_workgroup_" + groupId + "_message_bucket", client)
+  val reactiveGroupBucket = RaikuReactiveBucket[WorkGroup]("raiku_perf_test_group_bucket", client)
+  val reactiveMessageBoxBucket = RaikuReactiveBucket[MessageBox]("raiku_perf_test_message_box_bucket", client)
+
+  def workGroupMessageBucket(groupId: String) = RaikuBucket[WorkGroupMessage]("raiku_perf_test_workgroup_" + groupId + "_message_bucket", client)
 }

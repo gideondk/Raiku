@@ -18,7 +18,7 @@ import nl.gideondk.raiku.commands.RiakOperation
 
 case class RaikuHost(host: String, port: Int)
 
-case class RaikuConfig(host: RaikuHost, connections: Int, mrConnections: Int, reconnectDelay: FiniteDuration = 5 seconds)
+case class RaikuConfig(host: RaikuHost, connections: Int, mrConnections: Int, reconnectDelay: FiniteDuration = 2 seconds)
 
 object RaikuActor {
   val supervisorStrategy =
@@ -58,15 +58,15 @@ private[raiku] class RaikuActor(config: RaikuConfig) extends Actor {
       if (router.isEmpty) initialize
 
     case ReconnectMRRouter ⇒
-      if (mrRouter.isEmpty) initialize
+      if (mrRouter.isEmpty) initializeMR
 
     case Terminated(actor) ⇒
-      if (actor == router) {
+      if (Some(actor) == router) {
         router = None
         log.debug("Raiku router died, restarting in: "+config.reconnectDelay.toString())
         context.system.scheduler.scheduleOnce(config.reconnectDelay, self, ReconnectRouter)
       }
-      else if (actor == mrRouter) {
+      else if (Some(actor) == mrRouter) {
         mrRouter = None
         log.debug("Raiku MR router died, restarting in: "+config.reconnectDelay.toString())
         context.system.scheduler.scheduleOnce(config.reconnectDelay, self, ReconnectMRRouter)
