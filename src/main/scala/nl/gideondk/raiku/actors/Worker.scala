@@ -7,7 +7,7 @@ import akka.io.Tcp.Write
 import nl.gideondk.raiku.commands.RiakOperation
 import nl.gideondk.raiku.commands.RiakResponse
 
-private class RaikuWorkerActor(addr: InetSocketAddress) extends RaikuPBActor {
+private class RaikuWorkerActor(addr: InetSocketAddress) extends RaikuBaseActor {
   val workerDescription = "Raiku client worker"
   val address = addr
   def specificMessageHandler: Receive = {

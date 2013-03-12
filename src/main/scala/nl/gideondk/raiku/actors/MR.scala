@@ -14,7 +14,7 @@ import nl.gideondk.raiku.serialization.ProtoBufConversion
 import play.api.libs.iteratee.Concurrent
 import spray.json._
 
-private class RaikuMRWorkerActor(addr: InetSocketAddress) extends RaikuPBActor {
+private class RaikuMRWorkerActor(addr: InetSocketAddress) extends RaikuBaseActor {
   val workerDescription = "Raiku client MR worker"
   val address = addr
 

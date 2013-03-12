@@ -15,7 +15,7 @@ import akka.event.Logging
 import akka.io._
 import akka.io.Tcp._
 
-trait RaikuPBActor extends Actor with Stash {
+trait RaikuBaseActor extends Actor with Stash {
   import context.dispatcher
 
   def address: InetSocketAddress
