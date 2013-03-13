@@ -55,7 +55,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
             onlyHead: OnlyHeadArgument = OnlyHeadArgument(),
             deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): ValidatedFutureIO[Option[T]] = {
     val (nR, pR) = (List(r.v, config.r.v).flatten headOption, List(pr.v, config.pr.v).flatten headOption)
-    client.fetch(bucketName, key, nR, pR, basicQuorum.v, notFoundOk.v, ifModified.v, onlyHead.v, deletedVClock.v)
+    ValidatedFutureIORWListToValidatedFutureIOOptT(client.fetch(bucketName, key, nR, pR, basicQuorum.v, notFoundOk.v, ifModified.v, onlyHead.v, deletedVClock.v))
   }
 
   /** Fetches a List[T] in parallel from the current Raiku bucket
@@ -116,11 +116,11 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
           val (nW, nDw, nPw) = (List(w.v, config.w.v).flatten headOption, List(dw.v, config.dw.v).flatten headOption, List(pw.v, config.pw.v).flatten headOption)
           // Clobber converter as default
           val storeObj = converter.write(bucketName, obj).copy(vClock = fetchObj.map(_.vClock).getOrElse(None))
-          client.store(storeObj, nW, nDw, returnBody.v, nPw, ifNotModified.v, ifNonMatched.v, returnHead.v)
+          ValidatedFutureIORWListToValidatedFutureIOOptT(client.store(storeObj, nW, nDw, returnBody.v, nPw, ifNotModified.v, ifNonMatched.v, returnHead.v))
       }
   }
 
-  /* 
+  /*
      * *Should* be faster then the "normal" store, because object won't be fetched first to determine the vclock.
      * Only to be used when you are *absolutely* sure this object doesn't already exists.
      *
@@ -139,7 +139,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
                      ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
                      returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[Option[T]] = {
     val (nW, nDw, nPw) = (List(w.v, config.w.v).flatten headOption, List(dw.v, config.dw.v).flatten headOption, List(pw.v, config.pw.v).flatten headOption)
-    client.store(converter.write(bucketName, obj), nW, nDw, returnBody.v, nPw, ifNotModified.v, ifNonMatched.v, returnHead.v)
+    ValidatedFutureIORWListToValidatedFutureIOOptT(client.store(converter.write(bucketName, obj), nW, nDw, returnBody.v, nPw, ifNotModified.v, ifNonMatched.v, returnHead.v))
   }
 
   /** Stores a List[T] in parallel to the current Raiku bucket

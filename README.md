@@ -67,7 +67,7 @@ Or by adding the repo:
 to your SBT configuration and adding the `SNAPSHOT` to your library dependencies:
 
 <notextile><pre><code>libraryDependencies ++= Seq(
-	"nl.gideondk" %% "raiku" % "0.3.4-SNAPSHOT"
+	"nl.gideondk" %% "raiku" % "0.3.5-SNAPSHOT"
 )
 </code></pre></notextile>
 

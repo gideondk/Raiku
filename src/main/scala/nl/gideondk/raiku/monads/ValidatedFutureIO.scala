@@ -7,7 +7,7 @@ import scala.concurrent.duration._
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-final case class ValidatedFuture[A](run: Future[Validation[Throwable, A]])
+final case class ValidatedFuture[+A](run: Future[Validation[Throwable, A]])
 
 object ValidatedFuture {
   implicit val validatedFuture = new Monad[ValidatedFuture] {
@@ -28,7 +28,7 @@ object ValidatedFuture {
   }))
 }
 
-case class ValidatedFutureIO[A](run: IO[ValidatedFuture[A]]) { self ⇒
+case class ValidatedFutureIO[+A](run: IO[ValidatedFuture[A]]) { self ⇒
   def fulFill(duration: Duration = 5 seconds): IO[Validation[Throwable, A]] = run.map(x ⇒ Await.result(x.run, duration))
 
   def unsafePerformIO: ValidatedFuture[A] = run.unsafePerformIO
