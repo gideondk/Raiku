@@ -1,3 +1,7 @@
 language: scala
 scala:
   - 2.10.0
+script: "sbt ++$TRAVIS_SCALA_VERSION compile"
+notifications:
+  hipchat:
+    - secure: "cvXbA2yCSEEX9VxHluS4d47lK+yjBV5/qfeVX4j86Air59J8KKEXLYpeIn3R\n4eoX5UMT7zIlqFGFqlQ7uMMsY4gGXmdJ+H2NC0pKctq3cROjHKCM3rxQhtqe\nvmIJkJqSVUaXx4c2b0+vQ4Jziwfp/CcrGjO7FQ7r7LAR5CLWh5E="
