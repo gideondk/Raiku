@@ -211,6 +211,19 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
     client.delete(converter.write(bucketName, obj).copy(vClock = vClock.v), nRw, nR, nW, nPr, nPw, nDw)
   }
 
+  def deleteByKey(key: String,
+                  rw: RWArgument = RWArgument(),
+                  vClock: VClockArgument = VClockArgument(),
+                  r: RArgument = RArgument(),
+                  w: WArgument = WArgument(),
+                  pr: PRArgument = PRArgument(),
+                  pw: PWArgument = PWArgument(),
+                  dw: DWArgument = DWArgument()): ValidatedFutureIO[Unit] = {
+    val (nRw, nR, nW, nPr, nPw, nDw) = (List(rw.v, config.rw.v).flatten headOption, List(r.v, config.r.v).flatten headOption, List(w.v, config.w.v).flatten headOption,
+      List(pr.v, config.pr.v).flatten headOption, List(pw.v, config.pw.v).flatten headOption, List(dw.v, config.dw.v).flatten headOption)
+    client.deleteByKey(bucketName, key, nRw, vClock.v, nR, nW, nPr, nPw, nDw)
+  }
+
   /** Deletes a List[T] parallel from the current Raiku bucket
    *
    *  @param objs the to-be deleted objects from Riak
@@ -230,6 +243,16 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
                  pw: PWArgument = PWArgument(),
                  dw: DWArgument = DWArgument()): ValidatedFutureIO[List[Unit]] = {
     ValidatedFutureIO.sequence(objs.map(delete(_, rw, VClockArgument(None), r, w, pr, pw, dw)))
+  }
+
+  def deleteManyByKey(keys: Seq[String],
+                      rw: RWArgument = RWArgument(),
+                      r: RArgument = RArgument(),
+                      w: WArgument = WArgument(),
+                      pr: PRArgument = PRArgument(),
+                      pw: PWArgument = PWArgument(),
+                      dw: DWArgument = DWArgument()): ValidatedFutureIO[Seq[Unit]] = {
+    ValidatedFutureIO.sequence(keys.map(deleteByKey(_, rw, VClockArgument(None), r, w, pr, pw, dw)).toList).map(_.toSeq)
   }
 
   /** Fetches keys based on a binary index

@@ -117,6 +117,23 @@ class BucketSpec extends Specification {
       res.isSuccess && res.toOption.get == true
     }
 
+    "be able to delete objects correctly by key" in {
+      val newId = java.util.UUID.randomUUID.toString
+      val obj = Z(newId, "Should also be stored")
+
+      val retObj = for {
+        v ← bucket << obj
+        firstRet ← bucket ? obj.id
+        _ ← bucket deleteByKey obj.id
+        secRet ← bucket ? obj.id
+      } yield {
+        firstRet.isDefined && !secRet.isDefined
+      }
+
+      val res = retObj.unsafeFulFill
+      res.isSuccess && res.toOption.get == true
+    }
+
     "shouldn't be able to fetch multiple deleted objects" in {
       val vec = List.fill(50)(Z(java.util.UUID.randomUUID.toString, "Should also be persisted"))
       val retObj = for {

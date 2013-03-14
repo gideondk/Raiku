@@ -11,7 +11,7 @@ final case class ValidatedFuture[+A](run: Future[Validation[Throwable, A]])
 
 object ValidatedFuture {
   implicit val validatedFuture = new Monad[ValidatedFuture] {
-    def point[A](a: ⇒ A): ValidatedFuture[A] = ValidatedFuture(Future(a.success))
+    def point[A](a: ⇒ A): ValidatedFuture[A] = ValidatedFuture(Future(a))
 
     override def map[A, B](fa: ValidatedFuture[A])(f: A ⇒ B): ValidatedFuture[B] =
       ValidatedFuture(fa.run.map(validation ⇒ validation map f))
