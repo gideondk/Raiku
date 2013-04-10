@@ -36,7 +36,7 @@ trait ShortPerformanceTest extends PerformanceTest {
   val messageBoxes = List.fill(50) {
     val from = firstHalf(Random.nextInt(firstHalf.length)).email
     val to = secHalf(Random.nextInt(firstHalf.length)).email
-    val messages = for (i <- 0 to 350) yield Data.randomMessage
+    val messages = for (i <- 0 to 3050) yield Data.randomMessage
     MessageBox(Data.generateId, from, to, messages.toList)
   }
 
