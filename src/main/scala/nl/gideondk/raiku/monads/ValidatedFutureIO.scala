@@ -56,8 +56,8 @@ trait ValidatedFutureIOFunctions {
   def apply[T](a: ⇒ Future[T]): ValidatedFutureIO[T] = ValidatedFutureIO(ValidatedFuture(a).point[IO])
 
   def sequence[T](z: List[ValidatedFutureIO[T]]): ValidatedFutureIO[List[T]] =
-    ValidatedFutureIO(z.map(_.run).sequence.map(l ⇒ Future.sequence(l.map(_.run.map(_.toValidationNEL)))
-      .map(_.toList.sequence[({ type l[a] = ValidationNEL[Throwable, a] })#l, T])).map(z ⇒ ValidatedFuture(z.map(y ⇒ (y.bimap(x ⇒ x.head, x ⇒ x))))))
+    ValidatedFutureIO(z.map(_.run).sequence.map(l ⇒ Future.sequence(l.map(_.run.map(_.toValidationNel)))
+      .map(_.toList.sequence[({ type l[a] = ValidationNel[Throwable, a] })#l, T])).map(z ⇒ ValidatedFuture(z.map(y ⇒ (y.bimap(x ⇒ x.head, x ⇒ x))))))
 }
 
 object ValidatedFutureIO extends ValidatedFutureIOInstances with ValidatedFutureIOFunctions

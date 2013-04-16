@@ -48,11 +48,13 @@ object RaikuBuild extends Build {
                   "spray repo" at "http://repo.spray.io"))
 
   val appDependencies = Seq(
-      "org.scalaz" %% "scalaz-core" % "7.0.0-M7",
-      "org.scalaz" %% "scalaz-effect" % "7.0.0-M7",
+      "org.scalaz" %% "scalaz-core" % "7.0.0-RC1",
+      "org.scalaz" %% "scalaz-effect" % "7.0.0-RC1",
       "com.google.protobuf" % "protobuf-java" % "2.4.1",
+
       "io.spray" %%  "spray-json" % "1.2.3",
       "com.typesafe.akka" % "akka-actor_2.10" % "2.2-20130416-001427",
+      
       "play" %% "play-iteratees" % "2.1.0",
       "com.chuusai" % "shapeless_2.10.0" % "1.2.4",
       "org.specs2" %% "specs2" % "1.13"
