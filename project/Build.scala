@@ -8,7 +8,7 @@ object RaikuBuild extends Build {
   override lazy val settings = super.settings ++
     Seq(
       name := "raiku",
-      version := "0.3.8",
+      version := "0.3.9",
       organization := "nl.gideondk",
       parallelExecution in Test := false,
       scalaVersion := "2.10.0",
@@ -48,12 +48,12 @@ object RaikuBuild extends Build {
                   "spray repo" at "http://repo.spray.io"))
 
   val appDependencies = Seq(
-      "org.scalaz" %% "scalaz-core" % "7.0.0-RC1",
-      "org.scalaz" %% "scalaz-effect" % "7.0.0-RC1",
+      "org.scalaz" %% "scalaz-core" % "7.0.0",
+      "org.scalaz" %% "scalaz-effect" % "7.0.0",
       "com.google.protobuf" % "protobuf-java" % "2.4.1",
 
       "io.spray" %%  "spray-json" % "1.2.3",
-      "com.typesafe.akka" % "akka-actor_2.10" % "2.2-20130416-001427",
+      "com.typesafe.akka" % "akka-actor_2.10" % "2.2-M3",
       
       "play" %% "play-iteratees" % "2.1.0",
       "com.chuusai" % "shapeless_2.10.0" % "1.2.4",
