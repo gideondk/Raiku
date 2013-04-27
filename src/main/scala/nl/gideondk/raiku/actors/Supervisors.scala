@@ -43,7 +43,7 @@ private[raiku] class RaikuActor(config: RaikuConfig) extends Actor {
 
   def initializeMR {
     mrRouter = Some(context.system.actorOf(Props(new RaikuMRWorkerActor(address))
-      .withRouter(RandomRouter(nrOfInstances = config.connections, supervisorStrategy = RaikuActor.supervisorStrategy))
+      .withRouter(RandomRouter(nrOfInstances = config.mrConnections, supervisorStrategy = RaikuActor.supervisorStrategy))
       .withDispatcher("nl.gideondk.raiku.raiku-dispatcher")))
     context.watch(mrRouter.get)
   }
