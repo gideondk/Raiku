@@ -11,25 +11,29 @@ import Scalaz._
 import org.specs2.mutable.Specification
 import org.specs2.matcher.Matcher
 
+import scala.util.{ Success, Failure }
+
 case class Z(id: String, name: String)
 
 class BucketSpec extends Specification {
   val client = DB.client
 
+  implicit val timeout = Duration(5, duration.SECONDS)
+
   implicit val zConverter = new RaikuConverter[Z] {
-    def read(o: RWObject): ReadResult[Z] = Z(o.key, new String(o.value)).success
+    def read(o: RWObject): ReadResult[Z] = Success(Z(o.key, new String(o.value)))
     def write(bucket: String, o: Z): RWObject = RWObject(bucket, o.id, o.name.getBytes)
   }
 
   val bucket = RaikuBucket[Z]("raiku_test_z_bucket", client)
-  bucket.setBucketProperties(RaikuBucketProperties(None, Some(true))).unsafeFulFill
+  bucket.setBucketProperties(RaikuBucketProperties(None, Some(true))).copoint
 
   "A bucket" should {
     "be able to store objects" in {
       val newId = java.util.UUID.randomUUID.toString
       val obj = Z(newId, "Should also be stored")
       val v = bucket << obj
-      v.unsafeFulFill.isSuccess
+      v.run.isSuccess
     }
     "be able to fetch stored objects" in {
       val newId = java.util.UUID.randomUUID.toString
@@ -42,7 +46,7 @@ class BucketSpec extends Specification {
         retObj
       }
 
-      retObj.unsafeFulFill.toOption.get.get == obj
+      retObj.copoint.get == obj
     }
     "create siblings (and fail) when unsafely updating objects" in {
       val newId = java.util.UUID.randomUUID.toString
@@ -55,7 +59,7 @@ class BucketSpec extends Specification {
         retObj
       }
 
-      retObj.unsafeFulFill
+      retObj.copoint
 
       val updatedObj = for {
         v ← bucket unsafeStoreNew obj
@@ -64,7 +68,7 @@ class BucketSpec extends Specification {
         retObj
       }
 
-      updatedObj.unsafeFulFill.isFailure
+      updatedObj.run.isFailure
     }
     "shouldn't create siblings when updating safely" in {
       val newId = java.util.UUID.randomUUID.toString
@@ -77,7 +81,7 @@ class BucketSpec extends Specification {
         retObj
       }
 
-      retObj.unsafeFulFill
+      retObj.copoint
 
       val updatedObj = for {
         v ← bucket << obj
@@ -86,7 +90,7 @@ class BucketSpec extends Specification {
         retObj
       }
 
-      updatedObj.unsafeFulFill.isSuccess
+      updatedObj.run.isSuccess
     }
 
     "be able to persist multiple objects" in {
@@ -96,7 +100,7 @@ class BucketSpec extends Specification {
         retObj ← bucket ?* vec.map(_.id)
       } yield retObj
 
-      val res = retObj.unsafeFulFill
+      val res = retObj.run
       res.isSuccess && res.toOption.get.length == vec.length
     }
 
@@ -113,7 +117,7 @@ class BucketSpec extends Specification {
         firstRet.isDefined && !secRet.isDefined
       }
 
-      val res = retObj.unsafeFulFill
+      val res = retObj.run
       res.isSuccess && res.toOption.get == true
     }
 
@@ -130,7 +134,7 @@ class BucketSpec extends Specification {
         firstRet.isDefined && !secRet.isDefined
       }
 
-      val res = retObj.unsafeFulFill
+      val res = retObj.run
       res.isSuccess && res.toOption.get == true
     }
 
@@ -145,7 +149,7 @@ class BucketSpec extends Specification {
         bef.length == 50 && aft.length == 0
       }
 
-      val res = retObj.unsafeFulFill
+      val res = retObj.run
       res.isSuccess && res.toOption.get == true
     }
   }

@@ -5,11 +5,11 @@ import raiku.serialization._
 import raiku.monads.{ ValidatedFuture, ValidatedFutureIO }
 import scalaz._
 import Scalaz._
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scalaz.Success
 import scalaz.Failure
 import scala.Some
+import nl.gideondk.sentinel.Task
 
 package object raiku {
   implicit def stringToVClock(s: String): VClock = VClock(s.getBytes)
@@ -36,31 +36,31 @@ package object raiku {
 
   implicit def vclockToVClockArgument(v: VClock): VClockArgument = VClockArgument(Option(v))
 
-  implicit def ValidatedFutureIORWListToValidatedFutureIOOptT[T](v: ValidatedFutureIO[List[RWObject]])(implicit converter: RaikuConverter[T]): ValidatedFutureIO[Option[T]] = {
-    ValidatedFutureIO(v.run.map {
+  implicit def ValidatedFutureIORWListToValidatedFutureIOOptT[T](v: Task[List[RWObject]])(implicit converter: RaikuConverter[T]): Task[Option[T]] = {
+    Task(v.get.map {
       x ⇒
-        ValidatedFuture(x.run.map { v ⇒
+        x.map { v ⇒
           v match {
-            case Success(List(obj)) ⇒ converter.read(obj).map(_.some)
-            case Success(List())    ⇒ none.success[Throwable]
-            case Success(List(_*))  ⇒ new Exception("There were siblings").failure[Option[T]]
-            case Failure(fail)      ⇒ fail.failure[Option[T]]
+            case scala.util.Success(List(obj)) ⇒ converter.read(obj).map(_.some)
+            case scala.util.Success(List())    ⇒ scala.util.Success(none)
+            case scala.util.Success(List(_*))  ⇒ scala.util.Failure(new Exception("There were siblings"))
+            case scala.util.Failure(fail)      ⇒ scala.util.Failure(fail)
           }
-        })
+        }
     })
   }
 
-  implicit def ValidatedFutureIORWListToValidatedFutureIOOptRW(v: ValidatedFutureIO[List[RWObject]]): ValidatedFutureIO[Option[RWObject]] = {
-    ValidatedFutureIO(v.run.map {
+  implicit def ValidatedFutureIORWListToValidatedFutureIOOptRW(v: Task[List[RWObject]]): Task[Option[RWObject]] = {
+    Task(v.get.map {
       x ⇒
-        ValidatedFuture(x.run.map { v ⇒
+        x.map { v ⇒
           v match {
-            case Success(List(obj)) ⇒ Some(obj).success
-            case Success(List())    ⇒ none.success[Throwable]
-            case Success(List(_*))  ⇒ new Exception("There were siblings").failure[Option[RWObject]]
-            case Failure(fail)      ⇒ fail.failure[Option[RWObject]]
+            case scala.util.Success(List(obj)) ⇒ scala.util.Success(Some(obj))
+            case scala.util.Success(List())    ⇒ scala.util.Success(none)
+            case scala.util.Success(List(_*))  ⇒ scala.util.Failure(new Exception("There were siblings"))
+            case scala.util.Failure(fail)      ⇒ scala.util.Failure(fail)
           }
-        })
+        }
     })
   }
 }

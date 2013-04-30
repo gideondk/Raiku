@@ -1,24 +1,32 @@
 package nl.gideondk.raiku.commands
 
 import java.lang.Exception
-
 import scala.concurrent.Promise
-
 import com.basho.riak.protobuf.RpbErrorResp
-
 import akka.actor.{ ActorRef, ActorSystem, actorRef2Scala }
 import akka.util.ByteString
-
 import scalaz._
-import scalaz.Scalaz._
+import Scalaz._
 import scalaz.effect.IO
-
 import nl.gideondk.raiku.monads.{ ValidatedFuture, ValidatedFutureIO }
 import nl.gideondk.raiku.serialization.ProtoBufConversion
+import nl.gideondk.sentinel.client._
+import nl.gideondk.sentinel.Task
+import nl.gideondk.sentinel.Task._
+import scala.util.Try
 
-private[raiku] case class RiakResponse(length: Int, messageType: Int, message: ByteString)
+trait RiakMessage {
+  def messageType: RiakMessageType
+  def message: ByteString
+}
 
-private[raiku] case class RiakOperation(promise: Promise[RiakResponse], command: ByteString)
+/* Technically the same, but splitting them for readability reasons */
+private[raiku] case class RiakCommand(messageType: RiakMessageType, message: ByteString) extends RiakMessage
+private[raiku] case class RiakResponse(messageType: RiakMessageType, message: ByteString) extends RiakMessage
+
+//private[raiku] case class RiakResponse(messageType: Int, message: ByteString)
+//
+//private[raiku] case class RiakOperation(messageType: RiakMessageType, message: ByteString)
 
 trait Connection {
   def system: ActorSystem
@@ -29,24 +37,15 @@ trait Connection {
 }
 
 trait Request extends Connection with ProtoBufConversion {
-  def buildRequest(op: ByteString): ValidatedFutureIO[RiakResponse] = {
-    val ioAction = {
-      val promise = Promise[RiakResponse]()
-      actor ! RiakOperation(promise, op)
-      promise
-    }.point[IO]
+  def buildRequest(messageType: RiakMessageType, message: ByteString): Task[RiakResponse] =
+    Task(actor.sendCommand[RiakResponse, RiakCommand](RiakCommand(messageType, message)).get.map(_.map(_.flatMap(riakResponseToValidation))))
 
-    errorCheckedValidatedFutureIORiakResponse(ValidatedFutureIO(ioAction.map(x ⇒ ValidatedFuture(x.future))))
-  }
+  def buildRequest(messageType: RiakMessageType): Task[RiakMessage] = buildRequest(messageType, ByteString())
 
-  def errorCheckedValidatedFutureIORiakResponse(vr: ValidatedFutureIO[RiakResponse]) = {
-    ValidatedFutureIO(vr.run.map(z ⇒ ValidatedFuture(z.run.map(x ⇒ x.flatMap(riakResponseToValidation)))))
-  }
-
-  def riakResponseToValidation(resp: RiakResponse): Validation[Throwable, RiakResponse] = {
+  def riakResponseToValidation(resp: RiakResponse): Try[RiakResponse] = {
     if (resp.messageType == 0)
-      new Exception(RpbErrorResp().mergeFrom(resp.message.toArray).errmsg).failure
+      scala.util.Failure(new Exception(RpbErrorResp().mergeFrom(resp.message.toArray).errmsg))
     else
-      resp.success
+      scala.util.Success(resp)
   }
 }

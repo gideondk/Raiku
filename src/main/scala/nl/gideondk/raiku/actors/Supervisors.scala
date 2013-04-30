@@ -14,7 +14,7 @@ import akka.actor.Terminated
 import akka.event.Logging
 import akka.routing.RandomRouter
 import nl.gideondk.raiku.commands.RiakMROperation
-import nl.gideondk.raiku.commands.RiakOperation
+//import nl.gideondk.raiku.commands.RiakOperation
 
 case class RaikuHost(host: String, port: Int)
 
@@ -34,28 +34,28 @@ private[raiku] class RaikuActor(config: RaikuConfig) extends Actor {
   var router: Option[ActorRef] = None
   var mrRouter: Option[ActorRef] = None
 
-  def initialize {
-    router = Some(context.system.actorOf(Props(new RaikuWorkerActor(address))
-      .withRouter(RandomRouter(nrOfInstances = config.connections, supervisorStrategy = RaikuActor.supervisorStrategy))
-      .withDispatcher("nl.gideondk.raiku.raiku-dispatcher")))
-    context.watch(router.get)
-  }
+  //  def initialize {
+  //    router = Some(context.system.actorOf(Props(new RaikuWorkerActor(address))
+  //      .withRouter(RandomRouter(nrOfInstances = config.connections, supervisorStrategy = RaikuActor.supervisorStrategy))
+  //      .withDispatcher("nl.gideondk.raiku.raiku-dispatcher")))
+  //    context.watch(router.get)
+  //  }
 
   def initializeMR {
-    mrRouter = Some(context.system.actorOf(Props(new RaikuMRWorkerActor(address))
-      .withRouter(RandomRouter(nrOfInstances = config.connections, supervisorStrategy = RaikuActor.supervisorStrategy))
-      .withDispatcher("nl.gideondk.raiku.raiku-dispatcher")))
-    context.watch(mrRouter.get)
+    //    mrRouter = Some(context.system.actorOf(Props(new RaikuMRWorkerActor(address))
+    //      .withRouter(RandomRouter(nrOfInstances = config.connections, supervisorStrategy = RaikuActor.supervisorStrategy))
+    //      .withDispatcher("nl.gideondk.raiku.raiku-dispatcher")))
+    //    context.watch(mrRouter.get)
   }
 
   def receive = {
     case InitializeRouters ⇒
       log.debug("Raiku routers initializing")
-      initialize
+      //initialize
       initializeMR
 
     case ReconnectRouter ⇒
-      if (router.isEmpty) initialize
+    // if (router.isEmpty) initialize
 
     case ReconnectMRRouter ⇒
       if (mrRouter.isEmpty) initializeMR
@@ -71,18 +71,18 @@ private[raiku] class RaikuActor(config: RaikuConfig) extends Actor {
         log.debug("Raiku MR router died, restarting in: "+config.reconnectDelay.toString())
         context.system.scheduler.scheduleOnce(config.reconnectDelay, self, ReconnectMRRouter)
       }
-
-    case req @ RiakOperation(promise, command) ⇒
-      router match {
-        case Some(r) ⇒ r forward req
-        case None    ⇒ promise.failure(NoConnectionException())
-      }
-
-    case req: RiakMROperation ⇒
-      mrRouter match {
-        case Some(r) ⇒ r forward req
-        case None    ⇒ req.promise.failure(NoConnectionException())
-      }
+    //
+    //    case req @ RiakOperation(promise, command) ⇒
+    //      router match {
+    //        case Some(r) ⇒ r forward req
+    //        case None    ⇒ promise.failure(NoConnectionException())
+    //      }
+    //
+    //    case req: RiakMROperation ⇒
+    //      mrRouter match {
+    //        case Some(r) ⇒ r forward req
+    //        case None    ⇒ req.promise.failure(NoConnectionException())
+    //      }
   }
 }
 

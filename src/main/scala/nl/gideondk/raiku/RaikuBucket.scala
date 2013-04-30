@@ -3,16 +3,15 @@ package nl.gideondk.raiku
 import monads.ValidatedFutureIO
 import scalaz._
 import Scalaz._
-
 import scala.concurrent._
 import ExecutionContext.Implicits.global
-
 import com.basho.riak.protobuf._
 import nl.gideondk.raiku.commands._
 import nl.gideondk.raiku.serialization._
 import play.api.libs.iteratee._
 import Enumerator._
 import spray.json.JsValue
+import nl.gideondk.sentinel.Task
 
 case class RaikuBucketProperties(nVal: Option[Int], allowMulti: Option[Boolean])
 
@@ -53,7 +52,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
             notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
             ifModified: IfModifiedArgument = IfModifiedArgument(),
             onlyHead: OnlyHeadArgument = OnlyHeadArgument(),
-            deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): ValidatedFutureIO[Option[T]] = {
+            deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): Task[Option[T]] = {
     val (nR, pR) = (List(r.v, config.r.v).flatten headOption, List(pr.v, config.pr.v).flatten headOption)
     ValidatedFutureIORWListToValidatedFutureIOOptT(client.fetch(bucketName, key, nR, pR, basicQuorum.v, notFoundOk.v, ifModified.v, onlyHead.v, deletedVClock.v))
   }
@@ -75,8 +74,8 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
                 basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
                 notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
                 onlyHead: OnlyHeadArgument = OnlyHeadArgument(),
-                deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): ValidatedFutureIO[List[T]] = {
-    ValidatedFutureIO.sequence(keys.map(fetch(_, r, pr, basicQuorum, notFoundOk, IfModifiedArgument(None), onlyHead, deletedVClock))).map(_.flatten)
+                deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): Task[List[T]] = {
+    Task.sequenceSuccesses(keys.map(fetch(_, r, pr, basicQuorum, notFoundOk, IfModifiedArgument(None), onlyHead, deletedVClock))).map(_.flatten)
   }
 
   /** Stores a T to the current Raiku bucket
@@ -107,7 +106,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
             pw: PWArgument = PWArgument(),
             ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
             ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
-            returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[Option[T]] = {
+            returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[Option[T]] = {
     val converted = converter.write(bucketName, obj)
     val (nR, pR) = (List(r.v, config.r.v).flatten headOption, List(pr.v, config.pr.v).flatten headOption)
     ValidatedFutureIORWListToValidatedFutureIOOptRW(client.fetch(bucketName, converted.key, nR, pR, basicQuorum.v, notFoundOk.v, deletedvclock = None))
@@ -137,7 +136,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
                      pw: PWArgument = PWArgument(),
                      ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
                      ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
-                     returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[Option[T]] = {
+                     returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[Option[T]] = {
     val (nW, nDw, nPw) = (List(w.v, config.w.v).flatten headOption, List(dw.v, config.dw.v).flatten headOption, List(pw.v, config.pw.v).flatten headOption)
     ValidatedFutureIORWListToValidatedFutureIOOptT(client.store(converter.write(bucketName, obj), nW, nDw, returnBody.v, nPw, ifNotModified.v, ifNonMatched.v, returnHead.v))
   }
@@ -170,8 +169,8 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
                 pw: PWArgument = PWArgument(),
                 ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
                 ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
-                returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[List[T]] = {
-    ValidatedFutureIO.sequence(objs.map(store(_, r, pr, basicQuorum, notFoundOk, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead))).map(_.flatten)
+                returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[List[T]] = {
+    Task.sequenceSuccesses(objs.map(store(_, r, pr, basicQuorum, notFoundOk, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead))).map(_.flatten)
   }
 
   def unsafeStoreManyNew(objs: List[T],
@@ -182,8 +181,8 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
                          returnBody: ReturnBodyArgument = ReturnBodyArgument(),
                          pw: PWArgument = PWArgument(),
                          ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
-                         returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[List[T]] = {
-    ValidatedFutureIO.sequence(objs.map(unsafeStoreNew(_, basicQuorum, notFoundOk, DeletedVClockArgument(None), w, dw, returnBody, pw, IfNotModifiedArgument(None), ifNonMatched, returnHead))).map(_.flatten)
+                         returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[List[T]] = {
+    Task.sequenceSuccesses(objs.map(unsafeStoreNew(_, basicQuorum, notFoundOk, DeletedVClockArgument(None), w, dw, returnBody, pw, IfNotModifiedArgument(None), ifNonMatched, returnHead))).map(_.flatten)
   }
 
   /** Deletes a T from the current Raiku bucket
@@ -205,7 +204,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
              w: WArgument = WArgument(),
              pr: PRArgument = PRArgument(),
              pw: PWArgument = PWArgument(),
-             dw: DWArgument = DWArgument()): ValidatedFutureIO[Unit] = {
+             dw: DWArgument = DWArgument()): Task[Unit] = {
     val (nRw, nR, nW, nPr, nPw, nDw) = (List(rw.v, config.rw.v).flatten headOption, List(r.v, config.r.v).flatten headOption, List(w.v, config.w.v).flatten headOption,
       List(pr.v, config.pr.v).flatten headOption, List(pw.v, config.pw.v).flatten headOption, List(dw.v, config.dw.v).flatten headOption)
     client.delete(converter.write(bucketName, obj).copy(vClock = vClock.v), nRw, nR, nW, nPr, nPw, nDw)
@@ -218,7 +217,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
                   w: WArgument = WArgument(),
                   pr: PRArgument = PRArgument(),
                   pw: PWArgument = PWArgument(),
-                  dw: DWArgument = DWArgument()): ValidatedFutureIO[Unit] = {
+                  dw: DWArgument = DWArgument()): Task[Unit] = {
     val (nRw, nR, nW, nPr, nPw, nDw) = (List(rw.v, config.rw.v).flatten headOption, List(r.v, config.r.v).flatten headOption, List(w.v, config.w.v).flatten headOption,
       List(pr.v, config.pr.v).flatten headOption, List(pw.v, config.pw.v).flatten headOption, List(dw.v, config.dw.v).flatten headOption)
     client.deleteByKey(bucketName, key, nRw, vClock.v, nR, nW, nPr, nPw, nDw)
@@ -241,8 +240,8 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
                  w: WArgument = WArgument(),
                  pr: PRArgument = PRArgument(),
                  pw: PWArgument = PWArgument(),
-                 dw: DWArgument = DWArgument()): ValidatedFutureIO[List[Unit]] = {
-    ValidatedFutureIO.sequence(objs.map(delete(_, rw, VClockArgument(None), r, w, pr, pw, dw)))
+                 dw: DWArgument = DWArgument()): Task[List[Unit]] = {
+    Task.sequenceSuccesses(objs.map(delete(_, rw, VClockArgument(None), r, w, pr, pw, dw)))
   }
 
   def deleteManyByKey(keys: Seq[String],
@@ -251,8 +250,8 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
                       w: WArgument = WArgument(),
                       pr: PRArgument = PRArgument(),
                       pw: PWArgument = PWArgument(),
-                      dw: DWArgument = DWArgument()): ValidatedFutureIO[Seq[Unit]] = {
-    ValidatedFutureIO.sequence(keys.map(deleteByKey(_, rw, VClockArgument(None), r, w, pr, pw, dw)).toList).map(_.toSeq)
+                      dw: DWArgument = DWArgument()): Task[Seq[Unit]] = {
+    Task.sequenceSuccesses(keys.map(deleteByKey(_, rw, VClockArgument(None), r, w, pr, pw, dw)).toList).map(_.toSeq)
   }
 
   /** Fetches keys based on a binary index
@@ -261,7 +260,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
    *  @param idxv the binary index value
    */
 
-  def fetchKeysForBinIndexByValue(idxk: String, idxv: String): ValidatedFutureIO[List[String]] =
+  def fetchKeysForBinIndexByValue(idxk: String, idxv: String): Task[List[String]] =
     client.fetchKeysForBinIndexByValue(bucketName, idxk, idxv)
 
   /** Fetches keys based on a integer index
@@ -270,7 +269,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
    *  @param idxv the integer index value
    */
 
-  def fetchKeysForIntIndexByValue(idxk: String, idxv: Int): ValidatedFutureIO[List[String]] =
+  def fetchKeysForIntIndexByValue(idxk: String, idxv: Int): Task[List[String]] =
     client.fetchKeysForIntIndexByValue(bucketName, idxk, idxv)
 
   /** Fetches keys based on a ranged integer index
@@ -279,7 +278,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
    *  @param idxv the ranged integer index value
    */
 
-  def fetchKeysForIntIndexByValueRange(idxk: String, idxr: Range): ValidatedFutureIO[List[String]] =
+  def fetchKeysForIntIndexByValueRange(idxk: String, idxr: Range): Task[List[String]] =
     client.fetchKeysForIntIndexByValueRange(bucketName, idxk, idxr)
 
   /** @see fetch
@@ -292,7 +291,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
         notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
         ifModified: IfModifiedArgument = IfModifiedArgument(),
         onlyHead: OnlyHeadArgument = OnlyHeadArgument(),
-        deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): ValidatedFutureIO[Option[T]] =
+        deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): Task[Option[T]] =
     fetch(key, r, pr, basicQuorum, notFoundOk, ifModified, onlyHead, deletedVClock)
 
   /** @see fetchMany
@@ -304,7 +303,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
          basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
          notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
          onlyHead: OnlyHeadArgument = OnlyHeadArgument(),
-         deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): ValidatedFutureIO[List[T]] =
+         deletedVClock: DeletedVClockArgument = DeletedVClockArgument()): Task[List[T]] =
     fetchMany(keys, r, pr, basicQuorum, notFoundOk, onlyHead, deletedVClock)
 
   /** @see store
@@ -321,7 +320,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
          pw: PWArgument = PWArgument(),
          ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
          ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
-         returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[Option[T]] =
+         returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[Option[T]] =
     store(obj, r, pr, basicQuorum, notFoundOk, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead)
 
   /** @see storeMany
@@ -338,7 +337,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
           pw: PWArgument = PWArgument(),
           ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
           ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
-          returnHead: ReturnHeadArgument = ReturnHeadArgument()): ValidatedFutureIO[List[T]] =
+          returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[List[T]] =
     storeMany(objs, r, pr, basicQuorum, notFoundOk, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead)
 
   /** @see delete
@@ -351,7 +350,7 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
         w: WArgument = WArgument(),
         pr: PRArgument = PRArgument(),
         pw: PWArgument = PWArgument(),
-        dw: DWArgument = DWArgument()): ValidatedFutureIO[Unit] =
+        dw: DWArgument = DWArgument()): Task[Unit] =
     delete(obj, rw, vClock, r, w, pr, pw, dw)
 
   /** @see deleteMany
@@ -363,25 +362,25 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
          w: WArgument = WArgument(),
          pr: PRArgument = PRArgument(),
          pw: PWArgument = PWArgument(),
-         dw: DWArgument = DWArgument()): ValidatedFutureIO[List[Unit]] =
+         dw: DWArgument = DWArgument()): Task[List[Unit]] =
     deleteMany(objs, rw, r, w, pr, pw, dw)
 
   /** @see fetchKeysForBinIndexByValue
    */
 
-  def idx(idxk: String, idxv: String): ValidatedFutureIO[List[String]] =
+  def idx(idxk: String, idxv: String): Task[List[String]] =
     fetchKeysForBinIndexByValue(idxk, idxv)
 
   /** @see fetchKeysForIntIndexByValue
    */
 
-  def idx(idxk: String, idxv: Int): ValidatedFutureIO[List[String]] =
+  def idx(idxk: String, idxv: Int): Task[List[String]] =
     fetchKeysForIntIndexByValue(idxk, idxv)
 
   /** @see fetchKeysForIntIndexByValueRange
    */
 
-  def idx(idxk: String, idxv: Range): ValidatedFutureIO[List[String]] =
+  def idx(idxk: String, idxv: Range): Task[List[String]] =
     fetchKeysForIntIndexByValueRange(idxk, idxv)
 }
 

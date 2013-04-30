@@ -31,6 +31,15 @@ trait ProtoBufConversion {
     os.toByteArray()
   }
 
+  implicit def messageToByteString[T <: MessageLite with MessageLite.Builder](m: com.basho.riak.protobuf.Message[T]) = {
+    val os = new ByteArrayOutputStream()
+    val cos = CodedOutputStream.newInstance(os)
+    m.writeTo(cos)
+    cos.flush
+    os.close
+    ByteString(os.toByteArray())
+  }
+
   def request(messageType: RiakMessageType): ByteString = {
     val bsb = ByteString.newBuilder
     val cos = new DataOutputStream(bsb.asOutputStream)
