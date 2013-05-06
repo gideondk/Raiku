@@ -61,7 +61,7 @@ object RaikuBuild extends Build {
       "com.chuusai" % "shapeless_2.10.0" % "1.2.4",
       "org.specs2" %% "specs2" % "1.13",
 
-      "nl.gideondk" %% "sentinel" % "0.5.0"
+      "nl.gideondk" %% "sentinel" % "0.4.1"
   )
 
   lazy val root = Project(id = "raiku",
