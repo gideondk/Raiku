@@ -9,9 +9,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scalaz.Success
 import scalaz.Failure
 import scala.Some
-import nl.gideondk.sentinel.Task
 
 package object raiku {
+  type Task[T] = nl.gideondk.sentinel.Task[T]
+  val Task = nl.gideondk.sentinel.Task
+
   implicit def stringToVClock(s: String): VClock = VClock(s.getBytes)
 
   implicit def intToRArgument(i: Int): RArgument = RArgument(Option(i))
@@ -36,31 +38,5 @@ package object raiku {
 
   implicit def vclockToVClockArgument(v: VClock): VClockArgument = VClockArgument(Option(v))
 
-  implicit def ValidatedFutureIORWListToValidatedFutureIOOptT[T](v: Task[List[RWObject]])(implicit converter: RaikuConverter[T]): Task[Option[T]] = {
-    Task(v.get.map {
-      x ⇒
-        x.map { v ⇒
-          v match {
-            case scala.util.Success(List(obj)) ⇒ converter.read(obj).map(_.some)
-            case scala.util.Success(List())    ⇒ scala.util.Success(none)
-            case scala.util.Success(List(_*))  ⇒ scala.util.Failure(new Exception("There were siblings"))
-            case scala.util.Failure(fail)      ⇒ scala.util.Failure(fail)
-          }
-        }
-    })
-  }
-
-  implicit def ValidatedFutureIORWListToValidatedFutureIOOptRW(v: Task[List[RWObject]]): Task[Option[RWObject]] = {
-    Task(v.get.map {
-      x ⇒
-        x.map { v ⇒
-          v match {
-            case scala.util.Success(List(obj)) ⇒ scala.util.Success(Some(obj))
-            case scala.util.Success(List())    ⇒ scala.util.Success(none)
-            case scala.util.Success(List(_*))  ⇒ scala.util.Failure(new Exception("There were siblings"))
-            case scala.util.Failure(fail)      ⇒ scala.util.Failure(fail)
-          }
-        }
-    })
-  }
+  implicit def unwrapRaikuValue[T](rv: RaikuValue[T]): T = rv.value.getOrElse(throw new Exception("Only object Meta is available."))
 }

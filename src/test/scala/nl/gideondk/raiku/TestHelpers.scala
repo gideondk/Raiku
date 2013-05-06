@@ -1,6 +1,6 @@
 package nl.gideondk.raiku
 
-import commands.RWObject
+//import commands.RWObject
 import mapreduce._
 import scalaz._
 import scala.concurrent.Await

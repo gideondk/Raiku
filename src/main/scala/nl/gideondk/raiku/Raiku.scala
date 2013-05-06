@@ -3,10 +3,10 @@ package nl.gideondk.raiku
 import actors._
 import actors.RaikuConfig
 import actors.RaikuHost
-import commands.{ MapReduce, RWRequests }
+import commands._
 import akka.actor._
 
-case class RaikuClient(config: RaikuConfig)(implicit val system: ActorSystem) extends RWRequests with MapReduce {
+case class RaikuClient(config: RaikuConfig)(implicit val system: ActorSystem) extends GeneralRequests with RWRequests with BucketRequests with IndexRequests {
   //val actor = system.actorOf(Props(new RaikuActor(config)))
   val actor = RaikuWorker(config.host.host, config.host.port, config.connections)
 

@@ -24,10 +24,6 @@ trait RiakMessage {
 private[raiku] case class RiakCommand(messageType: RiakMessageType, message: ByteString) extends RiakMessage
 private[raiku] case class RiakResponse(messageType: RiakMessageType, message: ByteString) extends RiakMessage
 
-//private[raiku] case class RiakResponse(messageType: Int, message: ByteString)
-//
-//private[raiku] case class RiakOperation(messageType: RiakMessageType, message: ByteString)
-
 trait Connection {
   def system: ActorSystem
 
@@ -43,7 +39,7 @@ trait Request extends Connection with ProtoBufConversion {
   def buildRequest(messageType: RiakMessageType): Task[RiakMessage] = buildRequest(messageType, ByteString())
 
   def riakResponseToValidation(resp: RiakResponse): Try[RiakResponse] = {
-    if (resp.messageType == 0)
+    if (RiakMessageType.messageTypeToInt(resp.messageType) == 0)
       scala.util.Failure(new Exception(RpbErrorResp().mergeFrom(resp.message.toArray).errmsg))
     else
       scala.util.Success(resp)

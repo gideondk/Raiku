@@ -1,7 +1,6 @@
 package nl.gideondk.raiku
 
 import akka.actor._
-import commands.RWObject
 import scala.concurrent._
 import scala.concurrent.duration._
 
@@ -20,10 +19,9 @@ class BucketSpec extends Specification {
 
   implicit val timeout = Duration(5, duration.SECONDS)
 
-  implicit val zConverter = new RaikuConverter[Z] {
-    def read(o: RWObject): ReadResult[Z] = Success(Z(o.key, new String(o.value)))
-    def write(bucket: String, o: Z): RWObject = RWObject(bucket, o.id, o.name.getBytes)
-  }
+  implicit val zConverter = RaikuConverter.newConverter(
+    reader = (v: RaikuRWValue) ⇒ Z(v.key, new String(v.data)),
+    writer = (o: Z) ⇒ RaikuRWValue(o.id, o.name.getBytes(), "application/json"))
 
   val bucket = RaikuBucket[Z]("raiku_test_z_bucket", client)
   bucket.setBucketProperties(RaikuBucketProperties(None, Some(true))).copoint
@@ -40,13 +38,14 @@ class BucketSpec extends Specification {
       val obj = Z(newId, "Should also be stored")
 
       val retObj = for {
-        v ← bucket unsafeStoreNew obj
+        v ← bucket << obj
         retObj ← bucket ? obj.id
       } yield {
         retObj
       }
 
-      retObj.copoint.get == obj
+      val res: Z = retObj.copoint.get
+      res == obj
     }
     "create siblings (and fail) when unsafely updating objects" in {
       val newId = java.util.UUID.randomUUID.toString
@@ -54,12 +53,14 @@ class BucketSpec extends Specification {
 
       val retObj = for {
         v ← bucket unsafeStoreNew obj
+        v ← bucket unsafeStoreNew obj
+        v ← bucket unsafeStoreNew obj
         retObj ← bucket ? obj.id
       } yield {
         retObj
       }
 
-      retObj.copoint
+      retObj.run
 
       val updatedObj = for {
         v ← bucket unsafeStoreNew obj
@@ -118,7 +119,8 @@ class BucketSpec extends Specification {
       }
 
       val res = retObj.run
-      res.isSuccess && res.toOption.get == true
+
+      res.isSuccess && res.toOption.get
     }
 
     "be able to delete objects correctly by key" in {
@@ -135,7 +137,7 @@ class BucketSpec extends Specification {
       }
 
       val res = retObj.run
-      res.isSuccess && res.toOption.get == true
+      res.isSuccess && res.toOption.get
     }
 
     "shouldn't be able to fetch multiple deleted objects" in {
@@ -150,7 +152,7 @@ class BucketSpec extends Specification {
       }
 
       val res = retObj.run
-      res.isSuccess && res.toOption.get == true
+      res.isSuccess && res.toOption.get
     }
   }
 }

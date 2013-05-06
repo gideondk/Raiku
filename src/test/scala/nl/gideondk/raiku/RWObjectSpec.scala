@@ -3,7 +3,7 @@ package nl.gideondk.raiku
 // import org.scalatest.FunSuite
 // import org.scalatest.BeforeAndAfter
 import akka.actor._
-import commands.RWObject
+//import commands.RWObject
 import scala.concurrent._
 import scala.concurrent.duration._
 
@@ -14,6 +14,7 @@ import org.specs2.mutable.Specification
 import org.specs2.matcher.Matcher
 
 class RWObjectSpec extends Specification {
+  sequential
 
   implicit val timeout = Duration(5, duration.SECONDS)
   val client = DB.client
@@ -22,29 +23,30 @@ class RWObjectSpec extends Specification {
     "be able to store rw objects into Riak" in {
       val newId = java.util.UUID.randomUUID.toString
 
-      val rwObject = RWObject("raiku_test_bucket", newId, "this should be stored".getBytes)
-      val validation = client.store(rwObject).run
+      val rawObj = RaikuRawValue("raiku_test_bucket", newId, Some("text/plain"), None, None, "this should be stored".getBytes.point[Option], None)
+      // val rwObject = RWObject("raiku_test_bucket", newId, "this should be stored".getBytes.point[Option])
+      val validation = client.store(rawObj).run
       validation.isSuccess
     }
     "return stored items properly" in {
       val newId = java.util.UUID.randomUUID.toString
-      val rwObject = RWObject("raiku_test_bucket", newId, "this should be stored".getBytes)
-      val validation = client.store(rwObject).run
+      val rawObj = RaikuRawValue("raiku_test_bucket", newId, Some("text/plain"), None, None, "this should be stored".getBytes.point[Option], None)
+      val validation = client.store(rawObj).run
 
       val retRWObject = client.fetch("raiku_test_bucket", newId).run
 
-      validation.isSuccess && retRWObject.isSuccess && retRWObject.toOption.get.headOption.isDefined && new String(retRWObject.toOption.get.head.value) == new String(rwObject.value)
+      validation.isSuccess && retRWObject.isSuccess && retRWObject.toOption.get.content.headOption.isDefined && new String(retRWObject.toOption.get.content.head.value.get) == new String(rawObj.value.get)
     }
     "delete object properly" in {
       val newId = java.util.UUID.randomUUID.toString
-      val rwObject = RWObject("raiku_test_bucket", newId, "this should be stored".getBytes)
-      val validation = client.store(rwObject).run
+      val rawObj = RaikuRawValue("raiku_test_bucket", newId, Some("text/plain"), None, None, "this should be stored".getBytes.point[Option], None)
+      val validation = client.store(rawObj).run
 
-      client.delete(rwObject).run
+      client.delete(rawObj).run
 
-      val retRWObject = client.fetch("raiku_test_bucket", newId).run
+      val retRawObj = client.fetch("raiku_test_bucket", newId).run
 
-      validation.isSuccess && retRWObject.isSuccess && !retRWObject.toOption.get.headOption.isDefined
+      validation.isSuccess && retRawObj.isSuccess && !retRawObj.toOption.get.content.headOption.isDefined
     }
     "persist 2i properly" in {
       val newId = java.util.UUID.randomUUID.toString
@@ -52,11 +54,13 @@ class RWObjectSpec extends Specification {
       val orgIdA = java.util.UUID.randomUUID.toString
       val orgIdB = java.util.UUID.randomUUID.toString
 
-      val rwObject = RWObject("raiku_test_bucket", newId, "this should be stored".getBytes, binIndexes = Map("organization_id" -> List(orgIdA, orgIdB)))
-      val validation = client.store(rwObject).run
-      val retRWObject = client.fetch("raiku_test_bucket", newId).run.toOption.get.head
+      val indexes = RaikuIndexes(Map("organization_id" -> Set(orgIdA, orgIdB)), Map[String, Set[Int]]())
+      val rawObj = RaikuRawValue("raiku_test_bucket", newId, Some("text/plain"), None, None, "this should be stored".getBytes.point[Option], Some(RaikuMeta(indexes = indexes)))
 
-      rwObject.binIndexes.get("organization_id").get.sortBy(x ⇒ x) == retRWObject.binIndexes.get("organization_id").get.sortBy(x ⇒ x)
+      val validation = client.store(rawObj, returnBody = Option(true)).run
+      val retRawObject = client.fetch("raiku_test_bucket", newId).run.toOption.get.content.head
+
+      indexes.binary.get("organization_id").get.toList.sortBy(x ⇒ x) == retRawObject.meta.get.indexes.binary("organization_id").toList.sortBy(x ⇒ x)
     }
     "be able to retrieve object by 2i" in {
       val newId = java.util.UUID.randomUUID.toString
@@ -66,12 +70,15 @@ class RWObjectSpec extends Specification {
       val orgIdB = java.util.UUID.randomUUID.toString
       val orgIdC = java.util.UUID.randomUUID.toString
 
-      val rwObjectA = RWObject("raiku_test_bucket", newId, "this should be stored".getBytes, binIndexes = Map("organization_id" -> List(orgIdA, orgIdB)))
-      val rwObjectB = RWObject("raiku_test_bucket", anotherId, "this should be stored".getBytes, binIndexes = Map("organization_id" -> List(orgIdB, orgIdC)))
+      val indexesA = RaikuIndexes(Map("organization_id" -> Set(orgIdA, orgIdB)), Map[String, Set[Int]]())
+      val rawObjA = RaikuRawValue("raiku_test_bucket", newId, Some("text/plain"), None, None, "this should be stored".getBytes.point[Option], Some(RaikuMeta(indexes = indexesA)))
+
+      val indexesB = RaikuIndexes(Map("organization_id" -> Set(orgIdB, orgIdC)), Map[String, Set[Int]]())
+      val rawObjB = RaikuRawValue("raiku_test_bucket", anotherId, Some("text/plain"), None, None, "this should be stored".getBytes.point[Option], Some(RaikuMeta(indexes = indexesB)))
 
       val store = for {
-        _ ← client.store(rwObjectA)
-        _ ← client.store(rwObjectB)
+        _ ← client.store(rawObjA)
+        _ ← client.store(rawObjB)
       } yield ()
 
       store.copoint
@@ -85,5 +92,4 @@ class RWObjectSpec extends Specification {
       keys.toOption.get == (List(newId), List(anotherId))
     }
   }
-
 }

@@ -1,7 +1,7 @@
 package nl.gideondk.raiku
 
 import akka.actor._
-import commands.RWObject
+
 import scala.concurrent._
 import scala.concurrent.duration._
 
@@ -24,16 +24,11 @@ class BucketAdvancedSpec extends Specification with DefaultJsonProtocol {
   implicit val yFormat = jsonFormat4(Y)
   implicit val timeout = Duration(5, duration.SECONDS)
 
-  implicit val yConverter = new RaikuConverter[Y] {
-    def read(o: RWObject): ReadResult[Y] = try {
-      Success(yFormat.read(new String(o.value).asJson))
-    }
-    catch {
-      case e: Throwable ⇒ Failure(e)
-    }
-    def write(bucket: String, o: Y): RWObject = RWObject(bucket, o.id, o.toJson.toString.getBytes,
-      binIndexes = Map("group_id" -> List(o.groupId)), intIndexes = Map("age" -> List(o.age)))
-  }
+  implicit val yConverter = RaikuConverter.newConverter(
+    reader = (v: RaikuRWValue) ⇒ yFormat.read(new String(v.data).asJson),
+    writer = (o: Y) ⇒ RaikuRWValue(o.id, o.toJson.toString.getBytes, "application/json"),
+    binIndexes = (o: Y) ⇒ Map("group_id" -> Set(o.groupId)),
+    intIndexes = (o: Y) ⇒ Map("age" -> Set(o.age)))
 
   val bucket = RaikuBucket[Y]("raiku_test_y_bucket", client)
   bucket.setBucketProperties(RaikuBucketProperties(None, Some(true))).copoint
