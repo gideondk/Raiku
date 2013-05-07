@@ -119,7 +119,6 @@ class BucketSpec extends Specification {
       }
 
       val res = retObj.run
-
       res.isSuccess && res.toOption.get
     }
 

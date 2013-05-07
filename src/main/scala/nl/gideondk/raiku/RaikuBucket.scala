@@ -15,14 +15,15 @@ import spray.json.JsValue
 import shapeless._
 import TypeOperators._
 
+import scala.reflect.ClassTag
+
 case class RaikuBucketProperties(nVal: Option[Int], allowMulti: Option[Boolean])
 
 case class RaikuBucketConfig(r: RArgument = RArgument(), rw: RWArgument = RWArgument(),
                              w: WArgument = WArgument(), pr: PRArgument = PRArgument(), pw: PWArgument = PWArgument(), dw: DWArgument = DWArgument())
 
-case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: RaikuBucketConfig = RaikuBucketConfig(), resolver: RaikuResolver[T] = RaikuResolver.throwConflicts[T], mutator: RaikuMutator[T] = RaikuMutator.clobber[T])(implicit converter: RaikuValueConverter[T]) {
-  type Unboxed = T
-  type Boxed = RaikuValue[T]
+case class RaikuBucket[T: ClassTag](bucketName: String, client: RaikuClient, config: RaikuBucketConfig = RaikuBucketConfig(),
+                                    resolver: RaikuResolver[T] = RaikuResolver.throwConflicts[T], mutator: RaikuMutator[T] = RaikuMutator.clobber[T])(implicit converter: RaikuValueConverter[T]) {
 
   /** Retrieves the bucket properties from the current bucket
    */
@@ -103,22 +104,22 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
    *  @param returnHead returnBody except that the value(s) in the object are blank to avoid returning potentially large value(s)
    */
 
-  def store[A: (Unboxed |∨| Boxed)#λ](o: A,
-                                      r: RArgument = RArgument(),
-                                      pr: PRArgument = PRArgument(),
-                                      basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
-                                      notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-                                      w: WArgument = WArgument(),
-                                      dw: DWArgument = DWArgument(),
-                                      returnBody: ReturnBodyArgument = ReturnBodyArgument(),
-                                      pw: PWArgument = PWArgument(),
-                                      ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
-                                      ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
-                                      returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[Option[RaikuValue[T]]] = {
+  def store[A: (T |∨| RaikuValue[T])#λ](o: A,
+                                        r: RArgument = RArgument(),
+                                        pr: PRArgument = PRArgument(),
+                                        basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+                                        notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
+                                        w: WArgument = WArgument(),
+                                        dw: DWArgument = DWArgument(),
+                                        returnBody: ReturnBodyArgument = ReturnBodyArgument(),
+                                        pw: PWArgument = PWArgument(),
+                                        ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
+                                        ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
+                                        returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[Option[RaikuValue[T]]] = {
     val (nR, pR) = (List(r.v, config.r.v).flatten headOption, List(pr.v, config.pr.v).flatten headOption)
     val obj = o match {
-      case x: Unboxed ⇒ converter.write(bucketName, x)
-      case x: Boxed   ⇒ x
+      case x: T             ⇒ converter.write(bucketName, x)
+      case x: RaikuValue[T] ⇒ x
     }
 
     val fetchResp = client.fetch(bucketName, obj.key, nR, pR, basicQuorum.v, notFoundOk.v, deletedvclock = None)
@@ -132,28 +133,26 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
     }
   }
 
-  def unsafeStoreNew[A: (Unboxed |∨| Boxed)#λ](o: A,
-                                               r: RArgument = RArgument(),
-                                               pr: PRArgument = PRArgument(),
-                                               basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
-                                               notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-                                               w: WArgument = WArgument(),
-                                               dw: DWArgument = DWArgument(),
-                                               returnBody: ReturnBodyArgument = ReturnBodyArgument(),
-                                               pw: PWArgument = PWArgument(),
-                                               ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
-                                               ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
-                                               returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[Option[RaikuValue[T]]] = {
+  def unsafeStoreNew[A: (T |∨| RaikuValue[T])#λ](o: A,
+                                                 r: RArgument = RArgument(),
+                                                 pr: PRArgument = PRArgument(),
+                                                 basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+                                                 notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
+                                                 w: WArgument = WArgument(),
+                                                 dw: DWArgument = DWArgument(),
+                                                 returnBody: ReturnBodyArgument = ReturnBodyArgument(),
+                                                 pw: PWArgument = PWArgument(),
+                                                 ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
+                                                 ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
+                                                 returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[Option[RaikuValue[T]]] = {
     val (nR, pR) = (List(r.v, config.r.v).flatten headOption, List(pr.v, config.pr.v).flatten headOption)
     val obj = o match {
-      case x: Unboxed ⇒ converter.write(bucketName, x)
-      case x: Boxed   ⇒ x
+      case x: T             ⇒ converter.write(bucketName, x)
+      case x: RaikuValue[T] ⇒ x
     }
 
-    val storeObj = converter.writeToRaw(obj)
-
     val (nW, nDw, nPw) = (List(w.v, config.w.v).flatten headOption, List(dw.v, config.dw.v).flatten headOption, List(pw.v, config.pw.v).flatten headOption)
-    client.store(storeObj, nW, nDw, returnBody.v, nPw, None, ifNotModified.v, ifNonMatched.v, returnHead.v).map(_.content.headOption.map(converter.readRaw(_)))
+    client.store(converter.writeToRaw(obj), nW, nDw, returnBody.v, nPw, None, ifNotModified.v, ifNonMatched.v, returnHead.v).map(_.content.headOption.map(converter.readRaw(_)))
   }
 
   /** Stores a List[T] in parallel to the current Raiku bucket
@@ -173,21 +172,21 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
    *  @param returnHead returnBody except that the value(s) in the object are blank to avoid returning potentially large value(s)
    */
 
-  def storeMany[A: (List[Unboxed] |∨| List[Boxed])#λ](objs: A,
-                                                      r: RArgument = RArgument(),
-                                                      pr: PRArgument = PRArgument(),
-                                                      basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
-                                                      notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-                                                      w: WArgument = WArgument(),
-                                                      dw: DWArgument = DWArgument(),
-                                                      returnBody: ReturnBodyArgument = ReturnBodyArgument(),
-                                                      pw: PWArgument = PWArgument(),
-                                                      ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
-                                                      ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
-                                                      returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[List[RaikuValue[T]]] = {
+  def storeMany[A: (List[T] |∨| List[RaikuValue[T]])#λ](objs: A,
+                                                        r: RArgument = RArgument(),
+                                                        pr: PRArgument = PRArgument(),
+                                                        basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+                                                        notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
+                                                        w: WArgument = WArgument(),
+                                                        dw: DWArgument = DWArgument(),
+                                                        returnBody: ReturnBodyArgument = ReturnBodyArgument(),
+                                                        pw: PWArgument = PWArgument(),
+                                                        ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
+                                                        ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
+                                                        returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[List[RaikuValue[T]]] = {
     objs match {
-      case x: List[Unboxed] ⇒ Task.sequenceSuccesses(x.map(store(_, r, pr, basicQuorum, notFoundOk, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead))).map(_.flatten)
-      case x: List[Boxed]   ⇒ Task.sequenceSuccesses(x.map(store(_, r, pr, basicQuorum, notFoundOk, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead))).map(_.flatten)
+      case List(_: T, _*)             ⇒ Task.sequenceSuccesses(objs.asInstanceOf[List[T]].map(store(_, r, pr, basicQuorum, notFoundOk, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead))).map(_.flatten)
+      case List(_: RaikuValue[T], _*) ⇒ Task.sequenceSuccesses(objs.asInstanceOf[List[RaikuValue[T]]].map(store(_, r, pr, basicQuorum, notFoundOk, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead))).map(_.flatten)
     }
   }
 
@@ -203,17 +202,17 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
    *  @param dw how many replicas to commit to durable storage before returning a successful response;
    */
 
-  def delete[A: (Unboxed |∨| Boxed)#λ](o: A,
-                                       rw: RWArgument = RWArgument(),
-                                       vClock: VClockArgument = VClockArgument(),
-                                       r: RArgument = RArgument(),
-                                       w: WArgument = WArgument(),
-                                       pr: PRArgument = PRArgument(),
-                                       pw: PWArgument = PWArgument(),
-                                       dw: DWArgument = DWArgument()): Task[Unit] = {
+  def delete[A: (T |∨| RaikuValue[T])#λ](o: A,
+                                         rw: RWArgument = RWArgument(),
+                                         vClock: VClockArgument = VClockArgument(),
+                                         r: RArgument = RArgument(),
+                                         w: WArgument = WArgument(),
+                                         pr: PRArgument = PRArgument(),
+                                         pw: PWArgument = PWArgument(),
+                                         dw: DWArgument = DWArgument()): Task[Unit] = {
     val obj = o match {
-      case x: Unboxed ⇒ converter.write(bucketName, x)
-      case x: Boxed   ⇒ x
+      case x: T             ⇒ converter.write(bucketName, x)
+      case x: RaikuValue[T] ⇒ x
     }
 
     val (nRw, nR, nW, nPr, nPw, nDw) = (List(rw.v, config.rw.v).flatten headOption, List(r.v, config.r.v).flatten headOption, List(w.v, config.w.v).flatten headOption,
@@ -245,17 +244,17 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
    *  @param dw how many replicas to commit to durable storage before returning a successful response;
    */
 
-  def deleteMany[A: (List[Unboxed] |∨| List[Boxed])#λ](objs: A,
-                                                       rw: RWArgument = RWArgument(),
-                                                       r: RArgument = RArgument(),
-                                                       w: WArgument = WArgument(),
-                                                       pr: PRArgument = PRArgument(),
-                                                       pw: PWArgument = PWArgument(),
-                                                       dw: DWArgument = DWArgument()): Task[List[Unit]] = {
+  def deleteMany[A: (List[T] |∨| List[RaikuValue[T]])#λ](objs: A,
+                                                         rw: RWArgument = RWArgument(),
+                                                         r: RArgument = RArgument(),
+                                                         w: WArgument = WArgument(),
+                                                         pr: PRArgument = PRArgument(),
+                                                         pw: PWArgument = PWArgument(),
+                                                         dw: DWArgument = DWArgument()): Task[List[Unit]] = {
 
     objs match {
-      case x: List[Unboxed] ⇒ Task.sequenceSuccesses(x.map(delete(_, rw, VClockArgument(None), r, w, pr, pw, dw)))
-      case x: List[Boxed]   ⇒ Task.sequenceSuccesses(x.map(delete(_, rw, VClockArgument(None), r, w, pr, pw, dw)))
+      case List(_: T, _*)             ⇒ Task.sequenceSuccesses(objs.asInstanceOf[List[T]].map(delete(_, rw, VClockArgument(None), r, w, pr, pw, dw)))
+      case List(_: RaikuValue[T], _*) ⇒ Task.sequenceSuccesses(objs.asInstanceOf[List[RaikuValue[T]]].map(delete(_, rw, VClockArgument(None), r, w, pr, pw, dw)))
     }
   }
 
@@ -324,60 +323,60 @@ case class RaikuBucket[T](bucketName: String, client: RaikuClient, config: Raiku
   /** @see store
    */
 
-  def <<[A: (Unboxed |∨| Boxed)#λ](obj: A,
-                                   r: RArgument = RArgument(),
-                                   pr: PRArgument = PRArgument(),
-                                   basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
-                                   notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-                                   w: WArgument = WArgument(),
-                                   dw: DWArgument = DWArgument(),
-                                   returnBody: ReturnBodyArgument = ReturnBodyArgument(),
-                                   pw: PWArgument = PWArgument(),
-                                   ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
-                                   ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
-                                   returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[Option[RaikuValue[T]]] =
+  def <<[A: (T |∨| RaikuValue[T])#λ](obj: A,
+                                     r: RArgument = RArgument(),
+                                     pr: PRArgument = PRArgument(),
+                                     basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+                                     notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
+                                     w: WArgument = WArgument(),
+                                     dw: DWArgument = DWArgument(),
+                                     returnBody: ReturnBodyArgument = ReturnBodyArgument(),
+                                     pw: PWArgument = PWArgument(),
+                                     ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
+                                     ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
+                                     returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[Option[RaikuValue[T]]] =
     store(obj, r, pr, basicQuorum, notFoundOk, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead)
 
   /** @see storeMany
    */
 
-  def <<*[A: (List[Unboxed] |∨| List[Boxed])#λ](objs: A,
-                                                r: RArgument = RArgument(),
-                                                pr: PRArgument = PRArgument(),
-                                                basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
-                                                notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
-                                                w: WArgument = WArgument(),
-                                                dw: DWArgument = DWArgument(),
-                                                returnBody: ReturnBodyArgument = ReturnBodyArgument(),
-                                                pw: PWArgument = PWArgument(),
-                                                ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
-                                                ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
-                                                returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[List[RaikuValue[T]]] =
+  def <<*[A: (List[T] |∨| List[RaikuValue[T]])#λ](objs: A,
+                                                  r: RArgument = RArgument(),
+                                                  pr: PRArgument = PRArgument(),
+                                                  basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+                                                  notFoundOk: NotFoundOkArgument = NotFoundOkArgument(),
+                                                  w: WArgument = WArgument(),
+                                                  dw: DWArgument = DWArgument(),
+                                                  returnBody: ReturnBodyArgument = ReturnBodyArgument(),
+                                                  pw: PWArgument = PWArgument(),
+                                                  ifNotModified: IfNotModifiedArgument = IfNotModifiedArgument(),
+                                                  ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
+                                                  returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[List[RaikuValue[T]]] =
     storeMany(objs, r, pr, basicQuorum, notFoundOk, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead)
 
   /** @see delete
    */
 
-  def -[A: (Unboxed |∨| Boxed)#λ](obj: A,
-                                  rw: RWArgument = RWArgument(),
-                                  vClock: VClockArgument = VClockArgument(),
-                                  r: RArgument = RArgument(),
-                                  w: WArgument = WArgument(),
-                                  pr: PRArgument = PRArgument(),
-                                  pw: PWArgument = PWArgument(),
-                                  dw: DWArgument = DWArgument()): Task[Unit] =
+  def -[A: (T |∨| RaikuValue[T])#λ](obj: A,
+                                    rw: RWArgument = RWArgument(),
+                                    vClock: VClockArgument = VClockArgument(),
+                                    r: RArgument = RArgument(),
+                                    w: WArgument = WArgument(),
+                                    pr: PRArgument = PRArgument(),
+                                    pw: PWArgument = PWArgument(),
+                                    dw: DWArgument = DWArgument()): Task[Unit] =
     delete(obj, rw, vClock, r, w, pr, pw, dw)
 
   /** @see deleteMany
    */
 
-  def -*[A: (List[Unboxed] |∨| List[Boxed])#λ](objs: A,
-                                               rw: RWArgument = RWArgument(),
-                                               r: RArgument = RArgument(),
-                                               w: WArgument = WArgument(),
-                                               pr: PRArgument = PRArgument(),
-                                               pw: PWArgument = PWArgument(),
-                                               dw: DWArgument = DWArgument()): Task[List[Unit]] =
+  def -*[A: (List[T] |∨| List[RaikuValue[T]])#λ](objs: A,
+                                                 rw: RWArgument = RWArgument(),
+                                                 r: RArgument = RArgument(),
+                                                 w: WArgument = WArgument(),
+                                                 pr: PRArgument = PRArgument(),
+                                                 pw: PWArgument = PWArgument(),
+                                                 dw: DWArgument = DWArgument()): Task[List[Unit]] =
     deleteMany(objs, rw, r, w, pr, pw, dw)
 
   /** @see fetchKeysForBinIndexByValue

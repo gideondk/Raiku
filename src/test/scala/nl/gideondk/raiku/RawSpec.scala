@@ -13,7 +13,7 @@ import Scalaz._
 import org.specs2.mutable.Specification
 import org.specs2.matcher.Matcher
 
-class RWObjectSpec extends Specification {
+class RawSpec extends Specification {
   sequential
 
   implicit val timeout = Duration(5, duration.SECONDS)
