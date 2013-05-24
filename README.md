@@ -50,11 +50,11 @@ You are free to use any value serialisation method available, but I recommended 
 Values returned from a `RaikuBucket` are of a `RaikuValue[T]` type. RaikuValue wraps the raw converted type into a *container* without losing any of the information present in the RaikuRawValue.
 To retain the actual value of type `T` from the RaikuValue, a *value* property is available, containing the optional value of `T` (for cases where only the head was fetched from Riak).
 
-In the package object of Raiku, a implicit function `unwrapRaikuValue` is available, which makes it able to use RaikuValue[T] as a normal `T` anywhere in your code (while throwing a exception when the value isn't available).
+In the package object of Raiku, a implicit function `unwrapRaikuValue` is available, which makes it able to use `RaikuValue[T]` as a normal `T` anywhere in your code (while throwing a exception when the value isn't available).
 
 All operations return a value in a Task. Task combines a `Try`, `Future` and `IO` Monad into one type: exceptions will be caught in the Try, all async actions are abstracted into a future monad and all IO actions are as pure as possible by using the Scalaz IO monad.
 
-You can use `run` to expose the Future, or use zstart(d: Duration)` to perform IO and wait (blocking) on the future.
+You can use `run` to expose the Future, or use `start(d: Duration)` to perform IO and wait (blocking) on the future.
 Because `Task` is both a Monad as a Comonad, it's also possible to use (Scalaz powered) comonadic operations on Task:
 
 ```scala
@@ -101,13 +101,13 @@ val client = RaikuClient("localhost", 8087, 4)
 
 **Create a converter:**
 ```scala
- implicit val yFormat = jsonFormat4(Y)
+implicit val yFormat = jsonFormat4(Y)
 
- implicit val yConverter = RaikuConverter.newConverter(
-   reader = (v: RaikuRWValue) ⇒ yFormat.read(new String(v.data).asJson),
-   writer = (o: Y) ⇒ RaikuRWValue(o.id, o.toJson.toString.getBytes, "application/json"),
-   binIndexes = (o: Y) ⇒ Map("group_id" -> Set(o.groupId)),
-   intIndexes = (o: Y) ⇒ Map("age" -> Set(o.age)))
+implicit val yConverter = RaikuConverter.newConverter(
+  reader = (v: RaikuRWValue) ⇒ yFormat.read(new String(v.data).asJson),
+  writer = (o: Y) ⇒ RaikuRWValue(o.id, o.toJson.toString.getBytes, "application/json"),
+  binIndexes = (o: Y) ⇒ Map("group_id" -> Set(o.groupId)),
+  intIndexes = (o: Y) ⇒ Map("age" -> Set(o.age)))
 ```
 
 **Finally, create the bucket:**
@@ -153,7 +153,7 @@ persons -* 	 List(Person("Basho", 42, "Japan"), Person("Shiki", 52, "Japan"))
 
 **Querying objects based on 2i**
 ```scala
-persons idx 	("age", 42)
+persons idx  ("age", 42)
 persons idx	 ("country", "Japan")
 persons idx	 ("age", 39 to 50)
 ```
@@ -221,10 +221,10 @@ Iteratee.fold(0) { (result, chunk) ⇒ result + 1 }
 ```
 
 ## Monadic behavior
-You can use the monadic behavior of <code>ValidatedFutureIO[T]</code> to combine multiple requests:
+You can use the monadic behavior of <code>Task[RaikuValue[T]]</code> to combine multiple requests:
 
 ```scala
-val objs: ValidatedFutureIO[List[Person]] = for {
+val objs: Task[List[RaikuValue[Person]]] = for {
 	keys <- persons idx ("age", 39 to 50)
 	objs <- persons ?* keys
 } yield objs
@@ -241,7 +241,7 @@ Or if you want to run queries in parrallel:
 ```scala
 val storePersons = persons <<* perObjs
 val storeCountries = countries <<* countryObjs
-ValidatedFutureIO.sequence(List(storePersons, storeCountries))
+Task.sequenceSuccesses(List(storePersons, storeCountries))
 ```
 
 
