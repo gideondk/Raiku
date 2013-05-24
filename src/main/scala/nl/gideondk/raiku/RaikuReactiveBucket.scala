@@ -1,6 +1,5 @@
 package nl.gideondk.raiku
 
-import monads.ValidatedFutureIO
 import scalaz._
 import Scalaz._
 import effect._

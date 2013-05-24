@@ -18,18 +18,20 @@ class RiakMessageStage extends PipelineStage[HasByteOrder, RiakCommand, ByteStri
   def apply(ctx: HasByteOrder) = new PipePair[RiakCommand, ByteString, RiakResponse, ByteString] {
     implicit val byteOrder = ctx.byteOrder
 
-    override val commandPipeline = { msg: RiakCommand ⇒
-      val bsb = new ByteStringBuilder
-      bsb.putByte(RiakMessageType.messageTypeToInt(msg.messageType).toByte)
-      bsb ++= msg.message
-      ctx.singleCommand(bsb.result)
+    override val commandPipeline = {
+      msg: RiakCommand ⇒
+        val bsb = new ByteStringBuilder
+        bsb.putByte(RiakMessageType.messageTypeToInt(msg.messageType).toByte)
+        bsb ++= msg.message
+        ctx.singleCommand(bsb.result)
     }
 
-    override val eventPipeline = { bs: ByteString ⇒
-      val bi = bs.iterator
-      val messageType = bi.getByte
-      val message = bi.toByteString
-      ctx.singleEvent(RiakResponse(RiakMessageType.intToMessageType(messageType.toInt), message))
+    override val eventPipeline = {
+      bs: ByteString ⇒
+        val bi = bs.iterator
+        val messageType = bi.getByte
+        val message = bi.toByteString
+        ctx.singleEvent(RiakResponse(RiakMessageType.intToMessageType(messageType.toInt), message))
     }
   }
 }

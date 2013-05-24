@@ -80,7 +80,7 @@ class BucketAdvancedSpec extends Specification with DefaultJsonProtocol {
       res._1.contains(newId) && res._1.contains(secId) && res._2.contains(newId) && !res._2.contains(secId) && !res._3.contains(newId) && res._3.contains(secId)
     }
 
-    "be able to use Scalaz functionality on ValidatedIOFutures" in {
+    "be able to use Scalaz functionality on Tasks" in {
       val newId = java.util.UUID.randomUUID.toString
       val secId = java.util.UUID.randomUUID.toString
       val groupId = java.util.UUID.randomUUID.toString
