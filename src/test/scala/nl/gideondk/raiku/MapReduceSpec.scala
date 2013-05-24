@@ -19,22 +19,13 @@ import Traversables._
 import scala.concurrent._
 import scala.concurrent.duration._
 
-class MapReduceSpec extends Specification with DefaultJsonProtocol {
+class MapReduceSpec extends RaikuSpec {
   import nl.gideondk.raiku.mapreduce.MapReduceJsonProtocol._
+  import TestModels._
+
   sequential
 
   def typed[T](t: ⇒ T) {}
-
-  val client = DB.client
-
-  implicit val yFormat = jsonFormat4(Y)
-  implicit val timeout = Duration(60, scala.concurrent.duration.SECONDS)
-
-  implicit val yConverter = RaikuConverter.newConverter(
-    reader = (v: RaikuRWValue) ⇒ yFormat.read(new String(v.data).asJson),
-    writer = (o: Y) ⇒ RaikuRWValue(o.id, o.toJson.toString.getBytes, "application/json"),
-    binIndexes = (o: Y) ⇒ Map("group_id" -> Set(o.groupId)),
-    intIndexes = (o: Y) ⇒ Map("age" -> Set(o.age)))
 
   val bucket = RaikuBucket[Y]("raiku_test_z_bucket_"+java.util.UUID.randomUUID.toString, client)
 
@@ -77,6 +68,7 @@ class MapReduceSpec extends Specification with DefaultJsonProtocol {
       val phases = mrJob.phases
 
       val r = (client mapReduce mrJob).copoint
+
       r._1.length == n && r._2(0) == JsNumber(n)
     }
   }

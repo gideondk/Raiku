@@ -12,16 +12,8 @@ import org.specs2.matcher.Matcher
 
 import scala.util.{ Success, Failure }
 
-case class Z(id: String, name: String)
-
-class BucketSpec extends Specification {
-  val client = DB.client
-
-  implicit val timeout = Duration(5, duration.SECONDS)
-
-  implicit val zConverter = RaikuConverter.newConverter(
-    reader = (v: RaikuRWValue) ⇒ Z(v.key, new String(v.data)),
-    writer = (o: Z) ⇒ RaikuRWValue(o.id, o.name.getBytes(), "application/json"))
+class BucketSpec extends RaikuSpec {
+  import TestModels._
 
   val bucket = RaikuBucket[Z]("raiku_test_z_bucket", client)
   bucket.setBucketProperties(RaikuBucketProperties(None, Some(true))).copoint

@@ -15,20 +15,8 @@ import org.specs2.matcher.Matcher
 
 import scala.util.{ Success, Failure }
 
-case class Y(id: String, name: String, age: Int, groupId: String)
-
-class BucketAdvancedSpec extends Specification with DefaultJsonProtocol {
-
-  val client = DB.client
-
-  implicit val yFormat = jsonFormat4(Y)
-  implicit val timeout = Duration(5, duration.SECONDS)
-
-  implicit val yConverter = RaikuConverter.newConverter(
-    reader = (v: RaikuRWValue) ⇒ yFormat.read(new String(v.data).asJson),
-    writer = (o: Y) ⇒ RaikuRWValue(o.id, o.toJson.toString.getBytes, "application/json"),
-    binIndexes = (o: Y) ⇒ Map("group_id" -> Set(o.groupId)),
-    intIndexes = (o: Y) ⇒ Map("age" -> Set(o.age)))
+class BucketAdvancedSpec extends RaikuSpec {
+  import TestModels._
 
   val bucket = RaikuBucket[Y]("raiku_test_y_bucket", client)
   bucket.setBucketProperties(RaikuBucketProperties(None, Some(true))).copoint

@@ -13,21 +13,20 @@ import Scalaz._
 import org.specs2.mutable.Specification
 import org.specs2.matcher.Matcher
 
-class RawSpec extends Specification {
+class RawSpec extends RaikuSpec {
   sequential
 
-  implicit val timeout = Duration(5, duration.SECONDS)
-  val client = DB.client
+  import TestModels._
 
   "A client" should {
     "be able to store rw objects into Riak" in {
       val newId = java.util.UUID.randomUUID.toString
 
       val rawObj = RaikuRawValue("raiku_test_bucket", newId, Some("text/plain"), None, None, "this should be stored".getBytes.point[Option], None)
-      // val rwObject = RWObject("raiku_test_bucket", newId, "this should be stored".getBytes.point[Option])
       val validation = client.store(rawObj).run
       validation.isSuccess
     }
+
     "return stored items properly" in {
       val newId = java.util.UUID.randomUUID.toString
       val rawObj = RaikuRawValue("raiku_test_bucket", newId, Some("text/plain"), None, None, "this should be stored".getBytes.point[Option], None)
