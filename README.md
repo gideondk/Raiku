@@ -50,17 +50,11 @@ You are free to use any value serialisation method available, but I recommended 
 Values returned from a `RaikuBucket` are of a `RaikuValue[T]` type. RaikuValue wraps the raw converted type into a *container* without losing any of the information present in the RaikuRawValue.
 To retain the actual value of type `T` from the RaikuValue, a *value* property is available, containing the optional value of `T` (for cases where only the head was fetched from Riak).
 
-In the package object of Raiku, a implicit function `unwrapRaikuValue` is available, which makes it able to use `RaikuValue[T]` as a normal `T` anywhere in your code (while throwing a exception when the value isn't available).
+In the package object of Raiku, a implicit function `unwrapRaikuValue` is available and combined with some `shapeless` magic, Raiku makes you able to use `RaikuValue[T]` as a normal `T` anywhere in your code (while throwing a exception when the value isn't available) and is able to handle both boxed as unboxed `T` values using the same functions.
 
 All operations return a value in a Task. Task combines a `Try`, `Future` and `IO` Monad into one type: exceptions will be caught in the Try, all async actions are abstracted into a future monad and all IO actions are as pure as possible by using the Scalaz IO monad.
 
 You can use `run` to expose the Future, or use `start(d: Duration)` to perform IO and wait (blocking) on the future.
-Because `Task` is both a Monad as a Comonad, it's also possible to use (Scalaz powered) comonadic operations on Task:
-
-```scala
-	val a: Task[Int] = 2.point[Task] 
-	val b: Int = a.copoint
-```
 
 For more information about the inner workings of Raiku, a blog post is available through the LAB050 site: [The anatomy of Raiku](http://lab050.com/blog/2013/3/6/the-anatomy-of-raiku-a-akka-based-riak-client) (will be updated soon with the newer sentinel based inner workings)
 
@@ -79,6 +73,7 @@ to your SBT configuration and adding the `SNAPSHOT` to your library dependencies
 ```scala
 libraryDependencies ++= Seq(
 	"nl.gideondk" %% "raiku" % "0.4.0"
+)
 ````
 
 ### Play Framework 2.0
@@ -220,7 +215,7 @@ Enumeratee.filter(_.isDefined) &> Enumeratee.map(x ⇒ x.get) &> bucket.deleteEn
 Iteratee.fold(0) { (result, chunk) ⇒ result + 1 }
 ```
 
-## Monadic behavior
+## (co)Monadic behavior
 You can use the monadic behavior of <code>Task[RaikuValue[T]]</code> to combine multiple requests:
 
 ```scala
@@ -244,6 +239,12 @@ val storeCountries = countries <<* countryObjs
 Task.sequenceSuccesses(List(storePersons, storeCountries))
 ```
 
+Because `Task` is both a Monad as a Comonad, it's also possible to use (Scalaz powered) comonadic operations on Task:
+
+```scala
+val a: Task[Int] = 2.point[Task] 
+val b: Int = a.copoint
+```
 
 ## Credits
 
