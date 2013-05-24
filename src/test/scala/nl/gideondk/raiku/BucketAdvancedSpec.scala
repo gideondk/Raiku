@@ -1,42 +1,24 @@
 package nl.gideondk.raiku
 
 import akka.actor._
-import commands.RWObject
+
 import scala.concurrent._
 import scala.concurrent.duration._
 
 import scalaz._
 import Scalaz._
 
-import scalaz._
-import Scalaz._
-
 import spray.json._
 
-import org.specs2.mutable.Specification
-import org.specs2.matcher.Matcher
+import org.specs2.mutable._
 
-case class Y(id: String, name: String, age: Int, groupId: String)
+import scala.util.{ Success, Failure }
 
-class BucketAdvancedSpec extends Specification with DefaultJsonProtocol {
-
-  val client = DB.client
-
-  implicit val yFormat = jsonFormat4(Y)
-
-  implicit val yConverter = new RaikuConverter[Y] {
-    def read(o: RWObject): ReadResult[Y] = try {
-      yFormat.read(new String(o.value).asJson).success
-    }
-    catch {
-      case e: Throwable ⇒ e.failure
-    }
-    def write(bucket: String, o: Y): RWObject = RWObject(bucket, o.id, o.toJson.toString.getBytes,
-      binIndexes = Map("group_id" -> List(o.groupId)), intIndexes = Map("age" -> List(o.age)))
-  }
+class BucketAdvancedSpec extends RaikuSpec {
+  import TestModels._
 
   val bucket = RaikuBucket[Y]("raiku_test_y_bucket", client)
-  bucket.setBucketProperties(RaikuBucketProperties(None, Some(true))).unsafeFulFill
+  bucket.setBucketProperties(RaikuBucketProperties(None, Some(true))).copoint
 
   "A bucket" should {
     "be able to retrieve objects with their binary 2i" in {
@@ -49,8 +31,9 @@ class BucketAdvancedSpec extends Specification with DefaultJsonProtocol {
         idxf ← bucket idx ("group_id", groupId)
       } yield idxf
 
-      val res = key.unsafeFulFill
-      assert(res.isSuccess && res.toOption.get.length == 1 && res.toOption.get.head == newId)
+      val res = key.copoint
+      res must have length 1
+      res.head must beEqualTo(newId)
     }
     "be able to retrieve objects with their integeral 2i" in {
       val newId = java.util.UUID.randomUUID.toString
@@ -62,8 +45,9 @@ class BucketAdvancedSpec extends Specification with DefaultJsonProtocol {
         idxf ← bucket idx ("age", 41)
       } yield idxf
 
-      val res = keys.unsafeFulFill
-      res.toOption.get.contains(newId)
+      val res = keys.copoint
+
+      res must contain(newId)
     }
     "be able to retrieve objects with ranges on a integeral 2i" in {
       val newId = java.util.UUID.randomUUID.toString
@@ -81,11 +65,19 @@ class BucketAdvancedSpec extends Specification with DefaultJsonProtocol {
         shiki ← bucket idx ("age", 50 to 60)
       } yield (all, basho, shiki)
 
-      val res = keys.unsafeFulFill.toOption.get
-      res._1.contains(newId) && res._1.contains(secId) && res._2.contains(newId) && !res._2.contains(secId) && !res._3.contains(newId) && res._3.contains(secId)
+      val res = keys.copoint
+
+      res._1 must contain(newId)
+      res._1 must contain(secId)
+
+      res._2 must contain(newId)
+      res._2 must not contain (secId)
+
+      res._3 must not contain (newId)
+      res._3 must contain(secId)
     }
 
-    "be able to use Scalaz functionality on ValidatedIOFutures" in {
+    "be able to use Scalaz functionality on Tasks" in {
       val newId = java.util.UUID.randomUUID.toString
       val secId = java.util.UUID.randomUUID.toString
       val groupId = java.util.UUID.randomUUID.toString
@@ -99,8 +91,8 @@ class BucketAdvancedSpec extends Specification with DefaultJsonProtocol {
         all ← bucket idx ("age", 40 to 60) >>= ((x: List[String]) ⇒ bucket ?* x)
       } yield (all)
 
-      val res = all.unsafeFulFill
-      res.isSuccess
+      val res = all.run
+      res.isSuccess must beTrue
     }
   }
 

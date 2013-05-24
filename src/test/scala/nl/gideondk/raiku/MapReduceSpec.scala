@@ -1,42 +1,34 @@
 package nl.gideondk.raiku
 
-import commands.RWObject
 import mapreduce._
-import scalaz._
-import scala.concurrent.Await
-import Scalaz._
-import spray.json._
-import org.specs2.mutable.Specification
-import akka.actor.ActorSystem
-import scala.concurrent.Future
-import scala.util.Random
-import play.api.libs.iteratee.{ Enumerator, Iteratee }
 
 import shapeless._
 import HList._
 import Typeable._
 import Traversables._
 
-class MapReduceSpec extends Specification with DefaultJsonProtocol {
+import scala.concurrent._
+import scala.concurrent.duration._
+
+import scalaz._
+import scala.concurrent.Await
+import Scalaz._
+import spray.json._
+
+import akka.actor.ActorSystem
+import scala.concurrent.Future
+import scala.util.Random
+import play.api.libs.iteratee.{ Enumerator, Iteratee }
+
+import org.specs2.mutable._
+
+class MapReduceSpec extends RaikuSpec {
   import nl.gideondk.raiku.mapreduce.MapReduceJsonProtocol._
+  import TestModels._
+
   sequential
 
   def typed[T](t: ⇒ T) {}
-
-  val client = DB.client
-
-  implicit val yFormat = jsonFormat4(Y)
-
-  implicit val yConverter = new RaikuConverter[Y] {
-    def read(o: RWObject): ReadResult[Y] = try {
-      yFormat.read(new String(o.value).asJson).success
-    }
-    catch {
-      case e: Throwable ⇒ e.failure
-    }
-    def write(bucket: String, o: Y): RWObject = RWObject(bucket, o.id, o.toJson.toString.getBytes,
-      binIndexes = Map("group_id" -> List(o.groupId)), intIndexes = Map("age" -> List(o.age)))
-  }
 
   val bucket = RaikuBucket[Y]("raiku_test_z_bucket_"+java.util.UUID.randomUUID.toString, client)
 
@@ -46,7 +38,7 @@ class MapReduceSpec extends Specification with DefaultJsonProtocol {
   val n = 5000
   val rnd = new scala.util.Random
   val vec = List.fill(n)(Y.apply(java.util.UUID.randomUUID.toString, "NAME", rnd.nextInt(99), Random.shuffle(groupIds).head))
-  (bucket <<* vec).unsafeFulFill(duration)
+  (bucket <<* vec).copoint
 
   "A map reduce phases" should {
     "be build correctly" in {
@@ -78,10 +70,10 @@ class MapReduceSpec extends Specification with DefaultJsonProtocol {
       val mrJob = MR.bucket(bucket.bucketName) |>> mapToNumber >=> reduceSum
       val phases = mrJob.phases
 
-      val res = (client mapReduce mrJob).unsafeFulFill(duration) match {
-        case Failure(e) ⇒ throw e
-        case Success(r) ⇒ r._1.length == n && r._2(0) == JsNumber(n)
-      }
+      val r = (client mapReduce mrJob).copoint
+
+      r._1 must have size n
+      r._2(0) must beEqualTo(JsNumber(n))
     }
   }
 
@@ -94,10 +86,9 @@ class MapReduceSpec extends Specification with DefaultJsonProtocol {
       val mrJob = MR.items(Set((bucket.bucketName, vec(0).id), (bucket.bucketName, vec(1).id))) |>> mapToNumber >=> reduceSum
       val phases = mrJob.phases
 
-      val res = (client mapReduce mrJob).unsafeFulFill(duration) match {
-        case Failure(e) ⇒ throw e
-        case Success(r) ⇒ r._1.length == 2 && r._2(0) == JsNumber(2)
-      }
+      val r = (client mapReduce mrJob).copoint
+      r._1 must have size 2
+      r._2(0) must beEqualTo(JsNumber(2))
     }
   }
 
@@ -112,10 +103,10 @@ class MapReduceSpec extends Specification with DefaultJsonProtocol {
 
       val correctItems = vec.filter(_.groupId == groupIds(0))
 
-      val res = (client mapReduce mrJob).unsafeFulFill(duration) match {
-        case Failure(e) ⇒ throw e
-        case Success(r) ⇒ r._1.length == correctItems.length && r._2(0) == JsNumber(correctItems.length)
-      }
+      val r = (client mapReduce mrJob).copoint
+
+      r._1 must have size correctItems.length
+      r._2(0) must beEqualTo(JsNumber(correctItems.length))
     }
 
     "return the correct results for int indexes" in {
@@ -128,10 +119,10 @@ class MapReduceSpec extends Specification with DefaultJsonProtocol {
 
       val correctItems = vec.filter(_.age == 22)
 
-      val res = (client mapReduce mrJob).unsafeFulFill(duration) match {
-        case Failure(e) ⇒ throw e
-        case Success(r) ⇒ r._1.length == correctItems.length && r._2(0) == JsNumber(correctItems.length)
-      }
+      val r = (client mapReduce mrJob).copoint
+
+      r._1 must have size correctItems.length
+      r._2(0) must beEqualTo(JsNumber(correctItems.length))
     }
 
     "return the correct results for range indexes" in {
@@ -144,10 +135,9 @@ class MapReduceSpec extends Specification with DefaultJsonProtocol {
 
       val correctItems = vec.filter(x ⇒ x.age >= 50 && x.age <= 70)
 
-      val res = (client mapReduce mrJob).unsafeFulFill(duration) match {
-        case Failure(e) ⇒ throw e
-        case Success(r) ⇒ r._1.length == correctItems.length && r._2(0) == JsNumber(correctItems.length)
-      }
+      val r = (client mapReduce mrJob).copoint
+      r._1 must have size correctItems.length
+      r._2(0) must beEqualTo(JsNumber(correctItems.length))
     }
   }
 }

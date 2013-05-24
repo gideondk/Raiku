@@ -2,16 +2,17 @@ package nl.gideondk
 
 import raiku.commands._
 import raiku.serialization._
-import raiku.monads.{ ValidatedFuture, ValidatedFutureIO }
 import scalaz._
 import Scalaz._
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scalaz.Success
 import scalaz.Failure
 import scala.Some
 
 package object raiku {
+  type Task[T] = nl.gideondk.sentinel.Task[T]
+  val Task = nl.gideondk.sentinel.Task
+
   implicit def stringToVClock(s: String): VClock = VClock(s.getBytes)
 
   implicit def intToRArgument(i: Int): RArgument = RArgument(Option(i))
@@ -36,31 +37,5 @@ package object raiku {
 
   implicit def vclockToVClockArgument(v: VClock): VClockArgument = VClockArgument(Option(v))
 
-  implicit def ValidatedFutureIORWListToValidatedFutureIOOptT[T](v: ValidatedFutureIO[List[RWObject]])(implicit converter: RaikuConverter[T]): ValidatedFutureIO[Option[T]] = {
-    ValidatedFutureIO(v.run.map {
-      x ⇒
-        ValidatedFuture(x.run.map { v ⇒
-          v match {
-            case Success(List(obj)) ⇒ converter.read(obj).map(_.some)
-            case Success(List())    ⇒ none.success[Throwable]
-            case Success(List(_*))  ⇒ new Exception("There were siblings").failure[Option[T]]
-            case Failure(fail)      ⇒ fail.failure[Option[T]]
-          }
-        })
-    })
-  }
-
-  implicit def ValidatedFutureIORWListToValidatedFutureIOOptRW(v: ValidatedFutureIO[List[RWObject]]): ValidatedFutureIO[Option[RWObject]] = {
-    ValidatedFutureIO(v.run.map {
-      x ⇒
-        ValidatedFuture(x.run.map { v ⇒
-          v match {
-            case Success(List(obj)) ⇒ Some(obj).success
-            case Success(List())    ⇒ none.success[Throwable]
-            case Success(List(_*))  ⇒ new Exception("There were siblings").failure[Option[RWObject]]
-            case Failure(fail)      ⇒ fail.failure[Option[RWObject]]
-          }
-        })
-    })
-  }
+  implicit def unwrapRaikuValue[T](rv: RaikuValue[T]): T = rv.value.getOrElse(throw new Exception("Only object Meta is available."))
 }

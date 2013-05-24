@@ -1,7 +1,7 @@
 package nl.gideondk.raiku
 
 import akka.actor._
-import commands.RWObject
+//import commands.RWObject
 import scala.concurrent._
 import scala.concurrent.duration._
 
@@ -18,23 +18,9 @@ import play.api.libs.iteratee._
 import org.specs2.mutable.Specification
 import org.specs2.matcher.Matcher
 
-class ReactiveBucketSpec extends Specification with DefaultJsonProtocol {
+class ReactiveBucketSpec extends RaikuSpec {
+  import TestModels._
   sequential
-
-  val client = DB.client
-
-  implicit val yFormat = jsonFormat4(Y)
-
-  implicit val yConverter = new RaikuConverter[Y] {
-    def read(o: RWObject): ReadResult[Y] = try {
-      yFormat.read(new String(o.value).asJson).success
-    }
-    catch {
-      case e: Throwable ⇒ e.failure
-    }
-    def write(bucket: String, o: Y): RWObject = RWObject(bucket, o.id, o.toJson.toString.getBytes,
-      binIndexes = Map("group_id" -> List(o.groupId)), intIndexes = Map("age" -> List(o.age)))
-  }
 
   val bucket = RaikuReactiveBucket[Y]("raiku_test_y_bucket_"+java.util.UUID.randomUUID.toString, client)
 
