@@ -34,6 +34,8 @@ Until version 1.0, the API of the client can and will change over versions, but 
 
 **The following is currently missing in the client, but will be added soon:**
 
+* More solid, better reactive implementation;
+* Additional documentation for specific use cases;
 * Link walking;
 * Search support.
 
