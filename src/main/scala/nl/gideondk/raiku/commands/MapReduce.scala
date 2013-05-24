@@ -1,34 +1,29 @@
 package nl.gideondk.raiku.commands
 
+import nl.gideondk.raiku.mapreduce._
+import nl.gideondk.raiku.mapreduce.MapReduceJsonProtocol._
+import nl.gideondk.raiku.serialization.ProtoBufConversion
+
+import nl.gideondk.sentinel.client._
+import nl.gideondk.sentinel.Task
+
 import com.basho.riak.protobuf._
 import spray.json._
 
 import play.api.libs.iteratee._
 import scala.concurrent.Future
 
-import nl.gideondk.raiku.mapreduce._
-import nl.gideondk.raiku.mapreduce.MapReduceJsonProtocol._
-
-import shapeless._
-import TypeOperators._
-import HList._
-
-import nl.gideondk.raiku.serialization.ProtoBufConversion
 import scalaz._
 import Scalaz._
-import effect._
 
 import scala.concurrent.Promise
 import scala.concurrent.ExecutionContext.Implicits.global
 import akka.util.ByteString
 
-import nl.gideondk.sentinel.client._
-import nl.gideondk.sentinel.Task
-
 import shapeless._
-import TypeOperators._
 import LUBConstraint._
 import Tuples._
+import HList._
 
 import akka.actor.ActorRef
 
@@ -93,25 +88,32 @@ trait MapReduce extends Connection with ProtoBufConversion with MapReducePoly {
 }
 
 trait MapReducePoly {
+
   object newEnumeratorAndChannel extends (MapReducePhase -> (Enumerator[JsValue], Concurrent.Channel[JsValue]))(_ ⇒ Concurrent.broadcast[JsValue])
 
   object onlyEnumerators extends ((Enumerator[JsValue], Concurrent.Channel[JsValue]) -> Enumerator[JsValue])(_._1)
 
   object onlyChannels extends ((Enumerator[JsValue], Concurrent.Channel[JsValue]) -> Concurrent.Channel[JsValue])(_._2)
 
-  object consumeEnumerator extends (Enumerator[JsValue] -> Future[List[JsValue]])(_ |>>> Iteratee.fold(List.empty[JsValue]) { (result, chunk) ⇒
-    result ++ List(chunk)
+  object consumeEnumerator extends (Enumerator[JsValue] -> Future[List[JsValue]])(_ |>>> Iteratee.fold(List.empty[JsValue]) {
+    (result, chunk) ⇒
+      result ++ List(chunk)
   })
 
   def mrPhasesToBroadcastEnumerators[A <: HList, B <: HList](phs: A)(implicit mapper: MapperAux[newEnumeratorAndChannel.type, A, B]) = phs.map(newEnumeratorAndChannel)
 
   // Phases will return sequentially, so currently no parallel future processing necessary
   object combineFutures extends Poly2 {
-    implicit def caseUnitToListFut = at[Task[Unit], Future[List[JsValue]]]((c, s) ⇒ c.flatMap { x ⇒ Task(s.map(y ⇒ (y :: HNil).tupled)) })
+    implicit def caseUnitToListFut = at[Task[Unit], Future[List[JsValue]]]((c, s) ⇒ c.flatMap {
+      x ⇒ Task(s.map(y ⇒ (y :: HNil).tupled))
+    })
+
     implicit def caseFutToFut[T <: Product, A <: HList, B <: HList](implicit hlister: HListerAux[T, A],
                                                                     prepend: PrependAux[A, shapeless.::[List[spray.json.JsValue], shapeless.HNil], B],
                                                                     tupler: Tupler[B]) =
-      at[Task[T], Future[List[JsValue]]]((c, s) ⇒ c.flatMap { x ⇒ Task(s.map(y ⇒ (x.hlisted :+ y).tupled)) })
+      at[Task[T], Future[List[JsValue]]]((c, s) ⇒ c.flatMap {
+        x ⇒ Task(s.map(y ⇒ (x.hlisted :+ y).tupled))
+      })
   }
 
 }

@@ -1,20 +1,24 @@
 package nl.gideondk.raiku
 
-import scalaz._
-import Scalaz._
-import scala.concurrent._
-import ExecutionContext.Implicits.global
-import com.basho.riak.protobuf._
 import nl.gideondk.raiku.commands._
 import nl.gideondk.raiku.serialization._
-import play.api.libs.iteratee._
-import Enumerator._
-import spray.json.JsValue
 
 import shapeless._
 import TypeOperators._
 
 import scala.reflect.ClassTag
+
+import com.basho.riak.protobuf._
+
+import scalaz._
+import Scalaz._
+
+import scala.concurrent._
+import ExecutionContext.Implicits.global
+
+import play.api.libs.iteratee._
+import Enumerator._
+import spray.json.JsValue
 
 case class RaikuBucketProperties(nVal: Option[Int], allowMulti: Option[Boolean])
 

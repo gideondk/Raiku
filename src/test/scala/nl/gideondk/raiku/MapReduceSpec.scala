@@ -1,6 +1,15 @@
 package nl.gideondk.raiku
 
 import mapreduce._
+
+import shapeless._
+import HList._
+import Typeable._
+import Traversables._
+
+import scala.concurrent._
+import scala.concurrent.duration._
+
 import scalaz._
 import scala.concurrent.Await
 import Scalaz._
@@ -12,14 +21,6 @@ import scala.util.Random
 import play.api.libs.iteratee.{ Enumerator, Iteratee }
 
 import org.specs2.mutable._
-
-import shapeless._
-import HList._
-import Typeable._
-import Traversables._
-
-import scala.concurrent._
-import scala.concurrent.duration._
 
 class MapReduceSpec extends RaikuSpec {
   import nl.gideondk.raiku.mapreduce.MapReduceJsonProtocol._
@@ -120,7 +121,7 @@ class MapReduceSpec extends RaikuSpec {
 
       val r = (client mapReduce mrJob).copoint
 
-      r._1 must have size correctItems.length 
+      r._1 must have size correctItems.length
       r._2(0) must beEqualTo(JsNumber(correctItems.length))
     }
 
@@ -135,7 +136,7 @@ class MapReduceSpec extends RaikuSpec {
       val correctItems = vec.filter(x ⇒ x.age >= 50 && x.age <= 70)
 
       val r = (client mapReduce mrJob).copoint
-      r._1 must have size correctItems.length 
+      r._1 must have size correctItems.length
       r._2(0) must beEqualTo(JsNumber(correctItems.length))
     }
   }

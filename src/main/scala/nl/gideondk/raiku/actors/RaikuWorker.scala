@@ -1,14 +1,13 @@
 package nl.gideondk.raiku.actors
 
+import nl.gideondk.raiku.commands._
+import nl.gideondk.sentinel.client.SentinelClient
+
 import akka.io._
 
+import akka.actor.ActorSystem
 import akka.util.ByteString
 import akka.util.ByteStringBuilder
-
-import nl.gideondk.raiku.commands._
-
-import nl.gideondk.sentinel.client.SentinelClient
-import akka.actor.ActorSystem
 
 trait HasByteOrder extends PipelineContext {
   def byteOrder: java.nio.ByteOrder

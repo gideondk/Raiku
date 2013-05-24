@@ -41,7 +41,7 @@ class MutatorAndResolverSpec extends Specification with DefaultJsonProtocol with
       val todos = Todos("1", List("Do the lawn", "Do the laundry"), 0)
       val rv = RaikuValue("test", "1", Some(todos), None)
       val res = todosMutator(None, rv)
-      
+
       res.value must beSome(todos)
     }
 
@@ -52,7 +52,7 @@ class MutatorAndResolverSpec extends Specification with DefaultJsonProtocol with
       val rvB = RaikuValue("test", "1", Some(todosB), None)
 
       val res: Todos = todosMutator(Some(rvA), rvB)
-      
+
       res.version mustEqual 21
       res.items should have size 3
     }
@@ -74,7 +74,7 @@ class MutatorAndResolverSpec extends Specification with DefaultJsonProtocol with
       val rvB = RaikuValue("test", "1", Some(cartB), None)
 
       val res: ShoppingCart = cartResolver(Set(rvA, rvB)).get
-      
+
       res.items should have size 5
     }
   }

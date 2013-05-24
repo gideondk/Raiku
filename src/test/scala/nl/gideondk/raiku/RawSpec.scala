@@ -37,7 +37,7 @@ class RawSpec extends RaikuSpec {
       retRWObject.toOption.get.content.headOption must beSome
       retRWObject.toOption.get.content.head.value.get should beEqualTo(rawObj.value.get)
     }
-    
+
     "delete object properly" in {
       val newId = java.util.UUID.randomUUID.toString
       val rawObj = RaikuRawValue("raiku_test_bucket", newId, Some("text/plain"), None, None, "this should be stored".getBytes.point[Option], None)
@@ -92,7 +92,7 @@ class RawSpec extends RaikuSpec {
       } yield (aKeys, cKeys)
 
       val keys = keysIO.copoint
-      keys should beEqualTo (List(newId), List(anotherId))
+      keys should beEqualTo(List(newId), List(anotherId))
     }
   }
 }

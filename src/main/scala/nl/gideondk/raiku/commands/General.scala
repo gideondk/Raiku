@@ -1,6 +1,7 @@
 package nl.gideondk.raiku.commands
 
 import nl.gideondk.raiku._
+
 import com.basho.riak.protobuf._
 import scalaz._
 import Scalaz._

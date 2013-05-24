@@ -1,17 +1,19 @@
 package nl.gideondk.raiku.actors
 
+import nl.gideondk.raiku.commands._
+import nl.gideondk.sentinel.client.SentinelClient
+
+import com.basho.riak.protobuf._
+
 import akka.io._
 
+import akka.actor.ActorSystem
 import akka.util.ByteString
 import akka.util.ByteStringBuilder
 
-import nl.gideondk.raiku.commands._
-
-import nl.gideondk.sentinel.client.SentinelClient
-import akka.actor.ActorSystem
 import play.api.libs.iteratee._
+
 import spray.json._
-import com.basho.riak.protobuf._
 
 class RiakMRMessageStage extends PipelineStage[HasByteOrder, (RiakCommand, List[Concurrent.Channel[JsValue]]), ByteString, Unit, ByteString] {
   var queue = scala.collection.mutable.Queue[List[Concurrent.Channel[JsValue]]]()

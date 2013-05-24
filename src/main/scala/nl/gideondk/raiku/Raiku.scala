@@ -1,10 +1,15 @@
 package nl.gideondk.raiku
 
 import actors._
-import actors.RaikuConfig
-import actors.RaikuHost
 import commands._
 import akka.actor._
+
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.FiniteDuration
+
+case class RaikuHost(host: String, port: Int)
+
+case class RaikuConfig(host: RaikuHost, connections: Int, mrConnections: Int, reconnectDelay: FiniteDuration = 2 seconds)
 
 case class RaikuClient(config: RaikuConfig)(implicit val system: ActorSystem) extends GeneralRequests with RWRequests with BucketRequests with IndexRequests with MapReduce {
   val worker = RaikuWorker(config.host.host, config.host.port, config.connections)

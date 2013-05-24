@@ -46,7 +46,7 @@ class BucketAdvancedSpec extends RaikuSpec {
       } yield idxf
 
       val res = keys.copoint
-      
+
       res must contain(newId)
     }
     "be able to retrieve objects with ranges on a integeral 2i" in {
@@ -66,15 +66,15 @@ class BucketAdvancedSpec extends RaikuSpec {
       } yield (all, basho, shiki)
 
       val res = keys.copoint
-      
+
       res._1 must contain(newId)
       res._1 must contain(secId)
-      
+
       res._2 must contain(newId)
-      res._2 must not contain(secId)
-      
-      res._3 must not contain(newId)
-      res._3 must contain(newId)
+      res._2 must not contain (secId)
+
+      res._3 must not contain (newId)
+      res._3 must contain(secId)
     }
 
     "be able to use Scalaz functionality on Tasks" in {
