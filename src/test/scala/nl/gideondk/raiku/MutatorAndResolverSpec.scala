@@ -3,8 +3,7 @@ package nl.gideondk.raiku
 import scalaz._
 import Scalaz._
 
-import org.specs2.mutable.Specification
-import org.specs2.matcher.Matcher
+import org.specs2.mutable._
 
 import spray.json._
 
@@ -42,7 +41,8 @@ class MutatorAndResolverSpec extends Specification with DefaultJsonProtocol with
       val todos = Todos("1", List("Do the lawn", "Do the laundry"), 0)
       val rv = RaikuValue("test", "1", Some(todos), None)
       val res = todosMutator(None, rv)
-      res.value.get == todos
+      
+      res.value must beSome(todos)
     }
 
     "work correctly in case of collisions" in {
@@ -52,7 +52,9 @@ class MutatorAndResolverSpec extends Specification with DefaultJsonProtocol with
       val rvB = RaikuValue("test", "1", Some(todosB), None)
 
       val res: Todos = todosMutator(Some(rvA), rvB)
-      res.version == 21 && res.items.length == 3
+      
+      res.version mustEqual 21
+      res.items should have size 3
     }
   }
 
@@ -72,8 +74,8 @@ class MutatorAndResolverSpec extends Specification with DefaultJsonProtocol with
       val rvB = RaikuValue("test", "1", Some(cartB), None)
 
       val res: ShoppingCart = cartResolver(Set(rvA, rvB)).get
-
-      res.items.length == 5
+      
+      res.items should have size 5
     }
   }
 }

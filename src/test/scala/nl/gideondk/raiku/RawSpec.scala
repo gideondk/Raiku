@@ -1,17 +1,13 @@
 package nl.gideondk.raiku
 
-// import org.scalatest.FunSuite
-// import org.scalatest.BeforeAndAfter
 import akka.actor._
-//import commands.RWObject
 import scala.concurrent._
 import scala.concurrent.duration._
 
 import scalaz._
 import Scalaz._
 
-import org.specs2.mutable.Specification
-import org.specs2.matcher.Matcher
+import org.specs2.mutable._
 
 class RawSpec extends RaikuSpec {
   sequential
@@ -24,7 +20,8 @@ class RawSpec extends RaikuSpec {
 
       val rawObj = RaikuRawValue("raiku_test_bucket", newId, Some("text/plain"), None, None, "this should be stored".getBytes.point[Option], None)
       val validation = client.store(rawObj).run
-      validation.isSuccess
+
+      validation.isSuccess should beTrue
     }
 
     "return stored items properly" in {
@@ -34,8 +31,13 @@ class RawSpec extends RaikuSpec {
 
       val retRWObject = client.fetch("raiku_test_bucket", newId).run
 
-      validation.isSuccess && retRWObject.isSuccess && retRWObject.toOption.get.content.headOption.isDefined && new String(retRWObject.toOption.get.content.head.value.get) == new String(rawObj.value.get)
+      validation.isSuccess should beTrue
+      retRWObject.isSuccess should beTrue
+
+      retRWObject.toOption.get.content.headOption must beSome
+      retRWObject.toOption.get.content.head.value.get should beEqualTo(rawObj.value.get)
     }
+    
     "delete object properly" in {
       val newId = java.util.UUID.randomUUID.toString
       val rawObj = RaikuRawValue("raiku_test_bucket", newId, Some("text/plain"), None, None, "this should be stored".getBytes.point[Option], None)
@@ -45,7 +47,9 @@ class RawSpec extends RaikuSpec {
 
       val retRawObj = client.fetch("raiku_test_bucket", newId).run
 
-      validation.isSuccess && retRawObj.isSuccess && !retRawObj.toOption.get.content.headOption.isDefined
+      validation.isSuccess should beTrue
+      retRawObj.isSuccess should beTrue
+      retRawObj.toOption.get.content.headOption should beNone
     }
     "persist 2i properly" in {
       val newId = java.util.UUID.randomUUID.toString
@@ -59,7 +63,7 @@ class RawSpec extends RaikuSpec {
       val validation = client.store(rawObj, returnBody = Option(true)).run
       val retRawObject = client.fetch("raiku_test_bucket", newId).run.toOption.get.content.head
 
-      indexes.binary.get("organization_id").get.toList.sortBy(x ⇒ x) == retRawObject.meta.get.indexes.binary("organization_id").toList.sortBy(x ⇒ x)
+      indexes.binary.get("organization_id").get.toList.sortBy(x ⇒ x) should beEqualTo(retRawObject.meta.get.indexes.binary("organization_id").toList.sortBy(x ⇒ x))
     }
     "be able to retrieve object by 2i" in {
       val newId = java.util.UUID.randomUUID.toString
@@ -87,8 +91,8 @@ class RawSpec extends RaikuSpec {
         cKeys ← client.fetchKeysForBinIndexByValue("raiku_test_bucket", "organization_id", orgIdC)
       } yield (aKeys, cKeys)
 
-      val keys = keysIO.run
-      keys.toOption.get == (List(newId), List(anotherId))
+      val keys = keysIO.copoint
+      keys should beEqualTo (List(newId), List(anotherId))
     }
   }
 }

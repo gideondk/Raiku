@@ -5,11 +5,13 @@ import scalaz._
 import scala.concurrent.Await
 import Scalaz._
 import spray.json._
-import org.specs2.mutable.Specification
+
 import akka.actor.ActorSystem
 import scala.concurrent.Future
 import scala.util.Random
 import play.api.libs.iteratee.{ Enumerator, Iteratee }
+
+import org.specs2.mutable._
 
 import shapeless._
 import HList._
@@ -69,7 +71,8 @@ class MapReduceSpec extends RaikuSpec {
 
       val r = (client mapReduce mrJob).copoint
 
-      r._1.length == n && r._2(0) == JsNumber(n)
+      r._1 must have size n
+      r._2(0) must beEqualTo(JsNumber(n))
     }
   }
 
@@ -83,7 +86,8 @@ class MapReduceSpec extends RaikuSpec {
       val phases = mrJob.phases
 
       val r = (client mapReduce mrJob).copoint
-      r._1.length == 2 && r._2(0) == JsNumber(2)
+      r._1 must have size 2
+      r._2(0) must beEqualTo(JsNumber(2))
     }
   }
 
@@ -100,8 +104,8 @@ class MapReduceSpec extends RaikuSpec {
 
       val r = (client mapReduce mrJob).copoint
 
-      r._1.length == correctItems.length && r._2(0) == JsNumber(correctItems.length)
-
+      r._1 must have size correctItems.length
+      r._2(0) must beEqualTo(JsNumber(correctItems.length))
     }
 
     "return the correct results for int indexes" in {
@@ -116,8 +120,8 @@ class MapReduceSpec extends RaikuSpec {
 
       val r = (client mapReduce mrJob).copoint
 
-      r._1.length == correctItems.length && r._2(0) == JsNumber(correctItems.length)
-
+      r._1 must have size correctItems.length 
+      r._2(0) must beEqualTo(JsNumber(correctItems.length))
     }
 
     "return the correct results for range indexes" in {
@@ -131,7 +135,8 @@ class MapReduceSpec extends RaikuSpec {
       val correctItems = vec.filter(x ⇒ x.age >= 50 && x.age <= 70)
 
       val r = (client mapReduce mrJob).copoint
-      r._1.length == correctItems.length && r._2(0) == JsNumber(correctItems.length)
+      r._1 must have size correctItems.length 
+      r._2(0) must beEqualTo(JsNumber(correctItems.length))
     }
   }
 }

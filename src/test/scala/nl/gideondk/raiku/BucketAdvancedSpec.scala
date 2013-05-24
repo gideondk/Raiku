@@ -10,8 +10,7 @@ import Scalaz._
 
 import spray.json._
 
-import org.specs2.mutable.Specification
-import org.specs2.matcher.Matcher
+import org.specs2.mutable._
 
 import scala.util.{ Success, Failure }
 
@@ -33,7 +32,8 @@ class BucketAdvancedSpec extends RaikuSpec {
       } yield idxf
 
       val res = key.copoint
-      assert(res.length == 1 && res.head == newId)
+      res must have length 1
+      res.head must beEqualTo(newId)
     }
     "be able to retrieve objects with their integeral 2i" in {
       val newId = java.util.UUID.randomUUID.toString
@@ -46,7 +46,8 @@ class BucketAdvancedSpec extends RaikuSpec {
       } yield idxf
 
       val res = keys.copoint
-      assert(res.contains(newId))
+      
+      res must contain(newId)
     }
     "be able to retrieve objects with ranges on a integeral 2i" in {
       val newId = java.util.UUID.randomUUID.toString
@@ -65,7 +66,15 @@ class BucketAdvancedSpec extends RaikuSpec {
       } yield (all, basho, shiki)
 
       val res = keys.copoint
-      res._1.contains(newId) && res._1.contains(secId) && res._2.contains(newId) && !res._2.contains(secId) && !res._3.contains(newId) && res._3.contains(secId)
+      
+      res._1 must contain(newId)
+      res._1 must contain(secId)
+      
+      res._2 must contain(newId)
+      res._2 must not contain(secId)
+      
+      res._3 must not contain(newId)
+      res._3 must contain(newId)
     }
 
     "be able to use Scalaz functionality on Tasks" in {
@@ -82,8 +91,8 @@ class BucketAdvancedSpec extends RaikuSpec {
         all ← bucket idx ("age", 40 to 60) >>= ((x: List[String]) ⇒ bucket ?* x)
       } yield (all)
 
-      val res = all.copoint
-      true
+      val res = all.run
+      res.isSuccess must beTrue
     }
   }
 

@@ -59,7 +59,7 @@ object RaikuBuild extends Build {
       
       "play" %% "play-iteratees" % "2.1.0",
       "com.chuusai" % "shapeless_2.10.0" % "1.2.4",
-      "org.specs2" %% "specs2" % "1.13",
+      "org.specs2" %% "specs2" % "1.14",
 
       "nl.gideondk" %% "sentinel" % "0.4.1"
   )
