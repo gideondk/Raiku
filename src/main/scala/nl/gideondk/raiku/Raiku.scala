@@ -16,8 +16,8 @@ case class RaikuClient(config: RaikuConfig)(implicit val system: ActorSystem) ex
   val mrWorker = RaikuMRWorker(config.host.host, config.host.port, config.mrConnections)
 
   def disconnect = {
-    system stop worker
-    system stop mrWorker
+    system stop worker.actor
+    system stop mrWorker.actor
   }
 }
 

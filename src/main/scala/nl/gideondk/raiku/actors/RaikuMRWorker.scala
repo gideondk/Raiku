@@ -2,114 +2,127 @@ package nl.gideondk.raiku.actors
 
 import nl.gideondk.raiku.commands._
 import nl.gideondk.sentinel.client.SentinelClient
-
 import com.basho.riak.protobuf._
-
 import akka.io._
-
 import akka.actor.ActorSystem
 import akka.util.ByteString
 import akka.util.ByteStringBuilder
-
 import play.api.libs.iteratee._
-
 import spray.json._
+import nl.gideondk.sentinel.pipelines.EnumeratorStage
+import scala.concurrent.ExecutionContext.Implicits.global
+import akka.actor.Actor
+import scala.concurrent.Promise
+import akka.pattern._
 
-class RiakMRMessageStage extends PipelineStage[HasByteOrder, (RiakCommand, List[Concurrent.Channel[JsValue]]), ByteString, Unit, ByteString] {
-  var queue = scala.collection.mutable.Queue[List[Concurrent.Channel[JsValue]]]()
-  var commandQueue = scala.collection.mutable.Queue[(RiakCommand, List[Concurrent.Channel[JsValue]])]()
+import akka.util.Timeout
+import scala.concurrent.duration._
 
-  var currentChannels: Option[List[Concurrent.Channel[JsValue]]] = None
-  var currentMRPhase: Option[Int] = None
-  var currentChannelIndex = 0
+case object StartMRProcessing
 
-  var isCurrentlyRunningMRJob = false // Riak doesn't like multiple requests in a pipline when MR responses are still processing.
+class MRResultHandler(e: Enumerator[RiakResponse], phaseCount: Int, maxJobDuration: FiniteDuration = 5 minutes) extends Actor {
+  case class HandleMRChunk(chunk: RiakResponse)
+  case class NextMRChunk(i: Int)
 
-  def mrRespToJsValue(resp: RpbMapRedResp) = {
-    JsonParser(resp.response.get.toStringUtf8).asInstanceOf[JsArray].elements // TODO: Less assumptions!
+  case class Channel(hook: Option[Promise[Option[JsValue]]] = None,
+                     queue: scala.collection.mutable.Queue[Promise[Option[JsValue]]] = scala.collection.mutable.Queue[Promise[Option[JsValue]]]())
+
+  var phaseChannels = List.fill(phaseCount)(Channel())
+
+  var currentPhaseIndex = 0
+  var currentPhase: Option[Int] = None
+
+  def promiseForHeadChannel = promiseForChannel(currentPhaseIndex)
+
+  def promiseForChannel(idx: Int) = {
+    val c = phaseChannels(idx)
+    if (c.hook.isDefined) {
+      phaseChannels = phaseChannels.updated(currentPhaseIndex, c.copy(hook = None))
+      c.hook.get
+    }
+    else {
+      val p = Promise[Option[JsValue]]()
+      c.queue.enqueue(p)
+      p
+    }
   }
 
-  def apply(ctx: HasByteOrder) = new PipePair[(RiakCommand, List[Concurrent.Channel[JsValue]]), ByteString, Unit, ByteString] {
-    implicit val byteOrder = ctx.byteOrder
+  def mrRespToJsValue(resp: RpbMapRedResp) =
+    JsonParser(resp.response.get.toStringUtf8).asInstanceOf[JsArray].elements // TODO: Less assumptions!
 
-    override val commandPipeline = {
-      msg: (RiakCommand, List[Concurrent.Channel[JsValue]]) ⇒
-        if (!isCurrentlyRunningMRJob) {
-          queue.enqueue(msg._2)
-          val command = msg._1
-          val bsb = new ByteStringBuilder
-          bsb.putByte(RiakMessageType.messageTypeToInt(command.messageType).toByte)
-          bsb ++= command.message
-          isCurrentlyRunningMRJob = true
-          ctx.singleCommand(bsb.result)
-        }
-        else {
-          commandQueue.enqueue(msg)
-          ctx.nothing
-        }
-    }
+  def receive = {
+    case StartMRProcessing ⇒
+      e |>>> Iteratee.foreach { x ⇒
+        self ! HandleMRChunk(x)
+      }
 
-    override val eventPipeline = {
-      bs: ByteString ⇒
-        val channel = currentChannels match {
-          case None ⇒
-            val channels = queue.dequeue()
-            currentChannels = Some(channels)
-            channels(0)
-          case Some(x) ⇒ x(currentChannelIndex) // Should be safe, or else pipeline integrity is comprimised anyway!
+      val enums = phaseChannels.zipWithIndex.map {
+        case (e, i) ⇒
+          implicit val timeout = Timeout(maxJobDuration)
+          Enumerator.generateM { (self ? NextMRChunk(i)).mapTo[Promise[Option[JsValue]]].flatMap(_ future) }
+      }
+      sender ! enums
+
+    case NextMRChunk(idx: Int) ⇒
+      val c = phaseChannels(idx)
+        def addHookForIdentifier = {
+          val p = Promise[Option[JsValue]]()
+          phaseChannels = phaseChannels.updated(idx, c.copy(hook = Some(p)))
+          p
         }
 
-        val bi = bs.iterator
-        val messageType = bi.getByte
-        val message = bi.toByteString
+      sender ! {
+        if (c.queue.length == 0) addHookForIdentifier
+        else c.queue.dequeue()
+      }
 
-        RiakMessageType.intToMessageType(messageType.toInt) match {
-          case RiakMessageType.RpbErrorResp ⇒
-            val exception = new Exception(RpbErrorResp().mergeFrom(message.toArray).errmsg.toStringUtf8)
-            currentChannels.foreach(_.foreach(channel ⇒ channel.end(exception)))
-            throw exception
+    case HandleMRChunk(chunk) ⇒
+      chunk.messageType match {
+        case RiakMessageType.RpbErrorResp ⇒
+          val exception = new Exception(RpbErrorResp().mergeFrom(chunk.message.toArray).errmsg.toStringUtf8)
+          phaseChannels.foreach { x ⇒
+            x.hook.foreach(_.failure(exception))
+            x.queue.headOption.foreach(_.failure(exception))
+          }
+          throw exception
 
-          case RiakMessageType.RpbMapRedResp ⇒
-            val mrResp = RpbMapRedResp().mergeFrom(message.toArray)
-            if (mrResp.done.isDefined) {
-              channel.eofAndEnd()
-              currentChannelIndex = 0
-              currentChannels = None
-              currentMRPhase = None
-              isCurrentlyRunningMRJob = false
-              if (commandQueue.length > 0) commandPipeline(commandQueue.dequeue)
-              Nil
-            }
-            else if (currentMRPhase.isDefined && currentMRPhase.get == mrResp.phase.get) {
-              mrRespToJsValue(mrResp).foreach(channel push)
-              Nil
-            }
-            else if (currentMRPhase.isDefined && currentMRPhase.get != mrResp.phase.get) {
-              channel.eofAndEnd()
-              val newIndex = currentMRPhase.get + 1
-              currentMRPhase = Some(newIndex)
-              if (currentChannels.get.length > newIndex) mrRespToJsValue(mrResp).foreach(currentChannels.get(newIndex) push)
-              currentChannelIndex += 1
-              Nil
-            }
-            else {
-              mrRespToJsValue(mrResp).foreach(channel push)
-              currentMRPhase = mrResp.phase
-              Seq(Left(())) // Return a value through the pipeline after initial contact is made (so the Task[Unit] resolves)
-            }
-        }
-    }
+        case RiakMessageType.RpbMapRedResp ⇒
+          val mrResp = RpbMapRedResp().mergeFrom(chunk.message.toArray)
+          if (mrResp.done.isDefined) {
+            promiseForHeadChannel success None
+          }
+          else if (currentPhase.isDefined && currentPhase.get == mrResp.phase.get) {
+            mrRespToJsValue(mrResp).foreach(x ⇒ promiseForHeadChannel success Some(x))
+          }
+          else if (currentPhase.isDefined && currentPhase.get != mrResp.phase.get) {
+            promiseForHeadChannel success None
+            currentPhaseIndex = currentPhaseIndex + 1
+            mrRespToJsValue(mrResp).foreach(x ⇒ promiseForHeadChannel success Some(x))
+            currentPhase = mrResp.phase
+          }
+          else {
+            mrRespToJsValue(mrResp).foreach(x ⇒ promiseForHeadChannel success Some(x))
+            currentPhase = mrResp.phase
+          }
+
+        case _ ⇒
+          val exception = new Exception("Unexpect response returned in MR stream.")
+          phaseChannels.foreach { x ⇒
+            x.hook.foreach(_.failure(exception))
+            x.queue.headOption.foreach(_.failure(exception))
+          }
+          throw exception
+      }
   }
 }
 
 object RaikuMRWorker {
-  def ctx = new HasByteOrder {
-    def byteOrder = java.nio.ByteOrder.BIG_ENDIAN
+  def isMREnd(rs: RiakResponse) = {
+    RpbMapRedResp().mergeFrom(rs.message.toArray).done.isDefined
   }
 
-  val stages = new RiakMRMessageStage >> new LengthFieldFrame(1024 * 1024 * 200, lengthIncludesHeader = false) // 200mb max
-
   def apply(host: String, port: Int, numberOfWorkers: Int)(implicit system: ActorSystem) = {
-    SentinelClient.randomRouting(host, port, numberOfWorkers, "Raiku-MR")(ctx, stages)(system)
+      def stages = new EnumeratorStage(isMREnd, true) >> new RiakMessageStage >> new LengthFieldFrame(1024 * 1024 * 200, lengthIncludesHeader = false) // 200mb max
+    SentinelClient.randomRouting(host, port, numberOfWorkers, "Raiku-MR")(stages)(system)
   }
 }

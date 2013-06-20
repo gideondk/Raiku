@@ -23,14 +23,14 @@ private[raiku] case class RiakResponse(messageType: RiakMessageType, message: By
 trait Connection {
   def system: ActorSystem
 
-  def worker: ActorRef
+  def worker: SentinelClient[RiakCommand, RiakResponse]
 
   implicit val dispatcher = system.dispatcher
 }
 
 trait Request extends Connection with ProtoBufConversion {
   def buildRequest(messageType: RiakMessageType, message: ByteString): Task[RiakResponse] =
-    Task(worker.sendCommand[RiakResponse, RiakCommand](RiakCommand(messageType, message)).get.map(_.map(_.flatMap(riakResponseToValidation))))
+    Task(worker.sendCommand(RiakCommand(messageType, message)).get.map(_.map(_.flatMap(riakResponseToValidation))))
 
   def buildRequest(messageType: RiakMessageType): Task[RiakMessage] = buildRequest(messageType, ByteString())
 

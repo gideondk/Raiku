@@ -9,13 +9,9 @@ import akka.actor.ActorSystem
 import akka.util.ByteString
 import akka.util.ByteStringBuilder
 
-trait HasByteOrder extends PipelineContext {
-  def byteOrder: java.nio.ByteOrder
-}
-
-class RiakMessageStage extends PipelineStage[HasByteOrder, RiakCommand, ByteString, RiakResponse, ByteString] {
-  def apply(ctx: HasByteOrder) = new PipePair[RiakCommand, ByteString, RiakResponse, ByteString] {
-    implicit val byteOrder = ctx.byteOrder
+class RiakMessageStage extends PipelineStage[PipelineContext, RiakCommand, ByteString, RiakResponse, ByteString] {
+  def apply(ctx: PipelineContext) = new PipePair[RiakCommand, ByteString, RiakResponse, ByteString] {
+    implicit val byteOrder = java.nio.ByteOrder.BIG_ENDIAN
 
     override val commandPipeline = {
       msg: RiakCommand ⇒
@@ -36,13 +32,9 @@ class RiakMessageStage extends PipelineStage[HasByteOrder, RiakCommand, ByteStri
 }
 
 object RaikuWorker {
-  def ctx = new HasByteOrder {
-    def byteOrder = java.nio.ByteOrder.BIG_ENDIAN
-  }
-
   val stages = new RiakMessageStage >> new LengthFieldFrame(1024 * 1024 * 200, lengthIncludesHeader = false) // 200mb max
 
   def apply(host: String, port: Int, numberOfWorkers: Int)(implicit system: ActorSystem) = {
-    SentinelClient.randomRouting(host, port, numberOfWorkers, "Raiku")(ctx, stages)(system)
+    SentinelClient.randomRouting(host, port, numberOfWorkers, "Raiku")(stages)(system)
   }
 }

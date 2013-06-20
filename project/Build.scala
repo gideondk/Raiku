@@ -8,10 +8,10 @@ object RaikuBuild extends Build {
   override lazy val settings = super.settings ++
     Seq(
       name := "raiku",
-      version := "0.4.0",
+      version := "0.5.0-SNAPSHOT",
       organization := "nl.gideondk",
       parallelExecution in Test := false,
-      scalaVersion := "2.10.0",
+      scalaVersion := "2.10.2",
       crossScalaVersions := Seq("2.10.0"),
       ensimeConfig := sexp(
         key(":compiler-args"), sexp("-Ywarn-dead-code", "-Ywarn-shadowing"),
@@ -57,11 +57,10 @@ object RaikuBuild extends Build {
       "io.spray" %%  "spray-json" % "1.2.3",
       "com.typesafe.akka" % "akka-actor_2.10" % "2.2-M3",
       
-      "play" %% "play-iteratees" % "2.1.0",
-      "com.chuusai" % "shapeless_2.10.0" % "1.2.4",
+      "com.chuusai" % "shapeless_2.10.2" % "2.0.0-SNAPSHOT",
       "org.specs2" %% "specs2" % "1.14",
 
-      "nl.gideondk" %% "sentinel" % "0.4.1"
+      "nl.gideondk" %% "sentinel" % "0.5.1"
   )
 
   lazy val root = Project(id = "raiku",

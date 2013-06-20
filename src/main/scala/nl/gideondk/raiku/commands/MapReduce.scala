@@ -3,37 +3,42 @@ package nl.gideondk.raiku.commands
 import nl.gideondk.raiku.mapreduce._
 import nl.gideondk.raiku.mapreduce.MapReduceJsonProtocol._
 import nl.gideondk.raiku.serialization.ProtoBufConversion
-
 import nl.gideondk.sentinel.client._
 import nl.gideondk.sentinel.Task
-
 import com.basho.riak.protobuf._
 import spray.json._
-
 import play.api.libs.iteratee._
 import scala.concurrent.Future
-
 import scalaz._
 import Scalaz._
-
 import scala.concurrent.Promise
 import scala.concurrent.ExecutionContext.Implicits.global
 import akka.util.ByteString
-
 import shapeless._
 import LUBConstraint._
 import Tuples._
 import HList._
-
+import nl.gideondk.sentinel.client._
 import akka.actor.ActorRef
+import akka.pattern._
+import akka.actor.Props
+import nl.gideondk.raiku.actors._
 
-private[raiku] case class RiakMROperation(promise: Promise[Unit], channels: List[Concurrent.Channel[JsValue]], command: ByteString)
+import Traversables._
+import akka.util.Timeout
+import scala.concurrent.duration._
 
-trait MapReduce extends Connection with ProtoBufConversion with MapReducePoly {
-  def mrWorker: ActorRef
+//private[raiku] case class RiakMROperation(promise: Promise[Unit], channels: List[Concurrent.Channel[JsValue]], command: ByteString)
 
-  def buildMRRequest(messageType: RiakMessageType, message: ByteString, channels: List[Concurrent.Channel[JsValue]]) =
-    Task(mrWorker.sendCommand[Unit, (RiakCommand, List[Concurrent.Channel[JsValue]])](RiakCommand(messageType, message) -> channels).get)
+trait MapReduce extends Connection with ProtoBufConversion {
+  def mrWorker: SentinelClient[RiakCommand, Enumerator[RiakResponse]]
+
+  def buildMRRequest(messageType: RiakMessageType, message: ByteString, phaseCount: Int, maxJobDuration: FiniteDuration = 5 minutes) = {
+    (mrWorker <~< RiakCommand(messageType, message)).flatMap { x ⇒
+      implicit val timeout = Timeout(maxJobDuration)
+      Task((system.actorOf(Props(new MRResultHandler(x, phaseCount, maxJobDuration))) ? StartMRProcessing).mapTo[List[Enumerator[JsValue]]])
+    }
+  }
 
   def buildJobRequest[A <: HList: <<:[MapReducePhase]#λ](job: MapReduceJob[A])(implicit tl: ToList[A, MapReducePhase]) = {
     val jsonJob = JsObject(
@@ -50,57 +55,50 @@ trait MapReduce extends Connection with ProtoBufConversion with MapReducePoly {
     (RiakMessageType.RpbMapRedReq, RpbMapRedReq(jsonJob.compactPrint, "application/json"))
   }
 
-  def streamMapReduce[A <: HList: <<:[MapReducePhase]#λ, B <: HList, C <: HList, D <: HList, E <: HList, F <: HList, G <: Product](job: MapReduceJob[A])(implicit f1: FilterNotAux[A, NonKeepedMapPhase, B],
-                                                                                                                                                         f2: FilterNotAux[B, NonKeepedReducePhase, C],
-                                                                                                                                                         l: shapeless.Length[C],
-                                                                                                                                                         m1: shapeless.MapperAux[MapReduce.this.newEnumeratorAndChannel.type, C, D],
-                                                                                                                                                         m2: shapeless.MapperAux[MapReduce.this.onlyEnumerators.type, D, E],
-                                                                                                                                                         m3: shapeless.MapperAux[MapReduce.this.onlyChannels.type, D, F],
-                                                                                                                                                         t: TuplerAux[E, G],
-                                                                                                                                                         tl: ToList[A, MapReducePhase],
-                                                                                                                                                         tl2: ToList[F, Concurrent.Channel[JsValue]]): Task[G] = {
+  def streamMapReduce[A <: HList: <<:[MapReducePhase]#λ, B <: HList, C <: HList, D <: HList, T <: Product, Z <: HList](job: MapReduceJob[A])(implicit f1: FilterNotAux[A, NonKeepedMapPhase, B],
+                                                                                                                                             f2: FilterNotAux[B, NonKeepedReducePhase, C],
+
+                                                                                                                                             tl: ToList[A, MapReducePhase],
+                                                                                                                                             tl2: ToList[C, nl.gideondk.raiku.mapreduce.MapReducePhase],
+                                                                                                                                             mm: MapperAux[phaseToEmptyEnum.type, C, Z],
+                                                                                                                                             fl: shapeless.FromTraversable[Z],
+                                                                                                                                             t: TuplerAux[Z, T]): Task[T] = {
     val phases = job.phases.filterNot[NonKeepedMapPhase].filterNot[NonKeepedReducePhase]
     val req = buildJobRequest(job)
-    val channelsAndEnumerators = mrPhasesToBroadcastEnumerators(phases)
-    val channels = channelsAndEnumerators.map(onlyChannels).toList
-    val enums = channelsAndEnumerators.map(onlyEnumerators).tupled
-    buildMRRequest(req._1, req._2, channels).map(_ ⇒ enums)
+
+    val l = phases.toList
+    buildMRRequest(req._1, req._2, l.length) map { x ⇒
+      x.toHList[Z].getOrElse(throw new Exception("Unexpected number of enumerators returned")).tupled
+    }
   }
 
-  def mapReduce[A <: HList: <<:[MapReducePhase]#λ, B <: HList, C <: HList, D <: HList, E <: HList, F <: HList, G <: HList](job: MapReduceJob[A])(implicit f1: FilterNotAux[A, NonKeepedMapPhase, B],
-                                                                                                                                                 f2: FilterNotAux[B, NonKeepedReducePhase, C],
-                                                                                                                                                 l: shapeless.Length[C],
-                                                                                                                                                 m1: shapeless.MapperAux[MapReduce.this.newEnumeratorAndChannel.type, C, D],
-                                                                                                                                                 m2: shapeless.MapperAux[MapReduce.this.onlyEnumerators.type, D, E],
-                                                                                                                                                 m3: shapeless.MapperAux[MapReduce.this.onlyChannels.type, D, F],
-                                                                                                                                                 m4: shapeless.MapperAux[MapReduce.this.consumeEnumerator.type, E, G],
-                                                                                                                                                 folder: shapeless.LeftFolder[G, Task[Unit], MapReduce.this.combineFutures.type],
-                                                                                                                                                 tl: ToList[A, MapReducePhase],
-                                                                                                                                                 tl2: ToList[F, Concurrent.Channel[JsValue]]) = {
+  def mapReduce[A <: HList: <<:[MapReducePhase]#λ, B <: HList, C <: HList, D <: HList, E <: HList, F <: HList, G <: HList, P <: Product, Z <: HList, Y <: HList, T](job: MapReduceJob[A])(implicit f1: FilterNotAux[A, NonKeepedMapPhase, B],
+                                                                                                                                                                                          f2: FilterNotAux[B, NonKeepedReducePhase, C],
+                                                                                                                                                                                          tl: ToList[A, MapReducePhase],
+                                                                                                                                                                                          tl2: ToList[C, nl.gideondk.raiku.mapreduce.MapReducePhase],
+                                                                                                                                                                                          mm: MapperAux[phaseToEmptyEnum.type, C, Z],
+                                                                                                                                                                                          fl: shapeless.FromTraversable[Z],
+
+                                                                                                                                                                                          m2: shapeless.MapperAux[MapReduce.this.consumeEnumerator.type, Z, D],
+                                                                                                                                                                                          folder: shapeless.LeftFolderAux[D, Task[Unit], MapReduce.this.combineFutures.type, T],
+                                                                                                                                                                                          cse: shapeless.CaseAux[MapReduce.this.FlattenTask.type, shapeless.::[nl.gideondk.sentinel.Task[T], shapeless.HNil]],
+                                                                                                                                                                                          l: shapeless.Length[C]) = {
     val phases = job.phases.filterNot[NonKeepedMapPhase].filterNot[NonKeepedReducePhase]
     val req = buildJobRequest(job)
-    val channelsAndEnumerators = mrPhasesToBroadcastEnumerators(phases)
-    val channels = channelsAndEnumerators.map(onlyChannels).toList
-    val results = channelsAndEnumerators.map(onlyEnumerators).map(consumeEnumerator)
+    val l = phases.toList
 
-    results.foldLeft(buildMRRequest(req._1, req._2, channels))(combineFutures)
+    FlattenTask(buildMRRequest(req._1, req._2, l.length) map { x ⇒
+      val results = x.toHList[Z].getOrElse(throw new Exception("Unexpected number of enumerators returned")).map(consumeEnumerator)
+      results.foldLeft(().point[Task])(combineFutures)
+    })
   }
-}
 
-trait MapReducePoly {
-
-  object newEnumeratorAndChannel extends (MapReducePhase -> (Enumerator[JsValue], Concurrent.Channel[JsValue]))(_ ⇒ Concurrent.broadcast[JsValue])
-
-  object onlyEnumerators extends ((Enumerator[JsValue], Concurrent.Channel[JsValue]) -> Enumerator[JsValue])(_._1)
-
-  object onlyChannels extends ((Enumerator[JsValue], Concurrent.Channel[JsValue]) -> Concurrent.Channel[JsValue])(_._2)
+  object phaseToEmptyEnum extends (MapReducePhase -> Enumerator[JsValue])(x ⇒ Enumerator[JsValue]())
 
   object consumeEnumerator extends (Enumerator[JsValue] -> Future[List[JsValue]])(_ |>>> Iteratee.fold(List.empty[JsValue]) {
     (result, chunk) ⇒
       result ++ List(chunk)
   })
-
-  def mrPhasesToBroadcastEnumerators[A <: HList, B <: HList](phs: A)(implicit mapper: MapperAux[newEnumeratorAndChannel.type, A, B]) = phs.map(newEnumeratorAndChannel)
 
   // Phases will return sequentially, so currently no parallel future processing necessary
   object combineFutures extends Poly2 {
@@ -114,6 +112,10 @@ trait MapReducePoly {
       at[Task[T], Future[List[JsValue]]]((c, s) ⇒ c.flatMap {
         x ⇒ Task(s.map(y ⇒ (x.hlisted :+ y).tupled))
       })
+  }
+
+  object FlattenTask extends Poly1 {
+    implicit def default[T] = at[Task[Task[T]]](t ⇒ t.flatMap(x ⇒ x))
   }
 
 }
