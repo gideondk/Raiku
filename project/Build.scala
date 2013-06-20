@@ -8,7 +8,7 @@ object RaikuBuild extends Build {
   override lazy val settings = super.settings ++
     Seq(
       name := "raiku",
-      version := "0.5.0-SNAPSHOT",
+      version := "0.5.0",
       organization := "nl.gideondk",
       parallelExecution in Test := false,
       scalaVersion := "2.10.2",
@@ -55,12 +55,11 @@ object RaikuBuild extends Build {
       "com.google.protobuf" % "protobuf-java" % "2.4.1",
 
       "io.spray" %%  "spray-json" % "1.2.3",
-      "com.typesafe.akka" % "akka-actor_2.10" % "2.2-M3",
       
       "com.chuusai" % "shapeless_2.10.2" % "2.0.0-SNAPSHOT",
       "org.specs2" %% "specs2" % "1.14",
 
-      "nl.gideondk" %% "sentinel" % "0.5.1"
+      "nl.gideondk" %% "sentinel" % "0.5.2"
   )
 
   lazy val root = Project(id = "raiku",

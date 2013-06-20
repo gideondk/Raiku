@@ -1,7 +1,6 @@
 package nl.gideondk.raiku
 
 import akka.actor._
-//import commands.RWObject
 import scala.concurrent._
 import scala.concurrent.duration._
 
@@ -17,6 +16,8 @@ import play.api.libs.iteratee._
 
 import org.specs2.mutable.Specification
 import org.specs2.matcher.Matcher
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ReactiveBucketSpec extends RaikuSpec {
   import TestModels._

@@ -27,17 +27,17 @@ class MRResultHandler(e: Enumerator[RiakResponse], phaseCount: Int, maxJobDurati
   case class Channel(hook: Option[Promise[Option[JsValue]]] = None,
                      queue: scala.collection.mutable.Queue[Promise[Option[JsValue]]] = scala.collection.mutable.Queue[Promise[Option[JsValue]]]())
 
+  var currentMRPhase: Option[Int] = None
+
   var phaseChannels = List.fill(phaseCount)(Channel())
+  var currentPhaseChannelIndex = 0
 
-  var currentPhaseIndex = 0
-  var currentPhase: Option[Int] = None
+  def newPromiseForHeadChannel = newPromiseForChannel(currentPhaseChannelIndex)
 
-  def promiseForHeadChannel = promiseForChannel(currentPhaseIndex)
-
-  def promiseForChannel(idx: Int) = {
+  def newPromiseForChannel(idx: Int) = {
     val c = phaseChannels(idx)
     if (c.hook.isDefined) {
-      phaseChannels = phaseChannels.updated(currentPhaseIndex, c.copy(hook = None))
+      phaseChannels = phaseChannels.updated(currentPhaseChannelIndex, c.copy(hook = None))
       c.hook.get
     }
     else {
@@ -50,29 +50,28 @@ class MRResultHandler(e: Enumerator[RiakResponse], phaseCount: Int, maxJobDurati
   def mrRespToJsValue(resp: RpbMapRedResp) =
     JsonParser(resp.response.get.toStringUtf8).asInstanceOf[JsArray].elements // TODO: Less assumptions!
 
+  def enumeratorsForPhases = phaseChannels.zipWithIndex.map {
+    case (e, i) ⇒
+      implicit val timeout = Timeout(maxJobDuration)
+      Enumerator.generateM { (self ? NextMRChunk(i)).mapTo[Promise[Option[JsValue]]].flatMap(_ future) }
+  }
+
   def receive = {
     case StartMRProcessing ⇒
       e |>>> Iteratee.foreach { x ⇒
         self ! HandleMRChunk(x)
       }
-
-      val enums = phaseChannels.zipWithIndex.map {
-        case (e, i) ⇒
-          implicit val timeout = Timeout(maxJobDuration)
-          Enumerator.generateM { (self ? NextMRChunk(i)).mapTo[Promise[Option[JsValue]]].flatMap(_ future) }
-      }
-      sender ! enums
+      sender ! enumeratorsForPhases
 
     case NextMRChunk(idx: Int) ⇒
       val c = phaseChannels(idx)
-        def addHookForIdentifier = {
+
+      sender ! {
+        if (c.queue.length == 0) {
           val p = Promise[Option[JsValue]]()
           phaseChannels = phaseChannels.updated(idx, c.copy(hook = Some(p)))
           p
         }
-
-      sender ! {
-        if (c.queue.length == 0) addHookForIdentifier
         else c.queue.dequeue()
       }
 
@@ -81,35 +80,35 @@ class MRResultHandler(e: Enumerator[RiakResponse], phaseCount: Int, maxJobDurati
         case RiakMessageType.RpbErrorResp ⇒
           val exception = new Exception(RpbErrorResp().mergeFrom(chunk.message.toArray).errmsg.toStringUtf8)
           phaseChannels.foreach { x ⇒
-            x.hook.foreach(_.failure(exception))
-            x.queue.headOption.foreach(_.failure(exception))
+            x.hook.foreach(x ⇒ if (!x.isCompleted) x.failure(exception))
+            x.queue.headOption.foreach(x ⇒ if (!x.isCompleted) x.failure(exception))
           }
           throw exception
 
         case RiakMessageType.RpbMapRedResp ⇒
           val mrResp = RpbMapRedResp().mergeFrom(chunk.message.toArray)
           if (mrResp.done.isDefined) {
-            promiseForHeadChannel success None
+            newPromiseForHeadChannel success None
           }
-          else if (currentPhase.isDefined && currentPhase.get == mrResp.phase.get) {
-            mrRespToJsValue(mrResp).foreach(x ⇒ promiseForHeadChannel success Some(x))
+          else if (currentMRPhase.isDefined && currentMRPhase.get == mrResp.phase.get) {
+            mrRespToJsValue(mrResp).foreach(x ⇒ newPromiseForHeadChannel success Some(x))
           }
-          else if (currentPhase.isDefined && currentPhase.get != mrResp.phase.get) {
-            promiseForHeadChannel success None
-            currentPhaseIndex = currentPhaseIndex + 1
-            mrRespToJsValue(mrResp).foreach(x ⇒ promiseForHeadChannel success Some(x))
-            currentPhase = mrResp.phase
+          else if (currentMRPhase.isDefined && currentMRPhase.get != mrResp.phase.get) {
+            newPromiseForHeadChannel success None
+            currentPhaseChannelIndex = currentPhaseChannelIndex + 1
+            mrRespToJsValue(mrResp).foreach(x ⇒ newPromiseForHeadChannel success Some(x))
+            currentMRPhase = mrResp.phase
           }
           else {
-            mrRespToJsValue(mrResp).foreach(x ⇒ promiseForHeadChannel success Some(x))
-            currentPhase = mrResp.phase
+            mrRespToJsValue(mrResp).foreach(x ⇒ newPromiseForHeadChannel success Some(x))
+            currentMRPhase = mrResp.phase
           }
 
         case _ ⇒
           val exception = new Exception("Unexpect response returned in MR stream.")
           phaseChannels.foreach { x ⇒
-            x.hook.foreach(_.failure(exception))
-            x.queue.headOption.foreach(_.failure(exception))
+            x.hook.foreach(x ⇒ if (!x.isCompleted) x.failure(exception))
+            x.queue.headOption.foreach(x ⇒ if (!x.isCompleted) x.failure(exception))
           }
           throw exception
       }

@@ -70,11 +70,11 @@ You can use Raiku by source (by publishing it into your local Ivy repository):
 Or by adding the repo:
 <notextile><pre><code>"gideondk-repo" at "https://raw.github.com/gideondk/gideondk-mvn-repo/master"</code></pre></notextile>
 
-to your SBT configuration and adding the `SNAPSHOT` to your library dependencies:
+to your SBT configuration and adding Raiku to your library dependencies:
 
 ```scala
 libraryDependencies ++= Seq(
-	"nl.gideondk" %% "raiku" % "0.4.0"
+	"nl.gideondk" %% "raiku" % "0.5.0"
 )
 ````
 
@@ -82,7 +82,7 @@ libraryDependencies ++= Seq(
 For usage in combination with Play2.0, you have to use a Play2.0 version compiled against Akka 2.2, until Akka 2.2 integration is pushed into mainstream, you can find a version at: [https://github.com/gideondk/Play2.0](https://github.com/gideondk/Play20).
 
 When using the trunk version, remember to set:
-<notextile><pre><code>addSbtPlugin("play" % "sbt-plugin" % "2.2-SNAPSHOT")</code></pre></notextile>
+<notextile><pre><code>addSbtPlugin("play" % "sbt-plugin" % "2.2-akka22-SNAPSHOT")</code></pre></notextile>
 
 In your `plugins.sbt` to actually use the new Play version in your project.
 
