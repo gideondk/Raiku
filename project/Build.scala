@@ -45,9 +45,7 @@ object RaikuBuild extends Build {
                   "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
                   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
 
-                  "spray repo" at "http://repo.spray.io",
-
-                  "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.m2/repository"))
+                  "spray repo" at "http://repo.spray.io"))
 
   val appDependencies = Seq(
       "org.scalaz" %% "scalaz-core" % "7.0.0",
@@ -58,6 +56,8 @@ object RaikuBuild extends Build {
       
       "com.chuusai" % "shapeless_2.10.2" % "2.0.0-SNAPSHOT",
       "org.specs2" %% "specs2" % "1.14",
+
+      "com.typesafe.play" %% "play-iteratees" % "2.2-akka22-SNAPSHOT",
 
       "nl.gideondk" %% "sentinel" % "0.5.2"
   )
