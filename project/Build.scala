@@ -8,7 +8,7 @@ object RaikuBuild extends Build {
   override lazy val settings = super.settings ++
     Seq(
       name := "raiku",
-      version := "0.5.0",
+      version := "0.5.1",
       organization := "nl.gideondk",
       parallelExecution in Test := false,
       scalaVersion := "2.10.2",
@@ -59,7 +59,7 @@ object RaikuBuild extends Build {
 
       "com.typesafe.play" %% "play-iteratees" % "2.2-akka22-SNAPSHOT",
 
-      "nl.gideondk" %% "sentinel" % "0.5.2"
+      "nl.gideondk" %% "sentinel" % "0.5.3"
   )
 
   lazy val root = Project(id = "raiku",
