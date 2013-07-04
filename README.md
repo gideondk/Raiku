@@ -74,7 +74,7 @@ to your SBT configuration and adding Raiku to your library dependencies:
 
 ```scala
 libraryDependencies ++= Seq(
-	"nl.gideondk" %% "raiku" % "0.5.0"
+	"nl.gideondk" %% "raiku" % "0.5.1"
 )
 ````
 
