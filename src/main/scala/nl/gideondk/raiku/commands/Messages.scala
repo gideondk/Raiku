@@ -1,13 +1,8 @@
 package nl.gideondk.raiku.commands
 
-trait Enum[A] {
-  trait Value { self: A ⇒ }
-  val values: List[A]
-}
+sealed trait RiakMessageType
 
-sealed trait RiakMessageType extends RiakMessageType.Value
-
-object RiakMessageType extends Enum[RiakMessageType] {
+object RiakMessageType {
 
   case object RpbErrorResp extends RiakMessageType // 0
 
@@ -50,11 +45,17 @@ object RiakMessageType extends Enum[RiakMessageType] {
   case object RpbSearchQueryReq extends RiakMessageType // 27
   case object RbpSearchQueryResp extends RiakMessageType // 28
 
-  val values = List(RpbErrorResp, RpbPingReq, RpbPingResp, RpbGetClientIdReq, RpbGetClientIdResp, RpbSetClientIdReq, RpbSetClientIdResp, RpbGetServerInfoReq, RpbGetServerInfoResp,
-    RpbGetReq, RpbGetResp, RpbPutReq, RpbPutResp, RpbDelReq, RpbDelResp, RpbListBucketsReq, RpbListBucketsResp,
-    RpbListKeysReq, RpbListKeysResp, RpbGetBucketReq, RpbGetBucketResp, RpbSetBucketReq, RpbSetBucketResp,
-    RpbMapRedReq, RpbMapRedResp, RpbIndexReq, RpbIndexResp, RpbSearchQueryReq, RbpSearchQueryResp)
+  case object RbpCounterUpdateReq extends RiakMessageType // 50
+  case object RbpCounterUpdateResp extends RiakMessageType // 51
+  case object RbpCounterGetReq extends RiakMessageType // 52
+  case object RbpCounterGetResp extends RiakMessageType // 53
 
-  def messageTypeToInt(mt: RiakMessageType) = values.indexOf(mt)
+  val values = Map(0 -> RpbErrorResp, 1 -> RpbPingReq, 2 -> RpbPingResp, 3 -> RpbGetClientIdReq, 4 -> RpbGetClientIdResp, 5 -> RpbSetClientIdReq, 6 -> RpbSetClientIdResp, 7 -> RpbGetServerInfoReq, 8 -> RpbGetServerInfoResp,
+    9 -> RpbGetReq, 10 -> RpbGetResp, 11 -> RpbPutReq, 12 -> RpbPutResp, 13 -> RpbDelReq, 14 -> RpbDelResp, 15 -> RpbListBucketsReq, 16 -> RpbListBucketsResp,
+    17 -> RpbListKeysReq, 18 -> RpbListKeysResp, 19 -> RpbGetBucketReq, 20 -> RpbGetBucketResp, 21 -> RpbSetBucketReq, 22 -> RpbSetBucketResp,
+    23 -> RpbMapRedReq, 24 -> RpbMapRedResp, 25 -> RpbIndexReq, 26 -> RpbIndexResp, 27 -> RpbSearchQueryReq, 28 -> RbpSearchQueryResp,
+    50 -> RbpCounterUpdateReq, 51 -> RbpCounterUpdateResp, 52 -> RbpCounterGetReq, 53 -> RbpCounterGetResp)
+
+  def messageTypeToInt(mt: RiakMessageType) = values.keys.toList(values.values.toList.indexOf(mt))
   def intToMessageType(i: Int) = values(i)
 }

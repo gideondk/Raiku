@@ -38,4 +38,8 @@ package object raiku {
   implicit def vclockToVClockArgument(v: VClock): VClockArgument = VClockArgument(Option(v))
 
   implicit def unwrapRaikuValue[T](rv: RaikuValue[T]): T = rv.value.getOrElse(throw new Exception("Only object Meta is available."))
+
+  implicit class StringRange(val b: String) extends AnyVal {
+    def to(e: String) = RaikuStringRange(b, e)
+  }
 }

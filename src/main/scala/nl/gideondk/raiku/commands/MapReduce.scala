@@ -14,6 +14,7 @@ import Scalaz._
 import scala.concurrent.Promise
 import scala.concurrent.ExecutionContext.Implicits.global
 import akka.util.ByteString
+
 import shapeless._
 import LUBConstraint._
 import Tuples._
@@ -27,8 +28,6 @@ import nl.gideondk.raiku.actors._
 import Traversables._
 import akka.util.Timeout
 import scala.concurrent.duration._
-
-//private[raiku] case class RiakMROperation(promise: Promise[Unit], channels: List[Concurrent.Channel[JsValue]], command: ByteString)
 
 trait MapReduce extends Connection with ProtoBufConversion {
   def mrWorker: SentinelClient[RiakCommand, Enumerator[RiakResponse]]
@@ -81,7 +80,7 @@ trait MapReduce extends Connection with ProtoBufConversion {
 
                                                                                                                                                                                           m2: shapeless.MapperAux[MapReduce.this.consumeEnumerator.type, Z, D],
                                                                                                                                                                                           folder: shapeless.LeftFolderAux[D, Task[Unit], MapReduce.this.combineFutures.type, T],
-                                                                                                                                                                                          cse: shapeless.CaseAux[MapReduce.this.FlattenTask.type, shapeless.::[nl.gideondk.sentinel.Task[T], shapeless.HNil]],
+                                                                                                                                                                                          c: MapReduce.this.FlattenTask.Case1[nl.gideondk.sentinel.Task[T]],
                                                                                                                                                                                           l: shapeless.Length[C]) = {
     val phases = job.phases.filterNot[NonKeepedMapPhase].filterNot[NonKeepedReducePhase]
     val req = buildJobRequest(job)

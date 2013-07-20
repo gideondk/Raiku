@@ -14,6 +14,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import akka.actor.Actor
 import scala.concurrent.Promise
 import akka.pattern._
+import akka.routing._
 
 import akka.util.Timeout
 import scala.concurrent.duration._
@@ -122,6 +123,6 @@ object RaikuMRWorker {
 
   def apply(host: String, port: Int, numberOfWorkers: Int)(implicit system: ActorSystem) = {
       def stages = new EnumeratorStage(isMREnd, true) >> new RiakMessageStage >> new LengthFieldFrame(1024 * 1024 * 200, lengthIncludesHeader = false) // 200mb max
-    SentinelClient.randomRouting(host, port, numberOfWorkers, "Raiku-MR")(stages)(system)
+    SentinelClient.waiting(host, port, RandomRouter(numberOfWorkers), "Raiku-MR")(stages)(system)
   }
 }

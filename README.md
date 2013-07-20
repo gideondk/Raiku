@@ -26,6 +26,8 @@ Until version 1.0, the API of the client can and will change over versions, but 
 * Doing this non-blocking through multiple connections handled by multiple actors (through Sentinel).
 * Writing, fetching and deleting single or multiple objects at once;
 * Querying items on 2i, based on binary or integral indexes (ranges also supported);
+* Pagination and streaming of 2i queries; 
+* Setting and getting counters;
 * Sequencing and continuing multiple operations using Tasks;
 * Reactive Map/Reduce functionality;
 * Auto-Reconnecting client;
@@ -38,6 +40,13 @@ Until version 1.0, the API of the client can and will change over versions, but 
 * Additional documentation for specific use cases;
 * Link walking;
 * Search support.
+
+## Riak 1.4+
+
+From version Raiku version 0.6.0 and on, only Riak version 1.4+ is tested and supported. 
+It's possible that the client will work perfectly with older versions, but isn't tested and could result in unexpected behavior. 
+
+Please use Raiku 0.5.1 for usage with older versions of Riak.
 
 ## Architecture
 
@@ -74,9 +83,9 @@ to your SBT configuration and adding Raiku to your library dependencies:
 
 ```scala
 libraryDependencies ++= Seq(
-	"nl.gideondk" %% "raiku" % "0.5.1"
+	"nl.gideondk" %% "raiku" % "0.6.0"
 )
-````
+```
 
 ### Play Framework 2.0
 For usage in combination with Play2.0, you have to use a Play2.0 version compiled against Akka 2.2, until Akka 2.2 integration is pushed into mainstream, you can find a version at: [https://github.com/gideondk/Play2.0](https://github.com/gideondk/Play20).
@@ -125,6 +134,8 @@ Or to fetch keys on 2i:
 
 <code>fetchKeysForBinIndexByValue</code>
 
+<code>fetchKeysForBinIndexByValueRange</code>
+
 <code>fetchKeysForIntIndexByValue</code>
 
 <code>fetchKeysForIntIndexByValueRange</code>
@@ -153,6 +164,38 @@ persons -* 	 List(Person("Basho", 42, "Japan"), Person("Shiki", 52, "Japan"))
 persons idx  ("age", 42)
 persons idx	 ("country", "Japan")
 persons idx	 ("age", 39 to 50)
+persons idx 	("group_id", "A" to "B")
+```
+
+## 2i
+Raiku supports the newer 2i functionality available in Riak 1.4.0 through pagination and result streaming.
+
+### Pagination
+When using ranged queries on secondary indexes, it's possible to set a maximum number of results for both integral as binary range queries: 
+
+```scala
+bucket idx ("age", 20 to 50, maxResults = 20) 
+bucket idx ("group_id", "A" to "D", 40)
+```
+
+Queries with a maximum in results not only return the normal `List[String]` containing the keys, but also returns a option on a *continuation*, combining the result to a `Task[(Option[String], List[String])]`.
+
+This continuation value can be used to get the succeeding values of a specific query, making it able to paginate through values: 
+
+```scala
+val (cont, items) = (bucket idx ("age", 20 to 50, 10).copoint
+val (secCont, items) = (bucket idx ("age", 20 to 50, maxResults = 10, continuation = cont)).copoint
+```
+
+Passing a `None` to the index query as the continuation value, treats the query as to paginate from start. When taking results through this pagination functionality, treat a `None` as returning continuation key as a *end-of-content*.
+
+### Streaming
+For each non-paging 2i query, a `streamIdx` equivalent is available. Instead of returning a `Task[List[String]]` for index values, keys are streamed back using a *Enumerator*, wrapping each result into a `Task[Enumerator]`.
+
+This Play powered enumerator can directly be used to directly stream results to (web)clients, but can also be used to be composed into more complex pipelines (see the MapReduce and Reactive API chapters later on):
+
+```scala
+val persons: Task[List[Person]] = (bucket streamIdx ("age", 25)).flatMap(x ⇒ Task(x &> reactiveBucket.fetchEnumeratee() |>>> Iteratee.getChunks))
 ```
 
 ## MapReduce
@@ -201,7 +244,35 @@ res0: Tuple2[Enumerator[JsValue], Enumerator[JsValue]]
 
 Returning a `Tuple` of `Play` powered broadcast `Enumerators`, streaming multiple results in a *map phase* and streaming a single result during a *reduce phase*.
 
+## Counters
+Raiku exposes the counter functionality from Riak in a easy to use solution for auto-resolving counters in highly distributed environments.
+
+Counter functionality is directly exposed through two functions on a `RaikuBucket`: 
+
+```scala
+getCount(key: String, ...): Task[Long]
+incrementCount(key: String, amount: Long, ...): Task[Option[Long]]
+```
+
+Counters can also be used in a more natural way by creating and using a `RaikuCounter`:
+
+```scala
+val counter = bucket counter "person_count"
+val tpl = for {
+  a ← counter += 5
+  b ← counter += 20
+  c ← counter += 70
+  _ ← counter -= 40
+  v ← counter.get
+} yield v
+```
+
+The `RaikuCounter` class has a `get` method, to return the current value from Riak as a `Task[Long]`, but also exposes both `+=` and `-=` methods (both also returning a `Task[Long]`) for increasing or decreasing of counter values. 
+
+
 ## Reactive API
+***Word of caution: the current reactive API will change heavily in the 0.7.0 release of Raiku***
+
 To expose further reactive functionality for usage in your favorite reactive web stack, the client is implementing a naive *Reactive API*.
 
 Because Riak doens't support bulk inserts, bulk fetches or cursors, the Reactive API won't give you additional performance on top of the multi-fetch & multi-store `Future` implementation. But enables you to compose data flows in a more natural way, leveraging the awesome Reactive API `Play2.0` exposes.
@@ -217,7 +288,7 @@ Enumeratee.filter(_.isDefined) &> Enumeratee.map(x ⇒ x.get) &> bucket.deleteEn
 Iteratee.fold(0) { (result, chunk) ⇒ result + 1 }
 ```
 
-## (co)Monadic behavior
+## (Co)Monadic behavior
 You can use the monadic behavior of <code>Task[RaikuValue[T]]</code> to combine multiple requests:
 
 ```scala

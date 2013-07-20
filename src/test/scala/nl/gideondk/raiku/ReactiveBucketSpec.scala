@@ -25,9 +25,11 @@ class ReactiveBucketSpec extends RaikuSpec {
 
   val bucket = RaikuReactiveBucket[Y]("raiku_test_y_bucket_"+java.util.UUID.randomUUID.toString, client)
 
+  val normalBucket = RaikuBucket[Y](bucket.bucketName, client)
+
   val nrOfItems = 500
 
-  val randomObjects = List.fill(nrOfItems)(Y(java.util.UUID.randomUUID.toString, "Test Name", 25, "A")).toList
+  val randomObjects = List.fill(nrOfItems)(Y(java.util.UUID.randomUUID.toString, "Test Name", scala.util.Random.nextInt(100), "A")).toList
   val ids = randomObjects.map(_.id)
 
   "A reactive bucket" should {
@@ -45,13 +47,14 @@ class ReactiveBucketSpec extends RaikuSpec {
     "should be able to fetch objects based on indexes reactivly" in {
       Await.result(bucket.store(Enumerator(randomObjects: _*)), Duration(5, SECONDS))
       val idxs = Vector.fill(5)("group_id" -> "A")
-      val e = Enumerator(idxs: _*) &> bucket.binIdxEnumeratee &> bucket.fetchManyEnumeratee() |>>> Iteratee.fold(List[Y]()) { (result, chunk) ⇒
-        result ++ chunk.flatten
+
+      val e = bucket.client.streamKeysForBinIndexByValue(bucket.bucketName, "group_id", "A").copoint &> bucket.fetchEnumeratee() |>>> Iteratee.fold(List[Y]()) { (result, chunk) ⇒
+        result ++ chunk.toList
       }
 
       val res = Await.result(e, Duration(15, SECONDS))
       Await.result(bucket.delete(Enumerator(randomObjects: _*)), Duration(5, SECONDS))
-      res.length == 5 * 500
+      res.length == 500
     }
 
     "should be able to compose correctly" in {

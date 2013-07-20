@@ -8,7 +8,7 @@ object RaikuBuild extends Build {
   override lazy val settings = super.settings ++
     Seq(
       name := "raiku",
-      version := "0.5.1",
+      version := "0.6.0",
       organization := "nl.gideondk",
       parallelExecution in Test := false,
       scalaVersion := "2.10.2",
@@ -50,16 +50,16 @@ object RaikuBuild extends Build {
   val appDependencies = Seq(
       "org.scalaz" %% "scalaz-core" % "7.0.0",
       "org.scalaz" %% "scalaz-effect" % "7.0.0",
-      "com.google.protobuf" % "protobuf-java" % "2.4.1",
+      "com.google.protobuf" % "protobuf-java" % "2.5.0",
+
+      "nl.gideondk" %% "sentinel" % "0.5.5",
 
       "io.spray" %%  "spray-json" % "1.2.3",
-      
-      "com.chuusai" % "shapeless_2.10.2" % "2.0.0-SNAPSHOT",
       "org.specs2" %% "specs2" % "1.14",
 
       "com.typesafe.play" %% "play-iteratees" % "2.2-akka22-SNAPSHOT",
 
-      "nl.gideondk" %% "sentinel" % "0.5.3"
+      "com.chuusai" % "shapeless_2.10.0" % "1.2.4"
   )
 
   lazy val root = Project(id = "raiku",

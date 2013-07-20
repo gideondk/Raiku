@@ -47,6 +47,8 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
   val bucket = RaikuBucket[Y]("raiku_test_y_bucket_"+java.util.UUID.randomUUID.toString, client)
   bucket.setBucketProperties(RaikuBucketProperties(None, Some(true))).copoint
 
+  val reactiveBucket = RaikuReactiveBucket[Y](bucket.bucketName, client)
+
   val nrOfItems = 2000
 
   val randomObjects = List.fill(nrOfItems)(Y(java.util.UUID.randomUUID.toString, "Test Name", 25, "A")).toList
@@ -99,8 +101,28 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
       }
     }
 
-    "be able to delete objects in timely fashion" in {
+    "be able to stream index keys in timely fashion" in {
+      import play.api.libs.iteratee
+      val parActs = for (i ← 0 to 5) yield { (bucket streamIdx ("age", 25)).flatMap(x ⇒ Task(x |>>> Iteratee.getChunks)) }
 
+      val seq = Task.sequenceSuccesses(parActs.toList)
+      timed("Streaming "+nrOfItems+" index keys in parallel", nrOfItems * 5) {
+        val a = seq.run(Duration(15, SECONDS))
+      }
+    }
+
+    "be able to stream index keys into a fetch in timely fashion" in {
+      import play.api.libs.iteratee
+      val parActs = for (i ← 0 to 5) yield { (bucket streamIdx ("age", 25)).flatMap(x ⇒ Task(x &> reactiveBucket.fetchEnumeratee() |>>> Iteratee.getChunks)) }
+
+      val seq = Task.sequenceSuccesses(parActs.toList)
+      timed("Streaming "+nrOfItems+" items from indexes in parallel", nrOfItems * 5) {
+        val a = seq.run(Duration(15, SECONDS))
+
+      }
+    }
+
+    "be able to delete objects in timely fashion" in {
       val futs = bucket -* (randomObjects, r = 1, w = 1)
 
       timed("Deleting "+nrOfItems+" items in parallel", nrOfItems) {
@@ -110,3 +132,4 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
   }
 
 }
+

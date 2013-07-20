@@ -10,6 +10,7 @@ import scalaz._
 import Scalaz._
 
 import com.google.protobuf.{ ByteString ⇒ ProtoBufByteString }
+
 import com.basho.riak.protobuf._
 import nl.gideondk.raiku.commands._
 import nl.gideondk.raiku._
@@ -26,6 +27,7 @@ trait ProtoBufConversion {
   implicit def messageToByteArray[T <: MessageLite with MessageLite.Builder](m: com.basho.riak.protobuf.Message[T]) = {
     val os = new ByteArrayOutputStream()
     val cos = CodedOutputStream.newInstance(os)
+
     m.writeTo(cos)
     cos.flush()
     os.close()

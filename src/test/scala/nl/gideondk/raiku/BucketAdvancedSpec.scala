@@ -11,13 +11,14 @@ import Scalaz._
 import spray.json._
 
 import org.specs2.mutable._
+import play.api.libs.iteratee._
 
 import scala.util.{ Success, Failure }
 
 class BucketAdvancedSpec extends RaikuSpec {
   import TestModels._
 
-  val bucket = RaikuBucket[Y]("raiku_test_y_bucket", client)
+  val bucket = RaikuBucket[Y]("raiku_test_y_bucket_"+java.util.UUID.randomUUID.toString, client)
   bucket.setBucketProperties(RaikuBucketProperties(None, Some(true))).copoint
 
   "A bucket" should {
@@ -35,6 +36,7 @@ class BucketAdvancedSpec extends RaikuSpec {
       res must have length 1
       res.head must beEqualTo(newId)
     }
+
     "be able to retrieve objects with their integeral 2i" in {
       val newId = java.util.UUID.randomUUID.toString
       val groupId = java.util.UUID.randomUUID.toString
@@ -49,6 +51,7 @@ class BucketAdvancedSpec extends RaikuSpec {
 
       res must contain(newId)
     }
+
     "be able to retrieve objects with ranges on a integeral 2i" in {
       val newId = java.util.UUID.randomUUID.toString
       val secId = java.util.UUID.randomUUID.toString
@@ -75,6 +78,92 @@ class BucketAdvancedSpec extends RaikuSpec {
 
       res._3 must not contain (newId)
       res._3 must contain(secId)
+    }
+
+    "be able to retrieve objects with ranges on a binary 2i" in {
+      val newId = java.util.UUID.randomUUID.toString
+      val secId = java.util.UUID.randomUUID.toString
+      val thirdId = java.util.UUID.randomUUID.toString
+
+      val persA = Y(newId, "Person A", 41, "A")
+      val persB = Y(secId, "Person B", 52, "B")
+      val persC = Y(thirdId, "Person C", 12, "C")
+
+      val keys = for {
+        _ ← bucket << persA
+        _ ← bucket << persB
+        _ ← bucket << persC
+        all ← bucket idx ("group_id", "A" to "C")
+        aAndB ← bucket idx ("group_id", "A" to "B")
+        bAndC ← bucket idx ("group_id", "B" to "C")
+      } yield (all, aAndB, bAndC)
+
+      val res = keys.copoint
+
+      res._1 must contain(newId)
+      res._1 must contain(secId)
+      res._1 must contain(thirdId)
+
+      res._2 must contain(newId)
+      res._2 must contain(secId)
+      res._2 must not contain (thirdId)
+
+      res._3 must not contain (newId)
+      res._3 must contain(secId)
+      res._3 must contain(thirdId)
+    }
+
+    "be able to retrieve objects with a maximum number of results" in {
+      val groupId = java.util.UUID.randomUUID.toString
+      val objs = List.fill(50)(Y(java.util.UUID.randomUUID.toString, "Matsuo Bashō", 41, groupId))
+
+      val i = for {
+        _ ← bucket <<* objs
+        items ← bucket idx ("age", 40 to 41, 25)
+      } yield items
+
+      val res = i.copoint
+      res._2 must have length 25
+    }
+
+    "be able to paginate index results" in {
+      val groupId = java.util.UUID.randomUUID.toString
+      val objs = List.fill(200)(Y(java.util.UUID.randomUUID.toString, "Matsuo Bashō", scala.util.Random.nextInt(99), groupId))
+
+      val i = for {
+        _ ← bucket <<* (objs, r = 3, w = 3)
+        f ← bucket idx ("age", 20 to 50, 4)
+        s ← bucket idx ("age", 20 to 50, 4, f._1)
+        t ← bucket idx ("age", 20 to 50, 4, s._1)
+        l ← bucket idx ("age", 20 to 50, 4, t._1)
+      } yield f._2 ++ s._2 ++ t._2 ++ l._2
+
+      val res = i.copoint
+      res must have length 16
+    }
+
+    "be able to stream index results" in {
+      val idxs = (bucket streamIdx ("age", 25)).flatMap(x ⇒ Task(x |>>> Iteratee.getChunks))
+      val normalQuery = bucket idx ("age", 25)
+
+      idxs.copoint must have length normalQuery.copoint.length
+    }
+
+    "a counter should increment correctly" in {
+      val counter = bucket counter "like_count"
+      val tpl = for {
+        initial ← counter.get
+        firstAdd ← counter += 5
+        secAdd ← counter += 20
+        thirdAdd ← counter += 70
+        _ ← counter -= 40
+        lastValue ← counter.get
+      } yield (initial, thirdAdd, lastValue)
+
+      val res = tpl.copoint
+      res._1 must beEqualTo(0)
+      res._2 must beEqualTo(95)
+      res._3 must beEqualTo(55)
     }
 
     "be able to use Scalaz functionality on Tasks" in {

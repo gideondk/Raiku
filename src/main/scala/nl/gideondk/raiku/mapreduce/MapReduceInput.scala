@@ -1,13 +1,16 @@
 package nl.gideondk.raiku.mapreduce
 
-import shapeless.{ :: ⇒ ::, HList }
-import shapeless.{ HNil, LUBConstraint, PrependAux }
-import shapeless.HList.hlistOps
-
+import shapeless._
 import MapReducePhases.keeped
 
 trait MapReduceInput {
   import MapReducePhases._
+
+  def |>>(f: MFunction)(implicit bct: LUBConstraint[MapPhase :: HNil, MapReducePhase]) =
+    MapReduceJob(this, MapPhase(f) :: HNil)
+
+  def |>>(f: RFunction)(implicit bct: LUBConstraint[ReducePhase :: HNil, MapReducePhase]) =
+    MapReduceJob(this, ReducePhase(f) :: HNil)
 
   def |>>[T <: HList, Z <: HList](mrp: MapReducePhasesMHead[T])(implicit p: PrependAux[T, MapPhase :: HNil, Z],
                                                                 bct: LUBConstraint[Z, MapReducePhase]) = {

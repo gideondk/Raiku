@@ -109,7 +109,7 @@ class MapReduceSpec extends RaikuSpec {
       r._2(0) must beEqualTo(JsNumber(correctItems.length))
     }
 
-    "return the correct results for int indexes" in {
+    "return the correct results for integer indexes" in {
 
       val mapToNumber = MapFunction("function() {return [1]; }")
       val reduceSum = BuildInReduceFunction("Riak.reduceSum")
@@ -121,21 +121,6 @@ class MapReduceSpec extends RaikuSpec {
 
       val r = (client mapReduce mrJob).copoint
 
-      r._1 must have size correctItems.length
-      r._2(0) must beEqualTo(JsNumber(correctItems.length))
-    }
-
-    "return the correct results for range indexes" in {
-
-      val mapToNumber = MapFunction("function() {return [1]; }")
-      val reduceSum = BuildInReduceFunction("Riak.reduceSum")
-
-      val mrJob = MR.rangeIdx(bucket.bucketName, "age", 50 to 70) |>> mapToNumber >=> reduceSum
-      val phases = mrJob.phases
-
-      val correctItems = vec.filter(x ⇒ x.age >= 50 && x.age <= 70)
-
-      val r = (client mapReduce mrJob).copoint
       r._1 must have size correctItems.length
       r._2(0) must beEqualTo(JsNumber(correctItems.length))
     }

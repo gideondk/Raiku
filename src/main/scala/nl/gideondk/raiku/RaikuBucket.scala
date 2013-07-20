@@ -28,6 +28,24 @@ case class RaikuBucketConfig(r: RArgument = RArgument(), rw: RWArgument = RWArgu
 case class RaikuBucket[T: ClassTag](bucketName: String, client: RaikuClient, config: RaikuBucketConfig = RaikuBucketConfig(),
                                     resolver: RaikuResolver[T] = RaikuResolver.throwConflicts[T], mutator: RaikuMutator[T] = RaikuMutator.clobber[T])(implicit converter: RaikuValueConverter[T]) {
 
+  class RaikuCounter(key: String) {
+    def get: Task[Long] = getCount(key)
+
+    def get(r: RArgument = RArgument(),
+            pr: PRArgument = PRArgument(),
+            basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+            notFoundOk: NotFoundOkArgument = NotFoundOkArgument()): Task[Long] = getCount(key, r, pr, basicQuorum, notFoundOk)
+
+    def +=(amount: Long,
+           w: WArgument = WArgument(),
+           dw: DWArgument = DWArgument(),
+           pw: PWArgument = PWArgument()): Task[Long] = incrementCount(key, amount, w, dw, pw, true) map (~_) // Always returning the long by default, so not treating it as an option here...
+
+    def -=(amount: Long,
+           w: WArgument = WArgument(),
+           dw: DWArgument = DWArgument(),
+           pw: PWArgument = PWArgument()): Task[Long] = incrementCount(key, -amount, w, dw, pw, true) map (~_) // Always returning the long by default, so not treating it as an option here...
+  }
   /** Retrieves the bucket properties from the current bucket
    */
 
@@ -292,11 +310,116 @@ case class RaikuBucket[T: ClassTag](bucketName: String, client: RaikuClient, con
   /** Fetches keys based on a ranged integer index
    *
    *  @param idxk the integer index key
-   *  @param idxr the ranged integer index value
+   *  @param idxv the ranged integer index value
    */
 
   def fetchKeysForIntIndexByValueRange(idxk: String, idxr: Range): Task[List[String]] =
     client.fetchKeysForIntIndexByValueRange(bucketName, idxk, idxr)
+
+  /** Fetches keys based on a ranged integer index, maxed on the number of results
+   *
+   *  @param idxk the integer index key
+   *  @param idxv the ranged integer index value
+   *  @param maxResults the maximal number of results to return
+   *  @param continuation continutation used for pagination
+   */
+
+  def fetchMaxedKeysForIntIndexByValueRange(idxk: String, idxr: Range, maxResults: Int, continuation: Option[String] = None): Task[(Option[String], List[String])] =
+    client.fetchMaxedKeysForIntIndexByValueRange(bucketName, idxk, idxr, maxResults, continuation)
+
+  /** Fetches keys based on a ranged binary index
+   *
+   *  @param idxk the integer index key
+   *  @param idxv the ranged integer index value
+   */
+
+  def fetchKeysForBinIndexByValueRange(idxk: String, idxr: RaikuStringRange): Task[List[String]] =
+    client.fetchKeysForBinIndexByValueRange(bucketName, idxk, idxr)
+
+  /** Fetches keys based on a ranged binary index, maxed on the number of results
+   *
+   *  @param idxk the integer index key
+   *  @param idxv the ranged integer index value
+   *  @param maxResults the maximal number of results to return
+   *  @param continuation continutation used for pagination
+   */
+
+  def fetchMaxedKeysForBinIndexByValueRange(idxk: String, idxr: RaikuStringRange, maxResults: Int, continuation: Option[String] = None): Task[(Option[String], List[String])] =
+    client.fetchMaxedKeysForBinIndexByValueRange(bucketName, idxk, idxr, maxResults, continuation)
+
+  /** Streams keys based on a binary index
+   *
+   *  @param idxk the binary index key
+   *  @param idxv the binary index value
+   */
+
+  def streamKeysForBinIndexByValue(idxk: String, idxv: String): Task[Enumerator[String]] =
+    client.streamKeysForBinIndexByValue(bucketName, idxk, idxv)
+
+  /** Streams keys based on a binary index
+   *
+   *  @param idxk the binary index key
+   *  @param idxv the binary index value
+   */
+
+  def streamKeysForIntIndexByValue(idxk: String, idxv: Int): Task[Enumerator[String]] =
+    client.streamKeysForIntIndexByValue(bucketName, idxk, idxv)
+
+  /** Streams keys based on a ranged integer index
+   *
+   *  @param idxk the integer index key
+   *  @param idxv the ranged integer index value
+   */
+
+  def streamKeysForIntIndexByValueRange(idxk: String, idxv: Range): Task[Enumerator[String]] =
+    client.streamKeysForIntIndexByValueRange(bucketName, idxk, idxv)
+
+  /** Streams keys based on a ranged binary index
+   *
+   *  @param idxk the binary index key
+   *  @param idxv the ranged binary index value
+   */
+
+  def streamKeysForBinIndexByValueRange(idxk: String, idxv: RaikuStringRange): Task[Enumerator[String]] =
+    client.streamKeysForBinIndexByValueRange(bucketName, idxk, idxv)
+
+  /** Fetches a count from the current Raiku bucket
+   *
+   *  @param key the to be retrieved key from Riak
+   *  @param r the R argument: how many replicas need to agree when retrieving the object
+   *  @param pr the PR argument: how many primary replicas need to be available when retrieving the object
+   *  @param basicQuorum whether to return early in some failure cases (eg. when r=1 and you get 2 errors and a success basic_quorum=true would return an error)
+   *  @param notFoundOk whether to treat notfounds as successful reads for the purposes of R
+   */
+
+  def getCount(key: String,
+               r: RArgument = RArgument(),
+               pr: PRArgument = PRArgument(),
+               basicQuorum: BasicQuorumArgument = BasicQuorumArgument(),
+               notFoundOk: NotFoundOkArgument = NotFoundOkArgument()): Task[Long] = {
+    val (nR, pR) = (List(r.v, config.r.v).flatten headOption, List(pr.v, config.pr.v).flatten headOption)
+    client.getCount(bucketName, key, nR, pR, basicQuorum.v, notFoundOk.v)
+  }
+
+  /** Increments a count from the current Raiku bucket
+   *
+   *  @param key the to be retrieved key from Riak
+   *  @param amount the amount to increment the counter to
+   *  @param w (write quorum) how many replicas to write to before returning a successful response
+   *  @param pw how many primary nodes must be up when the write is attempted
+   *  @param dw how many replicas to commit to durable storage before returning a successful response
+   *  @param returnValue if the operation should return the new value or not (true by default)
+   */
+
+  def incrementCount(key: String,
+                     amount: Long,
+                     w: WArgument = WArgument(),
+                     dw: DWArgument = DWArgument(),
+                     pw: PWArgument = PWArgument(),
+                     returnValue: Boolean = true): Task[Option[Long]] = {
+    val (nW, nDw, nPw) = (List(w.v, config.w.v).flatten headOption, List(dw.v, config.dw.v).flatten headOption, List(pw.v, config.pw.v).flatten headOption)
+    client.incrementCount(bucketName, key, amount, nW, nDw, nPw, returnValue)
+  }
 
   /** @see fetch
    */
@@ -399,5 +522,59 @@ case class RaikuBucket[T: ClassTag](bucketName: String, client: RaikuClient, con
 
   def idx(idxk: String, idxv: Range): Task[List[String]] =
     fetchKeysForIntIndexByValueRange(idxk, idxv)
+
+  /** @see fetchMaxedKeysForIntIndexByValueRange
+   */
+
+  def idx(idxk: String, idxr: Range, maxResults: Int): Task[(Option[String], List[String])] =
+    fetchMaxedKeysForIntIndexByValueRange(idxk, idxr, maxResults, None)
+
+  def idx(idxk: String, idxr: Range, maxResults: Int, continuation: Option[String]): Task[(Option[String], List[String])] =
+    fetchMaxedKeysForIntIndexByValueRange(idxk, idxr, maxResults, continuation)
+
+  /** @see fetchKeysForIntIndexByValueRange
+   */
+
+  def idx(idxk: String, idxv: RaikuStringRange): Task[List[String]] =
+    fetchKeysForBinIndexByValueRange(idxk, idxv)
+
+  /** @see fetchMaxedKeysForIntIndexByValueRange
+   */
+
+  def idx(idxk: String, idxr: RaikuStringRange, maxResults: Int): Task[(Option[String], List[String])] =
+    fetchMaxedKeysForBinIndexByValueRange(idxk, idxr, maxResults, None)
+
+  def idx(idxk: String, idxr: RaikuStringRange, maxResults: Int, continuation: Option[String]): Task[(Option[String], List[String])] =
+    fetchMaxedKeysForBinIndexByValueRange(idxk, idxr, maxResults, continuation)
+
+  /** @see streamKeysForBinIndexByValue
+   */
+
+  def streamIdx(idxk: String, idxv: String): Task[Enumerator[String]] =
+    streamKeysForBinIndexByValue(idxk, idxv)
+
+  /** @see streamKeysForIntIndexByValue
+   */
+
+  def streamIdx(idxk: String, idxv: Int): Task[Enumerator[String]] =
+    streamKeysForIntIndexByValue(idxk, idxv)
+
+  /** @see streamKeysForIntIndexByValueRange
+   */
+
+  def streamIdx(idxk: String, idxv: Range): Task[Enumerator[String]] =
+    streamKeysForIntIndexByValueRange(idxk, idxv)
+
+  /** @see streamKeysForBinIndexByValueRange
+   */
+
+  def streamIdx(idxk: String, idxv: RaikuStringRange): Task[Enumerator[String]] =
+    streamKeysForBinIndexByValueRange(idxk, idxv)
+
+  /** Created a new counter
+   *
+   *  @param key the key of the counter
+   */
+  def counter(key: String) = new RaikuCounter(key)
 }
 
