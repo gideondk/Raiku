@@ -49,7 +49,7 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
 
   val reactiveBucket = RaikuReactiveBucket[Y](bucket.bucketName, client)
 
-  val nrOfItems = 2000
+  val nrOfItems = 500
 
   val randomObjects = List.fill(nrOfItems)(Y(java.util.UUID.randomUUID.toString, "Test Name", 25, "A")).toList
   val ids = randomObjects.map(_.id)
@@ -60,13 +60,13 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
 
       timed("Storing "+nrOfItems+" items sequentially", nrOfItems) {
         acts.foreach { x ⇒
-          x.run(Duration(15, SECONDS))
+          x.run(Duration(30, SECONDS))
         }
       }
 
       val futs = bucket <<* (randomObjects, w = 1)
       timed("Storing "+nrOfItems+" items in parallel", nrOfItems) {
-        val status = futs.run(Duration(15, SECONDS))
+        val status = futs.run(Duration(30, SECONDS))
       }
     }
 
@@ -75,14 +75,14 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
 
       timed("Fetching "+nrOfItems+" items sequentially", nrOfItems) {
         acts.foreach { x ⇒
-          x.run(Duration(15, SECONDS))
+          x.run(Duration(30, SECONDS))
         }
       }
 
       val futs = bucket ?* (ids, r = 1)
 
       timed("Fetching "+nrOfItems+" items in parallel", nrOfItems) {
-        val status = futs.run(Duration(15, SECONDS))
+        val status = futs.run(Duration(30, SECONDS))
       }
     }
 
@@ -90,14 +90,14 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
       val acts = for (i ← 0 to 100) yield { bucket idx ("age", 25) }
       timed("Fetching "+nrOfItems+" index keys sequentially", nrOfItems * 100) {
         acts.foreach { x ⇒
-          x.run(Duration(15, SECONDS))
+          x.run(Duration(30, SECONDS))
         }
       }
 
       val parActs = for (i ← 0 to 100) yield { bucket idx ("age", 25) }
       val seq = Task.sequenceSuccesses(parActs.toList)
       timed("Fetching "+nrOfItems+" index keys in parallel", nrOfItems * 100) {
-        seq.run(Duration(15, SECONDS))
+        seq.run(Duration(30, SECONDS))
       }
     }
 
@@ -107,7 +107,7 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
 
       val seq = Task.sequenceSuccesses(parActs.toList)
       timed("Streaming "+nrOfItems+" index keys in parallel", nrOfItems * 5) {
-        val a = seq.run(Duration(15, SECONDS))
+        val a = seq.run(Duration(30, SECONDS))
       }
     }
 
@@ -117,7 +117,7 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
 
       val seq = Task.sequenceSuccesses(parActs.toList)
       timed("Streaming "+nrOfItems+" items from indexes in parallel", nrOfItems * 5) {
-        val a = seq.run(Duration(15, SECONDS))
+        val a = seq.run(Duration(30, SECONDS))
 
       }
     }
@@ -126,7 +126,7 @@ class PerformanceSpec extends BenchmarkSpec with DefaultJsonProtocol {
       val futs = bucket -* (randomObjects, r = 1, w = 1)
 
       timed("Deleting "+nrOfItems+" items in parallel", nrOfItems) {
-        val status = futs.run(Duration(15, SECONDS))
+        val status = futs.run(Duration(30, SECONDS))
       }
     }
   }
