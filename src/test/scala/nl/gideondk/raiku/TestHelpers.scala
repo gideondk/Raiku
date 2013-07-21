@@ -35,7 +35,7 @@ object TestModels extends DefaultJsonProtocol {
 }
 
 trait RaikuSpec extends Specification {
-  implicit val timeout = Duration(5, duration.SECONDS)
+  implicit val timeout = Duration(30, duration.SECONDS)
   val client = DB.client
 
 }
