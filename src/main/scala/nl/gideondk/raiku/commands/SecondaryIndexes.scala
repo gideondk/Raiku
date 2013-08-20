@@ -33,23 +33,37 @@ trait IndexRequests extends Request {
     (cont, keys)
   }
 
+  /* Basic Index Queries */
+
   def fetchKeysForBinIndexByValue(bucket: String, idx: String, idxv: String): Task[List[String]] =
     fetchKeysForIndexRequest(buildRequest(RiakMessageType.RpbIndexReq, RpbIndexReq(bucket, idx+"_bin", RpbIndexReq.IndexQueryType.valueOf(0), idxv.some.map(x ⇒ x), None, None)))
 
   def fetchKeysForIntIndexByValue(bucket: String, idx: String, idxv: Int): Task[List[String]] =
     fetchKeysForIndexRequest(buildRequest(RiakMessageType.RpbIndexReq, RpbIndexReq(bucket, idx+"_int", RpbIndexReq.IndexQueryType.valueOf(0), idxv.some.map(x ⇒ x.toString), None, None)))
 
+  /* Ranged Index Queries */
+
   def fetchKeysForBinIndexByValueRange(bucket: String, idx: String, idxr: RaikuStringRange): Task[List[String]] =
     fetchKeysForIndexRequest(buildRequest(RiakMessageType.RpbIndexReq, RpbIndexReq(bucket, idx+"_bin", RpbIndexReq.IndexQueryType.valueOf(1), None, idxr.start.some.map(x ⇒ x.toString), idxr.end.some.map(x ⇒ x.toString))))
-
-  def fetchMaxedKeysForBinIndexByValueRange(bucket: String, idx: String, idxr: RaikuStringRange, maxResults: Int, continuation: Option[String]): Task[(Option[String], List[String])] =
-    fetchKeysForMaxedIndexRequest(buildRequest(RiakMessageType.RpbIndexReq, RpbIndexReq(bucket, idx+"_bin", RpbIndexReq.IndexQueryType.valueOf(1), None, idxr.start.some.map(x ⇒ x.toString), idxr.end.some.map(x ⇒ x.toString), None, None, Some(maxResults), continuation.map(x ⇒ x))))
 
   def fetchKeysForIntIndexByValueRange(bucket: String, idx: String, idxr: Range): Task[List[String]] =
     fetchKeysForIndexRequest(buildRequest(RiakMessageType.RpbIndexReq, RpbIndexReq(bucket, idx+"_int", RpbIndexReq.IndexQueryType.valueOf(1), None, idxr.start.some.map(x ⇒ x.toString), idxr.end.some.map(x ⇒ x.toString))))
 
+  /* Paginated Index Queries */
+
+  def fetchMaxedKeysForBinIndexByValue(bucket: String, idx: String, idxv: String, maxResults: Int, continuation: Option[String]): Task[(Option[String], List[String])] =
+    fetchKeysForMaxedIndexRequest(buildRequest(RiakMessageType.RpbIndexReq, RpbIndexReq(bucket, idx+"_bin", RpbIndexReq.IndexQueryType.valueOf(0), idxv.some.map(x ⇒ x), None, None, None, None, Some(maxResults), continuation.map(x ⇒ x))))
+
+  def fetchMaxedKeysForBinIndexByValueRange(bucket: String, idx: String, idxr: RaikuStringRange, maxResults: Int, continuation: Option[String]): Task[(Option[String], List[String])] =
+    fetchKeysForMaxedIndexRequest(buildRequest(RiakMessageType.RpbIndexReq, RpbIndexReq(bucket, idx+"_bin", RpbIndexReq.IndexQueryType.valueOf(1), None, idxr.start.some.map(x ⇒ x), idxr.end.some.map(x ⇒ x.toString), None, None, Some(maxResults), continuation.map(x ⇒ x))))
+
+  def fetchMaxedKeysForIntIndexByValue(bucket: String, idx: String, idxv: Int, maxResults: Int, continuation: Option[String]): Task[(Option[String], List[String])] =
+    fetchKeysForMaxedIndexRequest(buildRequest(RiakMessageType.RpbIndexReq, RpbIndexReq(bucket, idx+"_int", RpbIndexReq.IndexQueryType.valueOf(0), idxv.some.map(x ⇒ x.toString), None, None, None, None, Some(maxResults), continuation.map(x ⇒ x))))
+
   def fetchMaxedKeysForIntIndexByValueRange(bucket: String, idx: String, idxr: Range, maxResults: Int, continuation: Option[String]): Task[(Option[String], List[String])] =
     fetchKeysForMaxedIndexRequest(buildRequest(RiakMessageType.RpbIndexReq, RpbIndexReq(bucket, idx+"_int", RpbIndexReq.IndexQueryType.valueOf(1), None, idxr.start.some.map(x ⇒ x.toString), idxr.end.some.map(x ⇒ x.toString), None, None, Some(maxResults), continuation.map(x ⇒ x))))
+
+  /* Streaming Index Queries */
 
   def streamKeysForBinIndexByValue(bucket: String, idx: String, idxv: String): Task[Enumerator[String]] =
     buildStreaming2iRequest(RiakMessageType.RpbIndexReq, RpbIndexReq(bucket, idx+"_bin", RpbIndexReq.IndexQueryType.valueOf(0), idxv.some.map(x ⇒ x), None, None, None, Some(true)))

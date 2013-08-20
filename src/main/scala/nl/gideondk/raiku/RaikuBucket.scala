@@ -307,6 +307,15 @@ case class RaikuBucket[T: ClassTag](bucketName: String, client: RaikuClient, con
   def fetchKeysForIntIndexByValue(idxk: String, idxv: Int): Task[List[String]] =
     client.fetchKeysForIntIndexByValue(bucketName, idxk, idxv)
 
+  /** Fetches keys based on a ranged binary index
+   *
+   *  @param idxk the integer index key
+   *  @param idxv the ranged integer index value
+   */
+
+  def fetchKeysForBinIndexByValueRange(idxk: String, idxr: RaikuStringRange): Task[List[String]] =
+    client.fetchKeysForBinIndexByValueRange(bucketName, idxk, idxr)
+
   /** Fetches keys based on a ranged integer index
    *
    *  @param idxk the integer index key
@@ -316,25 +325,27 @@ case class RaikuBucket[T: ClassTag](bucketName: String, client: RaikuClient, con
   def fetchKeysForIntIndexByValueRange(idxk: String, idxr: Range): Task[List[String]] =
     client.fetchKeysForIntIndexByValueRange(bucketName, idxk, idxr)
 
-  /** Fetches keys based on a ranged integer index, maxed on the number of results
+  /** Fetches keys based on a binary index, maxed on the number of results
    *
    *  @param idxk the integer index key
-   *  @param idxv the ranged integer index value
+   *  @param idxv the binary index value
    *  @param maxResults the maximal number of results to return
    *  @param continuation continutation used for pagination
    */
 
-  def fetchMaxedKeysForIntIndexByValueRange(idxk: String, idxr: Range, maxResults: Int, continuation: Option[String] = None): Task[(Option[String], List[String])] =
-    client.fetchMaxedKeysForIntIndexByValueRange(bucketName, idxk, idxr, maxResults, continuation)
+  def fetchMaxedKeysForBinIndexByValue(idxk: String, idxv: String, maxResults: Int, continuation: Option[String] = None): Task[(Option[String], List[String])] =
+    client.fetchMaxedKeysForBinIndexByValue(bucketName, idxk, idxv, maxResults, continuation)
 
-  /** Fetches keys based on a ranged binary index
+  /** Fetches keys based on a integer index, maxed on the number of results
    *
    *  @param idxk the integer index key
-   *  @param idxv the ranged integer index value
+   *  @param idxv the integer index value
+   *  @param maxResults the maximal number of results to return
+   *  @param continuation continutation used for pagination
    */
 
-  def fetchKeysForBinIndexByValueRange(idxk: String, idxr: RaikuStringRange): Task[List[String]] =
-    client.fetchKeysForBinIndexByValueRange(bucketName, idxk, idxr)
+  def fetchMaxedKeysForIntIndexByValue(idxk: String, idxv: Int, maxResults: Int, continuation: Option[String] = None): Task[(Option[String], List[String])] =
+    client.fetchMaxedKeysForIntIndexByValue(bucketName, idxk, idxv, maxResults, continuation)
 
   /** Fetches keys based on a ranged binary index, maxed on the number of results
    *
@@ -346,6 +357,17 @@ case class RaikuBucket[T: ClassTag](bucketName: String, client: RaikuClient, con
 
   def fetchMaxedKeysForBinIndexByValueRange(idxk: String, idxr: RaikuStringRange, maxResults: Int, continuation: Option[String] = None): Task[(Option[String], List[String])] =
     client.fetchMaxedKeysForBinIndexByValueRange(bucketName, idxk, idxr, maxResults, continuation)
+
+  /** Fetches keys based on a ranged integer index, maxed on the number of results
+   *
+   *  @param idxk the integer index key
+   *  @param idxv the ranged integer index value
+   *  @param maxResults the maximal number of results to return
+   *  @param continuation continutation used for pagination
+   */
+
+  def fetchMaxedKeysForIntIndexByValueRange(idxk: String, idxr: Range, maxResults: Int, continuation: Option[String] = None): Task[(Option[String], List[String])] =
+    client.fetchMaxedKeysForIntIndexByValueRange(bucketName, idxk, idxr, maxResults, continuation)
 
   /** Streams keys based on a binary index
    *
@@ -517,11 +539,44 @@ case class RaikuBucket[T: ClassTag](bucketName: String, client: RaikuClient, con
   def idx(idxk: String, idxv: Int): Task[List[String]] =
     fetchKeysForIntIndexByValue(idxk, idxv)
 
+  /** @see fetchKeysForBinIndexByValueRange
+   */
+
+  def idx(idxk: String, idxv: RaikuStringRange): Task[List[String]] =
+    fetchKeysForBinIndexByValueRange(idxk, idxv)
+
   /** @see fetchKeysForIntIndexByValueRange
    */
 
   def idx(idxk: String, idxv: Range): Task[List[String]] =
     fetchKeysForIntIndexByValueRange(idxk, idxv)
+
+  /** @see fetchMaxedKeysForBinIndexByValue
+   */
+
+  def idx(idxk: String, idxv: String, maxResults: Int): Task[(Option[String], List[String])] =
+    fetchMaxedKeysForBinIndexByValue(idxk, idxv, maxResults, None)
+
+  def idx(idxk: String, idxv: String, maxResults: Int, continuation: Option[String]): Task[(Option[String], List[String])] =
+    fetchMaxedKeysForBinIndexByValue(idxk, idxv, maxResults, continuation)
+
+  /** @see fetchMaxedKeysForIntIndexByValue
+   */
+
+  def idx(idxk: String, idxv: Int, maxResults: Int): Task[(Option[String], List[String])] =
+    fetchMaxedKeysForIntIndexByValue(idxk, idxv, maxResults, None)
+
+  def idx(idxk: String, idxv: Int, maxResults: Int, continuation: Option[String]): Task[(Option[String], List[String])] =
+    fetchMaxedKeysForIntIndexByValue(idxk, idxv, maxResults, continuation)
+
+  /** @see fetchMaxedKeysForBinIndexByValueRange
+   */
+
+  def idx(idxk: String, idxr: RaikuStringRange, maxResults: Int): Task[(Option[String], List[String])] =
+    fetchMaxedKeysForBinIndexByValueRange(idxk, idxr, maxResults, None)
+
+  def idx(idxk: String, idxr: RaikuStringRange, maxResults: Int, continuation: Option[String]): Task[(Option[String], List[String])] =
+    fetchMaxedKeysForBinIndexByValueRange(idxk, idxr, maxResults, continuation)
 
   /** @see fetchMaxedKeysForIntIndexByValueRange
    */
@@ -531,21 +586,6 @@ case class RaikuBucket[T: ClassTag](bucketName: String, client: RaikuClient, con
 
   def idx(idxk: String, idxr: Range, maxResults: Int, continuation: Option[String]): Task[(Option[String], List[String])] =
     fetchMaxedKeysForIntIndexByValueRange(idxk, idxr, maxResults, continuation)
-
-  /** @see fetchKeysForIntIndexByValueRange
-   */
-
-  def idx(idxk: String, idxv: RaikuStringRange): Task[List[String]] =
-    fetchKeysForBinIndexByValueRange(idxk, idxv)
-
-  /** @see fetchMaxedKeysForIntIndexByValueRange
-   */
-
-  def idx(idxk: String, idxr: RaikuStringRange, maxResults: Int): Task[(Option[String], List[String])] =
-    fetchMaxedKeysForBinIndexByValueRange(idxk, idxr, maxResults, None)
-
-  def idx(idxk: String, idxr: RaikuStringRange, maxResults: Int, continuation: Option[String]): Task[(Option[String], List[String])] =
-    fetchMaxedKeysForBinIndexByValueRange(idxk, idxr, maxResults, continuation)
 
   /** @see streamKeysForBinIndexByValue
    */

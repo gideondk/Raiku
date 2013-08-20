@@ -132,10 +132,26 @@ class BucketAdvancedSpec extends RaikuSpec {
 
       val i = for {
         _ ← bucket <<* (objs, r = 3, w = 3)
-        f ← bucket idx ("age", 20 to 50, 4)
-        s ← bucket idx ("age", 20 to 50, 4, f._1)
-        t ← bucket idx ("age", 20 to 50, 4, s._1)
-        l ← bucket idx ("age", 20 to 50, 4, t._1)
+        f ← bucket idx ("group_id", groupId, 4)
+        s ← bucket idx ("group_id", groupId, 4, f._1)
+        t ← bucket idx ("group_id", groupId, 4, s._1)
+        l ← bucket idx ("group_id", groupId, 4, t._1)
+      } yield f._2 ++ s._2 ++ t._2 ++ l._2
+
+      val res = i.copoint
+      res must have length 16
+    }
+
+    "be able to paginate ranged index results" in {
+      val groupId = java.util.UUID.randomUUID.toString
+      val objs = List.fill(200)(Y(java.util.UUID.randomUUID.toString, "Matsuo Bashō", scala.util.Random.nextInt(99), groupId))
+
+      val i = for {
+        _ ← bucket <<* (objs, r = 3, w = 3)
+        f ← bucket idx ("age", 20 to 80, 4)
+        s ← bucket idx ("age", 20 to 80, 4, f._1)
+        t ← bucket idx ("age", 20 to 80, 4, s._1)
+        l ← bucket idx ("age", 20 to 80, 4, t._1)
       } yield f._2 ++ s._2 ++ t._2 ++ l._2
 
       val res = i.copoint

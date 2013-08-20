@@ -41,9 +41,9 @@ Until version 1.0, the API of the client can and will change over versions, but 
 * Link walking;
 * Search support.
 
-## Riak 1.4+
+## Riak 1.4.1+
 
-From version Raiku version 0.6.0 and on, only Riak version 1.4+ is tested and supported. 
+From version Raiku version 0.6.1 and on, only Riak version 1.4.1+ is tested and supported. 
 It's possible that the client will work perfectly with older versions, but isn't tested and could result in unexpected behavior. 
 
 Please use Raiku 0.5.1 for usage with older versions of Riak.
@@ -83,7 +83,7 @@ to your SBT configuration and adding Raiku to your library dependencies:
 
 ```scala
 libraryDependencies ++= Seq(
-	"nl.gideondk" %% "raiku" % "0.6.0"
+	"nl.gideondk" %% "raiku" % "0.6.1"
 )
 ```
 
@@ -171,11 +171,12 @@ persons idx 	("group_id", "A" to "B")
 Raiku supports the newer 2i functionality available in Riak 1.4.0 through pagination and result streaming.
 
 ### Pagination
-When using ranged queries on secondary indexes, it's possible to set a maximum number of results for both integral as binary range queries: 
+When using secondary indexes, it's possible to set a maximum number of results for both integral as binary index queries (ranges also supported): 
 
 ```scala
 bucket idx ("age", 20 to 50, maxResults = 20) 
-bucket idx ("group_id", "A" to "D", 40)
+
+bucket idx ("group_id", "A", 40)
 ```
 
 Queries with a maximum in results not only return the normal `List[String]` containing the keys, but also returns a option on a *continuation*, combining the result to a `Task[(Option[String], List[String])]`.
@@ -183,8 +184,8 @@ Queries with a maximum in results not only return the normal `List[String]` cont
 This continuation value can be used to get the succeeding values of a specific query, making it able to paginate through values: 
 
 ```scala
-val (cont, items) = (bucket idx ("age", 20 to 50, 10).copoint
-val (secCont, items) = (bucket idx ("age", 20 to 50, maxResults = 10, continuation = cont)).copoint
+val (cont, items) = (bucket idx ("age", 20, 10).copoint
+val (secCont, items) = (bucket idx ("age", 20, maxResults = 10, continuation = cont)).copoint
 ```
 
 Passing a `None` to the index query as the continuation value, treats the query as to paginate from start. When taking results through this pagination functionality, treat a `None` as returning continuation key as a *end-of-content*.
