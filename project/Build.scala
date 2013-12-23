@@ -8,7 +8,7 @@ object RaikuBuild extends Build {
   override lazy val settings = super.settings ++
     Seq(
       name := "raiku",
-      version := "0.6.1",
+      version := "0.6.2",
       organization := "nl.gideondk",
       parallelExecution in Test := false,
       scalaVersion := "2.10.2",

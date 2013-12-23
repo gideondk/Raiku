@@ -97,6 +97,13 @@ class BucketSpec extends RaikuSpec {
       res.isSuccess && res.toOption.get.length == vec.length
     }
 
+    "do nothing when the list of objects to be stored is empty" in {
+      val emptyList = List()
+      val res = (bucket <<* emptyList).run
+
+      res.isSuccess
+    }
+
     "be able to delete objects correctly" in {
       val newId = java.util.UUID.randomUUID.toString
       val obj = Z(newId, "Should also be stored")

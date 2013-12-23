@@ -206,6 +206,7 @@ case class RaikuBucket[T: ClassTag](bucketName: String, client: RaikuClient, con
                                                         ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
                                                         returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[List[RaikuValue[T]]] = {
     objs match {
+      case List()                     ⇒ List().point[Task]
       case List(_: T, _*)             ⇒ Task.sequenceSuccesses(objs.asInstanceOf[List[T]].map(store(_, r, pr, basicQuorum, notFoundOk, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead))).map(_.flatten)
       case List(_: RaikuValue[T], _*) ⇒ Task.sequenceSuccesses(objs.asInstanceOf[List[RaikuValue[T]]].map(store(_, r, pr, basicQuorum, notFoundOk, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead))).map(_.flatten)
     }
