@@ -275,6 +275,7 @@ case class RaikuBucket[T: ClassTag](bucketName: String, client: RaikuClient, con
                                                          dw: DWArgument = DWArgument()): Task[List[Unit]] = {
 
     objs match {
+      case List()                     ⇒ List().point[Task]
       case List(_: T, _*)             ⇒ Task.sequenceSuccesses(objs.asInstanceOf[List[T]].map(delete(_, rw, VClockArgument(None), r, w, pr, pw, dw)))
       case List(_: RaikuValue[T], _*) ⇒ Task.sequenceSuccesses(objs.asInstanceOf[List[RaikuValue[T]]].map(delete(_, rw, VClockArgument(None), r, w, pr, pw, dw)))
     }
