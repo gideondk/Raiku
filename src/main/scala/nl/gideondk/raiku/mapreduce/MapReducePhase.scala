@@ -1,10 +1,10 @@
 package nl.gideondk.raiku.mapreduce
 
-import scalaz.Scalaz._
-import shapeless.{ :: ⇒ ::, HList }
-import shapeless.{ HNil, Poly1, Prepend }
-import shapeless.HList.hlistOps
 import spray.json.{ JsValue, JsonWriter }
+
+trait MapReducePhaseCollection {
+  val
+}
 
 object MapReducePhases {
   def apply[T <: HList](p: T, h: NonKeepedMapPhase) = new MapReducePhasesMHead[T] {

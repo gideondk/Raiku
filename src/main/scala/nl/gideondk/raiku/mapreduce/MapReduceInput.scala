@@ -1,25 +1,20 @@
 package nl.gideondk.raiku.mapreduce
 
-import shapeless._
-import MapReducePhases.keeped
-
 trait MapReduceInput {
   import MapReducePhases._
 
-  def |>>(f: MFunction)(implicit bct: LUBConstraint[MapPhase :: HNil, MapReducePhase]) =
+  def |>>(f: MFunction) =
     MapReduceJob(this, MapPhase(f) :: HNil)
 
-  def |>>(f: RFunction)(implicit bct: LUBConstraint[ReducePhase :: HNil, MapReducePhase]) =
+  def |>>(f: RFunction) =
     MapReduceJob(this, ReducePhase(f) :: HNil)
 
-  def |>>[T <: HList, Z <: HList](mrp: MapReducePhasesMHead[T])(implicit p: PrependAux[T, MapPhase :: HNil, Z],
-                                                                bct: LUBConstraint[Z, MapReducePhase]) = {
+  def |>>[T <: HList: <<:[MapReducePhase]#λ, Z <: HList: <<:[MapReducePhase]#λ](mrp: MapReducePhasesMHead[T])(implicit p: Prepend.Aux[T, MapPhase :: HNil, Z]) = {
     val phases = mrp.phases :+ keeped(mrp.head)
     MapReduceJob(this, phases)
   }
 
-  def |>>[T <: HList, Z <: HList](mrp: MapReducePhasesRHead[T])(implicit p: PrependAux[T, ReducePhase :: HNil, Z],
-                                                                bct: LUBConstraint[Z, MapReducePhase]) = {
+  def |>>[T <: HList: <<:[MapReducePhase]#λ, Z <: HList: <<:[MapReducePhase]#λ](mrp: MapReducePhasesRHead[T])(implicit p: Prepend.Aux[T, ReducePhase :: HNil, Z]) = {
     val phases = mrp.phases :+ keeped(mrp.head)
     MapReduceJob(this, phases)
   }

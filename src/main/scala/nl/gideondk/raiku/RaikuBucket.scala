@@ -4,7 +4,6 @@ import nl.gideondk.raiku.commands._
 import nl.gideondk.raiku.serialization._
 
 import shapeless._
-import TypeOperators._
 
 import scala.reflect.ClassTag
 
@@ -206,7 +205,7 @@ case class RaikuBucket[T: ClassTag](bucketName: String, client: RaikuClient, con
                                                         ifNonMatched: IfNonMatchedArgument = IfNonMatchedArgument(),
                                                         returnHead: ReturnHeadArgument = ReturnHeadArgument()): Task[List[RaikuValue[T]]] = {
     objs match {
-      case List()                     ⇒ List().point[Task]
+      case List()                     ⇒ List[RaikuValue[T]]().point[Task]
       case List(_: T, _*)             ⇒ Task.sequenceSuccesses(objs.asInstanceOf[List[T]].map(store(_, r, pr, basicQuorum, notFoundOk, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead))).map(_.flatten)
       case List(_: RaikuValue[T], _*) ⇒ Task.sequenceSuccesses(objs.asInstanceOf[List[RaikuValue[T]]].map(store(_, r, pr, basicQuorum, notFoundOk, w, dw, returnBody, pw, ifNotModified, ifNonMatched, returnHead))).map(_.flatten)
     }
@@ -275,7 +274,7 @@ case class RaikuBucket[T: ClassTag](bucketName: String, client: RaikuClient, con
                                                          dw: DWArgument = DWArgument()): Task[List[Unit]] = {
 
     objs match {
-      case List()                     ⇒ List().point[Task]
+      case List()                     ⇒ List[Unit]().point[Task]
       case List(_: T, _*)             ⇒ Task.sequenceSuccesses(objs.asInstanceOf[List[T]].map(delete(_, rw, VClockArgument(None), r, w, pr, pw, dw)))
       case List(_: RaikuValue[T], _*) ⇒ Task.sequenceSuccesses(objs.asInstanceOf[List[RaikuValue[T]]].map(delete(_, rw, VClockArgument(None), r, w, pr, pw, dw)))
     }

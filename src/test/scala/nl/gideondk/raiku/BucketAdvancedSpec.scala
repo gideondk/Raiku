@@ -158,12 +158,12 @@ class BucketAdvancedSpec extends RaikuSpec {
       res must have length 16
     }
 
-    "be able to stream index results" in {
-      val idxs = (bucket streamIdx ("age", 25)).flatMap(x ⇒ Task(x |>>> Iteratee.getChunks))
-      val normalQuery = bucket idx ("age", 25)
-
-      idxs.copoint must have length normalQuery.copoint.length
-    }
+    //    "be able to stream index results" in {
+    //      val idxs = (bucket streamIdx ("age", 25)).flatMap(x ⇒ Task(x |>>> Iteratee.getChunks))
+    //      val normalQuery = bucket idx ("age", 25)
+    //
+    //      idxs.copoint must have length normalQuery.copoint.length
+    //    }
 
     "a counter should increment correctly" in {
       val counter = bucket counter "like_count"

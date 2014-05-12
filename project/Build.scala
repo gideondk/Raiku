@@ -1,38 +1,15 @@
 import sbt._
 import Keys._
 
-import org.ensime.sbt.Plugin.Settings.ensimeConfig
-import org.ensime.sbt.util.SExp._
-
 object RaikuBuild extends Build {
   override lazy val settings = super.settings ++
     Seq(
       name := "raiku",
-      version := "0.6.2",
+      version := "0.7.0",
       organization := "nl.gideondk",
       parallelExecution in Test := false,
       scalaVersion := "2.10.2",
-      crossScalaVersions := Seq("2.10.0"),
-      ensimeConfig := sexp(
-        key(":compiler-args"), sexp("-Ywarn-dead-code", "-Ywarn-shadowing"),
-        key(":formatting-prefs"), sexp(
-          key(":alignParameters"), true,
-          key(":AlignSingleLineCaseStatements"), true,
-          key(":CompactControlReadability"), true,
-          key(":CompactStringConcatenation"), true,
-          key(":DoubleIndentClassDeclaration"), true,
-          key(":IndentLocalDefs"), true,
-          key(":IndentPackageBlocks"), true,
-          key(":IndentSpaces"), 2,
-          key(":MultilineScaladocCommentsStartOnFirstLine"), true,
-          key(":PreserveSpaceBeforeArguments"), false,
-          key(":PreserveDanglingCloseParenthesis"), false,
-          key(":RewriteArrowSymbols"), true,
-          key(":SpaceBeforeColon"), false,
-          key(":SpaceInsideBrackets"), false,
-          key("SpacesWithinPatternBinders"), true
-        )
-      ),
+      crossScalaVersions := Seq("2.10.2"),
       publishTo := Some(Resolver.file("file", new File("/Users/gideondk/Development/gideondk-mvn-repo"))),
 
       resolvers ++= Seq("Typesafe Repository (releases)" at "http://repo.typesafe.com/typesafe/releases/",
@@ -48,18 +25,12 @@ object RaikuBuild extends Build {
                   "spray repo" at "http://repo.spray.io"))
 
   val appDependencies = Seq(
-      "org.scalaz" %% "scalaz-core" % "7.0.0",
-      "org.scalaz" %% "scalaz-effect" % "7.0.0",
       "com.google.protobuf" % "protobuf-java" % "2.4.1",
 
-      "nl.gideondk" %% "sentinel" % "0.5.5",
+      "nl.gideondk" %% "sentinel" % "0.6.5",
 
       "io.spray" %%  "spray-json" % "1.2.3",
-      "org.specs2" %% "specs2" % "1.14",
-
-      "com.typesafe.play" %% "play-iteratees" % "2.2-akka22-SNAPSHOT",
-
-      "com.chuusai" % "shapeless_2.10.0" % "1.2.4"
+      "org.specs2" %% "specs2" % "1.14"
   )
 
   lazy val root = Project(id = "raiku",
@@ -67,9 +38,7 @@ object RaikuBuild extends Build {
     settings = Project.defaultSettings ++ Seq(
       libraryDependencies ++= appDependencies
     )
-  ).configs(Benchmark).settings(inConfig(Benchmark)(Defaults.configSettings) : _*).settings(Format.settings : _*)
-
-  lazy val Benchmark = config("benchmark") extend(Test)
+  ).settings(Format.settings : _*)
 }
 
 object Format {

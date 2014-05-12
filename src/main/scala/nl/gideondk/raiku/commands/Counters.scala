@@ -2,10 +2,6 @@ package nl.gideondk.raiku.commands
 
 import nl.gideondk.raiku._
 import com.basho.riak.protobuf._
-import scalaz._
-import Scalaz._
-import spray.json._
-import nl.gideondk.sentinel.client.SentinelClient
 
 import play.api.libs.iteratee._
 import akka.util.ByteString

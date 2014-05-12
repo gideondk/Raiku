@@ -1,7 +1,8 @@
 package nl.gideondk.raiku.actors
 
 import nl.gideondk.raiku.commands._
-import nl.gideondk.sentinel.client.SentinelClient
+
+import nl.gideondk.sentinel._
 import com.basho.riak.protobuf._
 import akka.io._
 import akka.actor.ActorSystem
@@ -9,7 +10,7 @@ import akka.util.ByteString
 import akka.util.ByteStringBuilder
 import play.api.libs.iteratee._
 import spray.json._
-import nl.gideondk.sentinel.pipelines.EnumeratorStage
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import akka.actor.Actor
 import scala.concurrent.Promise
@@ -115,14 +116,14 @@ class MRResultHandler(e: Enumerator[RiakResponse], phaseCount: Int, maxJobDurati
       }
   }
 }
-
-object RaikuMRWorker {
-  def isMREnd(rs: RiakResponse) = {
-    RpbMapRedResp().mergeFrom(rs.message.toArray).done.isDefined
-  }
-
-  def apply(host: String, port: Int, numberOfWorkers: Int)(implicit system: ActorSystem) = {
-      def stages = new EnumeratorStage(isMREnd, true) >> new RiakMessageStage >> new LengthFieldFrame(1024 * 1024 * 200, lengthIncludesHeader = false) // 200mb max
-    SentinelClient.waiting(host, port, RandomRouter(numberOfWorkers), "Raiku-MR")(stages)(system)
-  }
-}
+//
+//object RaikuMRWorker {
+//  def isMREnd(rs: RiakResponse) = {
+//    RpbMapRedResp().mergeFrom(rs.message.toArray).done.isDefined
+//  }
+//
+//  def apply(host: String, port: Int, numberOfWorkers: Int)(implicit system: ActorSystem) = {
+//      def stages = new EnumeratorStage(isMREnd, true) >> new RiakMessageStage >> new LengthFieldFrame(1024 * 1024 * 200, lengthIncludesHeader = false) // 200mb max
+//    SentinelClient.waiting(host, port, RandomRouter(numberOfWorkers), "Raiku-MR")(stages)(system)
+//  }
+//}

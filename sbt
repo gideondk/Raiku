@@ -1,5 +1,6 @@
 #!/bin/bash
 
-SCALA="-XX:MaxPermSize=256m -Xms1G -Xmx1G -Xss8M"
-java $SCALA  -jar `dirname $0`/sbt-launch.jar "$@"
+export SBT_OPTS="-XX:+UseNUMA -XX:-UseBiasedLocking -Xms3024M -Xmx3048M -Xss1M -XX:MaxPermSize=256m -XX:+UseParallelGC"
+sbt "$@"
+
 

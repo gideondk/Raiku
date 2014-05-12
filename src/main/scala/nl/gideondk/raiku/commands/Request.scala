@@ -5,9 +5,10 @@ import com.basho.riak.protobuf.RpbErrorResp
 import akka.actor.{ ActorRef, ActorSystem }
 import akka.util.ByteString
 import nl.gideondk.raiku.serialization.ProtoBufConversion
-import nl.gideondk.sentinel.client._
-import nl.gideondk.sentinel.Task
+import nl.gideondk.sentinel._
+
 import scala.util.Try
+import scala.concurrent._
 
 trait RiakMessage {
   def messageType: RiakMessageType
@@ -23,16 +24,19 @@ private[raiku] case class RiakResponse(messageType: RiakMessageType, message: By
 trait Connection {
   def system: ActorSystem
 
-  def worker: SentinelClient[RiakCommand, RiakResponse]
+  def worker: Client[RiakCommand, RiakResponse]
 
   implicit val dispatcher = system.dispatcher
 }
 
 trait Request extends Connection with ProtoBufConversion {
-  def buildRequest(messageType: RiakMessageType, message: ByteString): Task[RiakResponse] =
-    Task(worker.sendCommand(RiakCommand(messageType, message)).get.map(_.map(_.flatMap(riakResponseToValidation))))
+  def buildRequest(messageType: RiakMessageType, message: ByteString): Future[RiakResponse] =
+    (worker ? RiakCommand(messageType, message)).flatMap(x ⇒ riakResponseToValidation(x) match {
+      case scala.util.Failure(ex) ⇒ Future.failed(ex)
+      case scala.util.Success(s)  ⇒ Future(s)
+    })
 
-  def buildRequest(messageType: RiakMessageType): Task[RiakMessage] = buildRequest(messageType, ByteString())
+  def buildRequest(messageType: RiakMessageType): Future[RiakResponse] = buildRequest(messageType, ByteString())
 
   def riakResponseToValidation(resp: RiakResponse): Try[RiakResponse] = {
     if (RiakMessageType.messageTypeToInt(resp.messageType) == 0)

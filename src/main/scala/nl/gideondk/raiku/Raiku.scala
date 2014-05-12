@@ -13,18 +13,18 @@ case class RaikuConfig(host: RaikuHost, connections: Int, mrConnections: Int, st
 
 case class RaikuClient(config: RaikuConfig)(implicit val system: ActorSystem) extends GeneralRequests with RWRequests with BucketRequests with IndexRequests with CounterRequests with MapReduce {
   val worker = RaikuWorker(config.host.host, config.host.port, config.connections)
-  val mrWorker = RaikuMRWorker(config.host.host, config.host.port, config.mrConnections)
-  val siWorker = Raiku2iStreamWorker(config.host.host, config.host.port, config.streamConnections)
+  //  val mrWorker = RaikuMRWorker(config.host.host, config.host.port, config.mrConnections)
+  //  val siWorker = Raiku2iStreamWorker(config.host.host, config.host.port, config.streamConnections)
 
   def disconnect = {
     system stop worker.actor
-    system stop mrWorker.actor
-    system stop siWorker.actor
+    //    system stop mrWorker.actor
+    //    system stop siWorker.actor
   }
 }
 
 object RaikuClient {
-  def apply(host: String, port: Int, connections: Int = 6, mrConnections: Int = 2, streamConnections: Int = 3)(implicit system: ActorSystem): RaikuClient = {
+  def apply(host: String, port: Int, connections: Int = 12, mrConnections: Int = 2, streamConnections: Int = 3)(implicit system: ActorSystem): RaikuClient = {
     val client = RaikuClient(RaikuConfig(RaikuHost(host, port), connections, mrConnections, streamConnections))
     client
   }
