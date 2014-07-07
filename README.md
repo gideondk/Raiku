@@ -27,18 +27,15 @@ Until version 1.0, the API of the client can and will change over versions, but 
 * Writing, fetching and deleting single or multiple objects at once;
 * Querying items on 2i, based on binary or integral indexes (ranges also supported);
 * Pagination and streaming of 2i queries; 
-* Setting and getting counters;
-* Sequencing and continuing multiple operations using Tasks;
-* Reactive Map/Reduce functionality;
 * Auto-Reconnecting client;
-* Different actor pools for *normal* and MR requests;
-* Naive Reactive bucket for reactive data flows.
+* Different actor pools for *normal* and 2i requests;
 
 **The following is currently missing in the client, but will be added soon:**
 
-* More solid, better reactive implementation;
+* Full CRDT support with Scala-like DSL for counters and collections;
+* Redesigned Map Reduce functionality;
+* Full Yokozuna support;
 * Additional documentation for specific use cases;
-* Link walking;
 * Search support.
 
 ## Riak 1.4.1+
@@ -48,6 +45,8 @@ It's possible that the client will work perfectly with older versions, but isn't
 
 Please use Raiku 0.5.1 for usage with older versions of Riak.
 
+Upcoming functionality such as CRDTs and search are only supported on the (current in Beta) 2.0 release of Riak
+
 ## Architecture
 
 The client uses Akka IO and pipelines to send and receive protocol buffer encoded data streams over TCP sockets.
@@ -56,7 +55,9 @@ Protocol Buffer messages are transformed into case classes using ScalaBuff, Riak
 
 You can use the client to fetch, store and delete these "low level" objects, but it's wiser to use the RaikuBucket to store objects converted using a RaikuConverter implementation.
 
-You are free to use any value serialisation method available, but I recommended to use the Spray JSON package (behaves very good in multi-threaded environments).
+You are free to use any value serialisation method available, but I recommended to use the Spray JSON package or the one available with the Play Framework
+
+Next to the retrieval of `RaikuRawValue` 
 
 Values returned from a `RaikuBucket` are of a `RaikuValue[T]` type. RaikuValue wraps the raw converted type into a *container* without losing any of the information present in the RaikuRawValue.
 To retain the actual value of type `T` from the RaikuValue, a *value* property is available, containing the optional value of `T` (for cases where only the head was fetched from Riak).
