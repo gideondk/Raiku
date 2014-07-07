@@ -18,7 +18,7 @@ Based on Akka IO and Sentinel, it uses the pipelines and actors to create the be
 ## Status
 The client should be stable enough for day to day usage, but should still be treated as beta software.
 
-The current milestone releases of 0.7.0 will focus on the addition of CRDT and Map Reduce functionality, while trying to minimise API changes as good as possible. 
+The next milestone releases of 0.7.0 will focus on the addition of CRDT and Map Reduce functionality, while trying to minimise API changes as good as possible. 
 
 **Currently available in the client:**
 
