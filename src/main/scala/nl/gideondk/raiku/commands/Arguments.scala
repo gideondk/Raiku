@@ -1,6 +1,8 @@
 package nl.gideondk.raiku.commands
 import nl.gideondk.raiku._
 
+import scala.concurrent.duration.Duration
+
 trait RaikuArgument[T] {
   def v: Option[T]
 }
@@ -9,6 +11,7 @@ trait RaikuIntArgument extends RaikuArgument[Int]
 trait RaikuStringArgument extends RaikuArgument[String]
 trait RaikuBooleanArgument extends RaikuArgument[Boolean]
 trait RaikuVClockArgument extends RaikuArgument[VClock]
+trait RaikuDurationArgument extends RaikuArgument[Duration]
 
 case class RArgument(v: Option[Int] = None) extends RaikuIntArgument
 case class RWArgument(v: Option[Int] = None) extends RaikuIntArgument
@@ -17,6 +20,9 @@ case class WArgument(v: Option[Int] = None) extends RaikuIntArgument
 case class PRArgument(v: Option[Int] = None) extends RaikuIntArgument
 case class PWArgument(v: Option[Int] = None) extends RaikuIntArgument
 case class DWArgument(v: Option[Int] = None) extends RaikuIntArgument
+
+case class TimeoutArgument(v: Option[Duration] = None) extends RaikuDurationArgument
+case class NValArgument(v: Option[Int] = None) extends RaikuIntArgument
 
 case class BasicQuorumArgument(v: Option[Boolean] = None) extends RaikuBooleanArgument
 case class NotFoundOkArgument(v: Option[Boolean] = None) extends RaikuBooleanArgument
@@ -32,5 +38,8 @@ case class ReturnBodyArgument(v: Option[Boolean] = None) extends RaikuBooleanArg
 
 case class DeletedVClockArgument(v: Option[Boolean] = None) extends RaikuBooleanArgument
 case class VClockArgument(v: Option[VClock] = None) extends RaikuVClockArgument
+
+case class SloppyQuorumArgument(v: Option[Boolean] = None) extends RaikuBooleanArgument
+case class AsisArgument(v: Option[Boolean] = None) extends RaikuBooleanArgument
 
 case class RaikuStringRange(start: String, end: String)

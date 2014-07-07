@@ -11,14 +11,14 @@ case class RaikuMeta(indexes: RaikuIndexes, vTag: Option[VTag] = None, lastModif
 	RaikuRawValue: the raw Riak value, combined with meta information
 */
 
-case class RaikuRawValue(bucket: String, key: String, contentType: Option[String], charset: Option[String], contentEncoding: Option[String],
+case class RaikuRawValue(bucket: String, key: String, bucketType: Option[String] = None, contentType: Option[String], charset: Option[String], contentEncoding: Option[String],
                          value: Option[Array[Byte]], meta: Option[RaikuMeta])
 
 /* 
 	RaikuValue: a converted (typed) Riak value, combined with meta information
 */
 
-case class RaikuValue[T](bucket: String, key: String, value: Option[T], meta: Option[RaikuMeta])
+case class RaikuValue[T](bucket: String, key: String, bucketType: Option[String] = None, value: Option[T], meta: Option[RaikuMeta])
 
 /* 
 	RaikuRWValue: typed used for (de)serialization of Riak values
@@ -62,4 +62,4 @@ case class VClock(v: Array[Byte])
 
 case class VTag(v: Array[Byte])
 
-case class UnresolvedSiblingsConflict extends Exception
+class UnresolvedSiblingsConflict extends Exception

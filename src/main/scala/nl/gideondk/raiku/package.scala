@@ -1,18 +1,9 @@
 package nl.gideondk
 
 import raiku.commands._
-import raiku.serialization._
-import scalaz._
-import Scalaz._
-import scala.concurrent.ExecutionContext.Implicits.global
-import scalaz.Success
-import scalaz.Failure
-import scala.Some
+import scala.concurrent.duration.Duration
 
 package object raiku {
-  type Task[T] = nl.gideondk.sentinel.Task[T]
-  val Task = nl.gideondk.sentinel.Task
-
   implicit def stringToVClock(s: String): VClock = VClock(s.getBytes)
 
   implicit def intToRArgument(i: Int): RArgument = RArgument(Option(i))
@@ -22,6 +13,8 @@ package object raiku {
   implicit def intToPRArgument(i: Int): PRArgument = PRArgument(Option(i))
   implicit def intToPWArgument(i: Int): PWArgument = PWArgument(Option(i))
   implicit def intToDWArgument(i: Int): DWArgument = DWArgument(Option(i))
+
+  implicit def durationToTimeoutArgument(d: Duration): TimeoutArgument = TimeoutArgument(Option(d))
 
   implicit def booleanToBasicQuoromArgument(b: Boolean): BasicQuorumArgument = BasicQuorumArgument(Option(b))
   implicit def booleanToNotFoundArgument(b: Boolean): NotFoundOkArgument = NotFoundOkArgument(Option(b))

@@ -7,6 +7,8 @@ import akka.util.ByteString
 import nl.gideondk.raiku.serialization.ProtoBufConversion
 import nl.gideondk.sentinel._
 
+import scala.concurrent.Future
+
 import scala.util.Try
 import scala.concurrent._
 
@@ -25,6 +27,8 @@ trait Connection {
   def system: ActorSystem
 
   def worker: Client[RiakCommand, RiakResponse]
+
+  def streamWorker: Client[RiakCommand, RiakResponse]
 
   implicit val dispatcher = system.dispatcher
 }

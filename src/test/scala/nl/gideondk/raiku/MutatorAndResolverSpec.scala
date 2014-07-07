@@ -1,9 +1,7 @@
 package nl.gideondk.raiku
 
-import scalaz._
-import Scalaz._
-
-import org.specs2.mutable._
+import org.scalatest._
+import Matchers._
 
 import spray.json._
 
@@ -35,26 +33,26 @@ trait ShoppingCartResolver {
   val cartResolver = RaikuResolver(resolverFun)
 }
 
-class MutatorAndResolverSpec extends Specification with DefaultJsonProtocol with TodoMutator with ShoppingCartResolver {
+class MutatorAndResolverSpec extends WordSpec with DefaultJsonProtocol with TodoMutator with ShoppingCartResolver {
   "A mutator" should {
     "work correctly without collisions" in {
       val todos = Todos("1", List("Do the lawn", "Do the laundry"), 0)
-      val rv = RaikuValue("test", "1", Some(todos), None)
+      val rv = RaikuValue("test", "1", None, Some(todos), None)
       val res = todosMutator(None, rv)
 
-      res.value must beSome(todos)
+      res.value should equal(Some(todos))
     }
 
     "work correctly in case of collisions" in {
       val todosA = Todos("1", List("Do the lawn", "Do the laundry"), 20)
       val todosB = Todos("1", List("Do the dishes", "Do the laundry"), 0)
-      val rvA = RaikuValue("test", "1", Some(todosA), None)
-      val rvB = RaikuValue("test", "1", Some(todosB), None)
+      val rvA = RaikuValue("test", "1", None, Some(todosA), None)
+      val rvB = RaikuValue("test", "1", None, Some(todosB), None)
 
       val res: Todos = todosMutator(Some(rvA), rvB)
 
-      res.version mustEqual 21
-      res.items should have size 3
+      res.version should equal(21)
+      res.items.length should equal(3)
     }
   }
 
@@ -70,12 +68,12 @@ class MutatorAndResolverSpec extends Specification with DefaultJsonProtocol with
         ShoppingItem("Haskell Book"),
         ShoppingItem("Axe")))
 
-      val rvA = RaikuValue("test", "1", Some(cartA), None)
-      val rvB = RaikuValue("test", "1", Some(cartB), None)
+      val rvA = RaikuValue("test", "1", None, Some(cartA), None)
+      val rvB = RaikuValue("test", "1", None, Some(cartB), None)
 
       val res: ShoppingCart = cartResolver(Set(rvA, rvB)).get
 
-      res.items should have size 5
+      res.items.length should equal(5)
     }
   }
 }

@@ -5,11 +5,9 @@ object RaikuBuild extends Build {
   override lazy val settings = super.settings ++
     Seq(
       name := "raiku",
-      version := "0.7.0",
+      version := "0.7.0-M1",
       organization := "nl.gideondk",
-      parallelExecution in Test := false,
-      scalaVersion := "2.10.2",
-      crossScalaVersions := Seq("2.10.2"),
+      scalaVersion := "2.11.1",
       publishTo := Some(Resolver.file("file", new File("/Users/gideondk/Development/gideondk-mvn-repo"))),
 
       resolvers ++= Seq("Typesafe Repository (releases)" at "http://repo.typesafe.com/typesafe/releases/",
@@ -26,11 +24,11 @@ object RaikuBuild extends Build {
 
   val appDependencies = Seq(
       "com.google.protobuf" % "protobuf-java" % "2.4.1",
-
-      "nl.gideondk" %% "sentinel" % "0.6.5",
-
-      "io.spray" %%  "spray-json" % "1.2.3",
-      "org.specs2" %% "specs2" % "1.14"
+      "io.spray" %%  "spray-json" % "1.2.6",
+      "net.sandrogrzicic" %% "scalabuff-runtime" % "1.3.8",
+      
+      "nl.gideondk" %% "sentinel" % "0.7.5",
+      "org.scalatest" %% "scalatest" % "2.2.0" % "test"
   )
 
   lazy val root = Project(id = "raiku",

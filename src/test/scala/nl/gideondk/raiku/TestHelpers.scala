@@ -1,23 +1,24 @@
 package nl.gideondk.raiku
 
 //import commands.RWObject
-import mapreduce._
-import scalaz._
-import scala.concurrent.Await
-import Scalaz._
-import spray.json._
-import org.specs2.mutable.Specification
-import akka.actor.ActorSystem
+
+import org.scalatest.time.{ Millis, Seconds, Span }
+
 import scala.concurrent._
 import scala.concurrent.duration._
-import scala.util.Random
+import akka.actor._
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{ Suite, WordSpec }
+import org.scalatest.matchers.ShouldMatchers
+import spray.json._
 
 object DB {
   implicit val system = ActorSystem("perf-bucket-system")
-  val client = RaikuClient("localhost", 8087, 4)
+  val client = RaikuClient("localhost", 8087, 8)
 }
 
 case class Y(id: String, name: String, age: Int, groupId: String)
+
 case class Z(id: String, name: String)
 
 object TestModels extends DefaultJsonProtocol {
@@ -34,8 +35,10 @@ object TestModels extends DefaultJsonProtocol {
     writer = (o: Z) ⇒ RaikuRWValue(o.id, o.name.getBytes(), "application/json"))
 }
 
-trait RaikuSpec extends Specification {
-  implicit val timeout = Duration(30, duration.SECONDS)
+abstract class RaikuSpec extends WordSpec with Suite with ShouldMatchers with ScalaFutures {
+  implicit val timeout = 30 seconds
+  implicit val defaultPatience = PatienceConfig(timeout = Span(5, Seconds), interval = Span(200, Millis))
+
   val client = DB.client
 
 }
