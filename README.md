@@ -39,7 +39,7 @@ The next milestone releases of 0.8.0 will focus on the addition of CRDT and Map 
 
 ## Roadmap
 ### 0.8.0 release
-The 0.8.0 release will integrate Akka Streams as the architecture for both streaming 2i as MR results.
+The 0.8.0 release will integrate Akka Streams as the architecture for both streaming 2i as MR results.  
 
 ### 1.0.0 release
 This version will be the first stable 1.0 release, and will contain a revised test suite and an actor driven test kit, able to emulate Riak’s behaviour for integration within application tests. 
@@ -92,7 +92,7 @@ Using the client / bucket is quite simple, check the code of the tests to see al
 **Create a client:**
 ```scala
 implicit val system = ActorSystem("system")
-val client = RaikuClient("localhost", 8087, 4)
+val client = RaikuClient("localhost", 8087)
 ```
 
 **Create a converter:**
