@@ -18,7 +18,9 @@ Based on Akka IO and Sentinel, it uses the pipelines and actors to create the be
 ## Status
 The client should be stable enough for day to day usage, but should still be treated as beta software.
 
-The next milestone releases of 0.8.0 will focus on the addition of CRDT and Map Reduce functionality, while trying to minimise API changes as good as possible. 
+The next milestone releases of 0.8.0 will focus on the addition of CRDT and Map Reduce functionality, while trying to minimise API changes. 
+
+Because the actual client hasn't been updated in a quite long time, not all new Riak functionality is covered. This will be re-added soon.
 
 **Currently available in the client:**
 
@@ -42,7 +44,7 @@ The next milestone releases of 0.8.0 will focus on the addition of CRDT and Map 
 The 0.8.0 release will integrate Akka Streams as the architecture for both streaming 2i as MR results.  
 
 ### 1.0.0 release
-This version will be the first stable 1.0 release, and will contain a revised test suite and an actor driven test kit, able to emulate Riak’s behaviour for integration within application tests. 
+This version will be the first stable 1.0 release, and will contain a revised test suite and an (Sentinel driven) test kit, able to emulate Riak’s behaviour for integration within application tests. 
 
 ## Riak 1.4.1+
 From version Raiku version 0.6.1 and on, only Riak version 1.4.1+ is tested and supported. 
