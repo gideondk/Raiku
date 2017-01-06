@@ -5,9 +5,9 @@ object RaikuBuild extends Build {
   override lazy val settings = super.settings ++
     Seq(
       name := "raiku",
-      version := "0.7.0-M2",
+      version := "0.8-M1",
       organization := "nl.gideondk",
-      scalaVersion := "2.11.1",
+      scalaVersion := "2.11.8",
       publishTo := Some(Resolver.file("file", new File("/Users/gideondk/Development/gideondk-mvn-repo"))),
 
       resolvers ++= Seq("Typesafe Repository (releases)" at "http://repo.typesafe.com/typesafe/releases/",
@@ -26,7 +26,7 @@ object RaikuBuild extends Build {
       "io.spray" %%  "spray-json" % "1.2.6",
       "net.sandrogrzicic" %% "scalabuff-runtime" % "1.3.8",
       
-      "nl.gideondk" %% "sentinel" % "0.7.5.1",
+      "nl.gideondk" %% "sentinel" % "0.8-M1",
       "org.scalatest" %% "scalatest" % "2.2.0" % "test"
   )
 

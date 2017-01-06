@@ -7,6 +7,7 @@ import org.scalatest.time.{ Millis, Seconds, Span }
 import scala.concurrent._
 import scala.concurrent.duration._
 import akka.actor._
+import akka.stream.ActorMaterializer
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{ Suite, WordSpec }
 import org.scalatest.matchers.ShouldMatchers
@@ -14,7 +15,10 @@ import spray.json._
 
 object DB {
   implicit val system = ActorSystem("perf-bucket-system")
-  val client = RaikuClient("localhost", 8087, 8)
+  implicit val mat = ActorMaterializer()
+  implicit val ec = system.dispatcher
+
+  val client = RaikuClient("localhost", 8087)
 }
 
 case class Y(id: String, name: String, age: Int, groupId: String)

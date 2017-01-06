@@ -18,7 +18,7 @@ Based on Akka IO and Sentinel, it uses the pipelines and actors to create the be
 ## Status
 The client should be stable enough for day to day usage, but should still be treated as beta software.
 
-The next milestone releases of 0.7.0 will focus on the addition of CRDT and Map Reduce functionality, while trying to minimise API changes as good as possible. 
+The next milestone releases of 0.8.0 will focus on the addition of CRDT and Map Reduce functionality, while trying to minimise API changes as good as possible. 
 
 **Currently available in the client:**
 
@@ -38,9 +38,6 @@ The next milestone releases of 0.7.0 will focus on the addition of CRDT and Map 
 * Additional documentation for specific use cases.
 
 ## Roadmap
-### 0.7.0 release
-The 0.7.0 release will focus on the stabilisation of the API and the implementation of a new Map Reduce framework and support for CRDTs. While earlier releases were based on technology available in Scalaz and Shapeless libraries, the 0.7.0 releases minimises dependencies by only focusing on the functionality available through Scala and Akka.
-
 ### 0.8.0 release
 The 0.8.0 release will integrate Akka Streams as the architecture for both streaming 2i as MR results.
 
@@ -85,7 +82,7 @@ to your SBT configuration and adding Raiku to your library dependencies:
 
 ```scala
 libraryDependencies ++= Seq(
-  "nl.gideondk" %% "raiku" % "0.7.0-M2"
+  "nl.gideondk" %% "raiku" % "0.8-M1"
 )
 ```
 
@@ -187,7 +184,7 @@ for
 Passing a `None` to the index query as the continuation value, treats the query as to paginate from start. When taking results through this pagination functionality, treat a `None` as returning continuation key as a *end-of-content*.
 
 ### Streaming
-For each non-paging 2i query, a `streamIdx` equivalent is available. Instead of returning a `Future[List[String]]` for index values, keys are streamed back using a *Enumerator*, wrapping each result into a `Future[Enumerator]`.
+For each non-paging 2i query, a `streamIdx` equivalent is available. Instead of returning a `Future[List[String]]` for index values, keys are streamed back using a (Akka Streams) *Source*, wrapping each result into a `Future[Source]`.
 
 This Play powered enumerator can directly be used to directly stream results to (web)clients, but can also be used to be composed into more complex pipelines.
 
@@ -196,7 +193,7 @@ Lots of credits go to [Jordan West](https://github.com/jrwest) for the structure
 and to [Sandro Gržičić](https://github.com/SandroGrzicic) for the ScalaBuff implementation.
 
 ## License
-Copyright © 2013 Gideon de Kok
+Copyright © 2017 Gideon de Kok
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 

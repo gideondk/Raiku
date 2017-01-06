@@ -1,14 +1,15 @@
 package nl.gideondk.raiku.commands
 
 import java.lang.Exception
+
 import com.basho.riak.protobuf.RpbErrorResp
 import akka.actor.{ ActorRef, ActorSystem }
 import akka.util.ByteString
 import nl.gideondk.raiku.serialization.ProtoBufConversion
 import nl.gideondk.sentinel._
+import nl.gideondk.sentinel.client.Client
 
 import scala.concurrent.Future
-
 import scala.util.Try
 import scala.concurrent._
 
@@ -35,7 +36,7 @@ trait Connection {
 
 trait Request extends Connection with ProtoBufConversion {
   def buildRequest(messageType: RiakMessageType, message: ByteString): Future[RiakResponse] =
-    (worker ? RiakCommand(messageType, message)).flatMap(x ⇒ riakResponseToValidation(x) match {
+    (worker ask RiakCommand(messageType, message)).flatMap(x ⇒ riakResponseToValidation(x) match {
       case scala.util.Failure(ex) ⇒ Future.failed(ex)
       case scala.util.Success(s)  ⇒ Future(s)
     })

@@ -1,27 +1,27 @@
 package nl.gideondk.raiku.commands
 
+import akka.stream.scaladsl.{ Flow, Source }
 import nl.gideondk.raiku._
 import com.basho.riak.protobuf._
-import nl.gideondk.sentinel.processors.Consumer.ConsumerException
+
 import scala.concurrent.Future
 import spray.json._
-
-import play.api.libs.iteratee._
 import akka.util.ByteString
+import nl.gideondk.sentinel.client.Client.EventException
 
 trait IndexRequests extends Request {
 
-  def buildStreaming2iRequest(messageType: RiakMessageType, message: ByteString): Future[Enumerator[String]] =
-    (streamWorker ?->> (RiakCommand(messageType, message))).map {
-      _ &> Enumeratee.map { x: RiakResponse ⇒
+  def buildStreaming2iRequest(messageType: RiakMessageType, message: ByteString): Future[Source[String, Any]] =
+    (streamWorker askStream (RiakCommand(messageType, message))).map { x ⇒
+      x.map { x: RiakResponse ⇒
         riakResponseToValidation(x) match {
           case scala.util.Success(s) ⇒ RpbIndexResp().mergeFrom(s.message.toArray)
           case scala.util.Failure(e) ⇒ throw e
         }
-      } &> Enumeratee.map(_.keys.map(byteStringToString(_)).toList) &> Enumeratee.mapFlatten { x ⇒ Enumerator(x: _*) }
+      }.map(_.keys.map(byteStringToString(_)).toList).mapConcat(x ⇒ x)
     }.recoverWith {
-      case e: ConsumerException[RiakMessage] ⇒ Future.failed(new Exception(RpbErrorResp().mergeFrom(e.cause.message.toArray).errmsg))
-      case e                                 ⇒ Future.failed(e)
+      case e: EventException[RiakMessage] ⇒ Future.failed(new Exception(RpbErrorResp().mergeFrom(e.cause.message.toArray).errmsg))
+      case e                              ⇒ Future.failed(e)
     }
 
   def fetchKeysForIndexRequest(req: Future[RiakResponse]) =
@@ -65,16 +65,16 @@ trait IndexRequests extends Request {
 
   /* Streaming Index Queries */
 
-  def streamKeysForBinIndexByValue(bucket: String, idx: String, idxv: String, bucketType: Option[String] = None): Future[Enumerator[String]] =
+  def streamKeysForBinIndexByValue(bucket: String, idx: String, idxv: String, bucketType: Option[String] = None): Future[Source[String, Any]] =
     buildStreaming2iRequest(RiakMessageType.RpbIndexReq, RpbIndexReq(bucket, idx+"_bin", RpbIndexReq.IndexQueryType.valueOf(0), Some(idxv).map(x ⇒ x), None, None, None, Some(true), `type` = bucketType.map(x ⇒ x)))
 
-  def streamKeysForIntIndexByValue(bucket: String, idx: String, idxv: Int, bucketType: Option[String] = None): Future[Enumerator[String]] =
+  def streamKeysForIntIndexByValue(bucket: String, idx: String, idxv: Int, bucketType: Option[String] = None): Future[Source[String, Any]] =
     buildStreaming2iRequest(RiakMessageType.RpbIndexReq, RpbIndexReq(bucket, idx+"_int", RpbIndexReq.IndexQueryType.valueOf(0), Some(idxv).map(x ⇒ x.toString), None, None, None, Some(true), `type` = bucketType.map(x ⇒ x)))
 
-  def streamKeysForBinIndexByValueRange(bucket: String, idx: String, idxr: RaikuStringRange, regex: Option[String] = None, bucketType: Option[String] = None): Future[Enumerator[String]] =
+  def streamKeysForBinIndexByValueRange(bucket: String, idx: String, idxr: RaikuStringRange, regex: Option[String] = None, bucketType: Option[String] = None): Future[Source[String, Any]] =
     buildStreaming2iRequest(RiakMessageType.RpbIndexReq, RpbIndexReq(bucket, idx+"_bin", RpbIndexReq.IndexQueryType.valueOf(1), None, Some(idxr.start).map(x ⇒ x.toString), Some(idxr.end).map(x ⇒ x.toString), None, Some(true), `termRegex` = regex.map(x ⇒ x), `type` = bucketType.map(x ⇒ x)))
 
-  def streamKeysForIntIndexByValueRange(bucket: String, idx: String, idxr: Range, bucketType: Option[String] = None): Future[Enumerator[String]] =
+  def streamKeysForIntIndexByValueRange(bucket: String, idx: String, idxr: Range, bucketType: Option[String] = None): Future[Source[String, Any]] =
     buildStreaming2iRequest(RiakMessageType.RpbIndexReq, RpbIndexReq(bucket, idx+"_int", RpbIndexReq.IndexQueryType.valueOf(1), None, Some(idxr.start).map(x ⇒ x.toString), Some(idxr.end).map(x ⇒ x.toString), None, Some(true), `type` = bucketType.map(x ⇒ x)))
 
 }

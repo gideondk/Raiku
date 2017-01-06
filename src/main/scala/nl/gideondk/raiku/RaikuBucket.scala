@@ -1,16 +1,13 @@
 package nl.gideondk.raiku
 
+import akka.stream.scaladsl.Source
 import nl.gideondk.raiku.commands._
 import nl.gideondk.raiku.serialization._
 
 import scala.reflect.ClassTag
-
 import com.basho.riak.protobuf._
 
 import scala.concurrent._
-
-import play.api.libs.iteratee._
-import Enumerator._
 import spray.json.JsValue
 
 case class RaikuBucketProperties(nVal: Option[Int], allowMulti: Option[Boolean])
@@ -229,7 +226,7 @@ case class RaikuBucket[T](bucketName: String, bucketType: Option[String], client
    *  @param idxv the binary index value
    */
 
-  def streamKeysForBinIndexByValue(idxk: String, idxv: String): Future[Enumerator[String]] =
+  def streamKeysForBinIndexByValue(idxk: String, idxv: String): Future[Source[String, Any]] =
     client.streamKeysForBinIndexByValue(bucketName, idxk, idxv, bucketType = bucketType)
 
   /** Streams keys based on a binary index
@@ -238,7 +235,7 @@ case class RaikuBucket[T](bucketName: String, bucketType: Option[String], client
    *  @param idxv the binary index value
    */
 
-  def streamKeysForIntIndexByValue(idxk: String, idxv: Int): Future[Enumerator[String]] =
+  def streamKeysForIntIndexByValue(idxk: String, idxv: Int): Future[Source[String, Any]] =
     client.streamKeysForIntIndexByValue(bucketName, idxk, idxv, bucketType = bucketType)
 
   /** Streams keys based on a ranged integer index
@@ -247,7 +244,7 @@ case class RaikuBucket[T](bucketName: String, bucketType: Option[String], client
    *  @param idxv the ranged integer index value
    */
 
-  def streamKeysForIntIndexByValueRange(idxk: String, idxv: Range): Future[Enumerator[String]] =
+  def streamKeysForIntIndexByValueRange(idxk: String, idxv: Range): Future[Source[String, Any]] =
     client.streamKeysForIntIndexByValueRange(bucketName, idxk, idxv, bucketType = bucketType)
 
   /** Streams keys based on a ranged binary index
@@ -256,7 +253,7 @@ case class RaikuBucket[T](bucketName: String, bucketType: Option[String], client
    *  @param idxv the ranged binary index value
    */
 
-  def streamKeysForBinIndexByValueRange(idxk: String, idxv: RaikuStringRange): Future[Enumerator[String]] =
+  def streamKeysForBinIndexByValueRange(idxk: String, idxv: RaikuStringRange): Future[Source[String, Any]] =
     client.streamKeysForBinIndexByValueRange(bucketName, idxk, idxv, bucketType = bucketType)
 
   /** @see fetch
@@ -357,25 +354,25 @@ case class RaikuBucket[T](bucketName: String, bucketType: Option[String], client
   /** @see streamKeysForBinIndexByValue
    */
 
-  def streamIdx(idxk: String, idxv: String): Future[Enumerator[String]] =
+  def streamIdx(idxk: String, idxv: String): Future[Source[String, Any]] =
     streamKeysForBinIndexByValue(idxk, idxv)
 
   /** @see streamKeysForIntIndexByValue
    */
 
-  def streamIdx(idxk: String, idxv: Int): Future[Enumerator[String]] =
+  def streamIdx(idxk: String, idxv: Int): Future[Source[String, Any]] =
     streamKeysForIntIndexByValue(idxk, idxv)
 
   /** @see streamKeysForIntIndexByValueRange
    */
 
-  def streamIdx(idxk: String, idxv: Range): Future[Enumerator[String]] =
+  def streamIdx(idxk: String, idxv: Range): Future[Source[String, Any]] =
     streamKeysForIntIndexByValueRange(idxk, idxv)
 
   /** @see streamKeysForBinIndexByValueRange
    */
 
-  def streamIdx(idxk: String, idxv: RaikuStringRange): Future[Enumerator[String]] =
+  def streamIdx(idxk: String, idxv: RaikuStringRange): Future[Source[String, Any]] =
     streamKeysForBinIndexByValueRange(idxk, idxv)
 
   /** Created a new counter

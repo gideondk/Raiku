@@ -1,12 +1,8 @@
 package nl.gideondk.raiku.commands
 
-import nl.gideondk.raiku._
 import com.basho.riak.protobuf._
 
 import scala.concurrent.Future
-
-import play.api.libs.iteratee._
-import akka.util.ByteString
 
 trait CounterRequests extends Request {
   def getCount(bucket: String, key: String, bucketType: Option[String], r: Option[Int] = None, pr: Option[Int] = None,

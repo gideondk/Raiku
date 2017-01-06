@@ -1,10 +1,11 @@
 package nl.gideondk.raiku
 
+import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.Sink
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
 import scala.concurrent.duration._
-
-import play.api.libs.iteratee._
 
 class BucketAdvancedSpec extends RaikuSpec {
   import TestModels._
@@ -143,7 +144,10 @@ class BucketAdvancedSpec extends RaikuSpec {
   }
 
   "be able to stream index results" in {
-    val idxs = (bucket streamIdx ("age", 25)).flatMap(_ |>>> Iteratee.getChunks)
+    implicit val system = DB.system
+    implicit val mat = ActorMaterializer()
+
+    val idxs = (bucket streamIdx ("age", 25)).flatMap(_.runWith(Sink.seq))
     val normalQuery = bucket idx ("age", 25)
 
     idxs.futureValue.length should equal(normalQuery.futureValue.length)
